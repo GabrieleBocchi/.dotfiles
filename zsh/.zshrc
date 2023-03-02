@@ -76,6 +76,8 @@ source "$ZSH"/oh-my-zsh.sh
 source "$HOME"/repos/.dotfiles/zsh/aliases.zsh
 
 # User configuration
+setopt globdots
+zstyle ':completion:*' special-dirs false
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
