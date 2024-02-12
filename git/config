@@ -1,6 +1,10 @@
 [core]
     editor = nvim
 
+[gpg]
+    format = ssh
+    signingkey = ~/.ssh/id_rsa
+
 [user]
     email = 40704221+GabrieleBocchi@users.noreply.github.com
 	name = Gabriele Bocchi
