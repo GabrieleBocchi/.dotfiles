@@ -31,5 +31,5 @@
     command: ./utils/install_fonts
     description: Installing fonts
   - 
-    command: nvim --headless +MasonInstallAll +qa
-    description: Installing Mason plugins
+    command: ./utils/nvim_setup
+    description: Setup nvim

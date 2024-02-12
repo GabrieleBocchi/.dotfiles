@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+#Open nvim to install plugins
+nvim --headless +"qa"
+
+# Copilot auth
+nvim --headless +"Copilot auth" +"qa"
+
+# Mason install plugins
+nvim --headless +"MasonInstallAll" +"qa"
