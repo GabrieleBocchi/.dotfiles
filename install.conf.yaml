@@ -28,8 +28,8 @@
     description: Making ZSH the default shell
     stdin: true
   -
-    command: git submodule update --init --recursive
-    description: Installing submodules
-  -
     command: ./utils/install_fonts
     description: Installing fonts
+  - 
+    command: nvim --headless +MasonInstallAll +qa
+    description: Installing Mason plugins

@@ -29,6 +29,16 @@ local plugins = {
     ft = { "json" },
     config = true,
   },
+
+  {
+   "williamboman/mason.nvim",
+   opts = {
+      ensure_installed = {
+        "black",
+        "prettier",
+      },
+    },
+  }
 }
 
 return plugins
