@@ -4,4 +4,6 @@ set -e
 
 git submodule update --init --recursive
 
-./dotbot/tools/git-submodule/install
+ln -s ./dotbot/tools/git-submodule/install ./dotbot_install
+./dotbot_install
+rm ./dotbot_install
