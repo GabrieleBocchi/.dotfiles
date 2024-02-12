@@ -9,9 +9,8 @@
 
 - clean:
     ~/:
-      force: true
-    ~/.config:
-      force: true
+      recursive: false
+    ~/.config/:
       recursive: true
 
 - link:
