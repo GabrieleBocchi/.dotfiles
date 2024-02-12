@@ -10,3 +10,7 @@
 	path = tmux/.tmux
 	url = https://github.com/gpakosz/.tmux.git
 	ignore = dirty
+[submodule "neofetch/neofetch-themes"]
+	path = neofetch/neofetch-themes
+	url = https://github.com/Chick2D/neofetch-themes
+	ignore = dirty
