@@ -1,0 +1,20 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+      force: true
+
+- clean:
+    ~/:
+      force: true
+    ~/.config:
+      force: true
+      recursive: true
+
+- link:
+    ~/.config/nvim: nvim/NvChad
+    ~/.config/tmux/tmux.conf: tmux/.tmux/.tmux.conf
+
+- shell:
+  - [sudo chsh -s $(which zsh), Making ZSH the default shell]
+  - [git submodule update --init --recursive, Installing submodules]
