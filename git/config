@@ -1,3 +1,6 @@
+[core]
+    editor = nvim
+
 [user]
     email = 40704221+GabrieleBocchi@users.noreply.github.com
 	name = Gabriele Bocchi
