@@ -16,6 +16,8 @@
 
 - link:
     ~/.config/nvim: nvim/NvChad
+    ~/dotfiles/nvim/NvChad/lua/custom: nvim/custom
+
     ~/.config/tmux/tmux.conf: tmux/.tmux/.tmux.conf
 
 - create:
