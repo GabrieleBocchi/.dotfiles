@@ -2,6 +2,7 @@ local plugins = {
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
+    event = 'VeryLazy',
     opts = {
       panel = {
         enabled = true,
@@ -14,9 +15,6 @@ local plugins = {
         ["*"] = true,
       },
     },
-    config = function()
-      require("copilot").setup({})
-    end,
   },
 }
 
