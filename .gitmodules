@@ -2,9 +2,9 @@
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "nvim/NvChad"]
-	path = nvim/NvChad
-	url = https://github.com/NvChad/NvChad
+[submodule "nvim/renso.lazy"]
+	path = nvim/renso.lazy
+	url = https://github.com/ardubev16/renso.lazy
 	ignore = dirty
 [submodule "tmux/.tmux"]
 	path = tmux/.tmux

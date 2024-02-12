@@ -2,11 +2,11 @@
 
 set -e
 
-#Open nvim to install plugins
+# Delete old nvim config
+rm -rf ~/.local/share/nvim
+
+# Open nvim to install plugins
 nvim --headless +"qa"
 
 # Copilot auth
 nvim --headless +"Copilot auth" +"qa"
-
-# Mason install plugins
-nvim --headless +"MasonInstallAll" +"qa"

@@ -14,22 +14,17 @@
       recursive: true
 
 - link:
-    ~/.config/nvim: nvim/NvChad
-    ~/dotfiles/nvim/NvChad/lua/custom: nvim/custom
-
+    ~/.config/nvim: nvim/renso.lazy
     ~/.config/tmux/tmux.conf: tmux/.tmux/.tmux.conf
 
 - create:
-  - ~/.local/share/fonts/fonts/
+    - ~/.local/share/fonts/fonts/
 
 - shell:
-  -
-    command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s $(which zsh); fi
-    description: Making ZSH the default shell
-    stdin: true
-  -
-    command: ./utils/install_fonts
-    description: Installing fonts
-  - 
-    command: ./utils/nvim_setup
-    description: Setup nvim
+    - command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s $(which zsh); fi
+      description: Making ZSH the default shell
+      stdin: true
+    - command: ./utils/install_fonts
+      description: Installing fonts
+    - command: ./utils/nvim_setup
+      description: Setup nvim
