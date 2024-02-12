@@ -1,1 +1,7 @@
-dotbot/tools/git-submodule/install
+#!/usr/bin/env bash
+
+set -e
+
+git submodule update --init --recursive
+
+./dotbot/tools/git-submodule/install
