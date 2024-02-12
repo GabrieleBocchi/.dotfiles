@@ -16,6 +16,12 @@ local plugins = {
       },
     },
   },
+
+  {
+    "RaafatTurki/hex.nvim",
+    config = true,
+    lazy = false,
+  },
 }
 
 return plugins
