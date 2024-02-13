@@ -15,10 +15,11 @@
       recursive: true
 
 - link:
+    ~/.config/alacritty/alacritty.toml: alacritty/alacritty.toml
+    ~/.config/neofetch/config.conf: neofetch/neofetch-themes/normal/ozozPredatorFetch.conf
     ~/.config/nvim: nvim/renso.lazy
     ~/.config/tmux/tmux.conf: tmux/.tmux/.tmux.conf
     ~/.gitconfig: git/config
-    ~/.config/neofetch/config.conf: neofetch/neofetch-themes/normal/ozozPredatorFetch.conf
 
 - create:
     - ~/.local/share/fonts/fonts/
