@@ -27,7 +27,9 @@
 - shell:
     - command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s $(which zsh); fi
       description: Making ZSH the default shell
-    - command: ./utils/install_fonts
+    - command: ./utils/install_fonts.sh
       description: Installing fonts
-    - command: ./utils/nvim_setup
+    - command: ./utils/nvim_setup.sh
       description: Setup nvim
+    - command: ./utils/keyboard_setup.sh
+      description: Setup keyboard

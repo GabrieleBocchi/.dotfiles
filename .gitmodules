@@ -13,3 +13,6 @@
 [submodule "neofetch/neofetch-themes"]
 	path = neofetch/neofetch-themes
 	url = https://github.com/Chick2D/neofetch-themes
+[submodule "keyboard/keyd"]
+	path = keyboard/keyd
+	url = https://github.com/rvaiya/keyd
