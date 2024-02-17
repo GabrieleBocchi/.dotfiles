@@ -15,6 +15,8 @@
       recursive: true
 
 - link:
+    ~/.zshenv: zsh/.zshenv
+    ~/.zshrc: zsh/.zshrc
     ~/.config/alacritty/alacritty.toml: alacritty/alacritty.toml
     ~/.config/neofetch/config.conf: neofetch/neofetch-themes/normal/ozozPredatorFetch.conf
     ~/.config/nvim: nvim/renso.lazy
@@ -25,8 +27,10 @@
     - ~/.local/share/fonts/fonts/
 
 - shell:
-    - command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s $(which zsh); fi
+    - command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s "$(which zsh)"; fi
       description: Making ZSH the default shell
+    - command: if ! [ -d ~/.oh-my-zsh ]; then sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; fi
+      description: Install Oh My Zsh
     - command: ./utils/install_fonts.sh
       description: Installing fonts
     - command: ./utils/nvim_setup.sh
