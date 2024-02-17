@@ -35,5 +35,5 @@
       description: Installing fonts
     - command: ./utils/nvim_setup.sh
       description: Setup nvim
-    - command: sudo ln -s -f ~/dotfiles/keyboard/default.conf /etc/keyd/default.conf && sudo keyd reload
+    - command: sudo ln -s -f "$DOTFILES"/keyboard/default.conf /etc/keyd/default.conf && sudo keyd reload
       description: Setup keyboard

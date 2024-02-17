@@ -1,5 +1,5 @@
 # Directories
-export DOTFILES=$HOME/dotfiles
+export DOTFILES=$HOME/.dotfiles
 export REPOS=$HOME/repos
 
 # Editor
