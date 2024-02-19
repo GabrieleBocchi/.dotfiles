@@ -4,9 +4,9 @@
 [submodule "alacritty/alacritty-theme"]
 	path = alacritty/alacritty-theme
 	url = https://github.com/alacritty/alacritty-theme
-[submodule "nvim/renso.lazy"]
-	path = nvim/renso.lazy
-	url = https://github.com/ardubev16/renso.lazy
+[submodule "nvim/gab.lazy"]
+	path = nvim/gab.lazy
+	url = git@github.com:GabrieleBocchi/gab.lazy.git
 [submodule "tmux/.tmux"]
 	path = tmux/.tmux
 	url = https://github.com/gpakosz/.tmux.git
