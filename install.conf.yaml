@@ -30,7 +30,9 @@
     - command: if ! [ -n "$ZSH_VERSION" ]; then chsh -s "$(which zsh)"; fi
       description: Making ZSH the default shell
     - command: if ! [ -d ~/.oh-my-zsh ]; then sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; fi
-      description: Install Oh My Zsh
+      description: Installing Oh My Zsh
+    - command: ansible-playbook -K "$DOTFILES"/utils/install_packages.yaml
+      description: Installing packages
     - command: ./utils/install_fonts.sh
       description: Installing fonts
     - command: ./utils/nvim_setup.sh

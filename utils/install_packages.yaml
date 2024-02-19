@@ -1,0 +1,22 @@
+- name: Install packages
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    package_name:
+      - bat-cat
+      - ripgrep
+
+  tasks:
+    - name: Retrieve packages name
+      ansible.builtin.uri:
+        url: https://repology.org/api/v1/project/{{ item }}
+      loop: "{{ package_name }}"
+      register: packages
+
+    - name: Ensure packages are installed
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: latest
+      become: true
+      loop: "{{ packages | community.general.json_query('results[].json[?repo==`arch`].srcname') }}"
