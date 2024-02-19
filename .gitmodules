@@ -1,15 +1,15 @@
 [submodule "dotbot"]
 	path = dotbot
-	url = https://github.com/anishathalye/dotbot
+	url = git@github.com:anishathalye/dotbot.git
 [submodule "alacritty/alacritty-theme"]
 	path = alacritty/alacritty-theme
-	url = https://github.com/alacritty/alacritty-theme
+	url = git@github.com:alacritty/alacritty-theme.git
 [submodule "nvim/gab.lazy"]
 	path = nvim/gab.lazy
 	url = git@github.com:GabrieleBocchi/gab.lazy.git
 [submodule "tmux/.tmux"]
 	path = tmux/.tmux
-	url = https://github.com/gpakosz/.tmux.git
+	url = git@github.com:gpakosz/.tmux.git
 [submodule "neofetch/neofetch-themes"]
 	path = neofetch/neofetch-themes
-	url = https://github.com/Chick2D/neofetch-themes
+	url = git@github.com:Chick2D/neofetch-themes.git
