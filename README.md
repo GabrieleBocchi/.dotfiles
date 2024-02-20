@@ -14,8 +14,14 @@ This is my dotfiles collection.
 
 ## Requirements
 
-- [Ansible]: Used to automate installation of packages
-- [Git]: Used to clone submodules
+- Alacritty
+- Ansible: Used to automate installation of packages
+- Git: Used to clone submodules
+- Keyd: Used to manage keyboard configuration
+- Neofetch
+- Neovim
+- Tmux
+- Zsh
 
 ## Installation
 
