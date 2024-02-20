@@ -15,7 +15,7 @@ antigen bundle ssh-agent
 antigen theme robbyrussell
 
 # Load SSH identities
-zstyle :omz:plugins:ssh-agent identities ~/.ssh/$SSH_IDENTITIES
+zstyle :omz:plugins:ssh-agent identities $(echo $SSH_IDENTITIES)
 
 # Apply changes
 antigen apply
