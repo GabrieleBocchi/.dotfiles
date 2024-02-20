@@ -3,6 +3,7 @@ alias cat='bat'
 alias cdtemp='cd $(mktemp -d)'
 alias ez="exec zsh"
 alias gdb='gdb -q'
+alias grep='grep -i --color=auto'
 alias l='ls -lAh'
 alias mkdir='mkdir -pv'
 alias open='xdg-open'
