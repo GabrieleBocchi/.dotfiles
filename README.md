@@ -31,6 +31,12 @@ This is my dotfiles collection.
 
 ## Installation
 
+Clone this repository in your home directory:
+
+```sh
+git clone https://github.com/GabrieleBocchi/.dotfiles ~/.dotfiles
+```
+
 Execute the installation script:
 
 ```sh
