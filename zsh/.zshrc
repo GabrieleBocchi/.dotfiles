@@ -1,8 +1,5 @@
-# Oh My Zsh plugins
-plugins=(git)
-
 # Other sources
-source "$ZSH"/oh-my-zsh.sh
+source "$DOTFILES"/zsh/oh-my-zsh.zsh
 source "$DOTFILES"/zsh/aliases.zsh
 source "$DOTFILES"/zsh/functions.zsh
 

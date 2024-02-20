@@ -7,10 +7,6 @@ VIM="nvim"
 export EDITOR=$VIM
 export VISUAL=$VIM
 
-# Oh My Zsh
-export ZSH="$HOME/.oh-my-zsh"
-export ZSH_THEME="robbyrussell"
-
 # Rust
 . "$HOME/.cargo/env"
 
