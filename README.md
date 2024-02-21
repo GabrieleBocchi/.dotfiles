@@ -15,7 +15,6 @@ This is my dotfiles collection.
 ## Requirements
 
 - `Alacritty`
-- `Ansible`: Used to automate installation of packages
 - `Antigen`: Used to manage Zsh plugins
 - `Git`: Used to clone submodules
 - `Keyd`: Used to manage keyboard configuration
