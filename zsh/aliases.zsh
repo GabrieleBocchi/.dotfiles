@@ -5,7 +5,6 @@ alias ez="exec zsh"
 alias gdb='gdb -q'
 alias grep='grep -i --color=auto'
 alias l='ls -lAh'
-alias mkdir='mkdir -pv'
 alias open='xdg-open'
 alias sl='sl -ade5'
 alias tmx='tmux'
