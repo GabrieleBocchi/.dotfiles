@@ -25,7 +25,6 @@ This is my dotfiles collection.
 
 ## Environment variables
 
-- `OPENAI_API_KEY`: OpenAI API key
 - `SSH_IDENTITIES`: List of SSH identities
 
 ## Installation
