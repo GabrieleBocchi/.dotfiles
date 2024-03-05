@@ -1,3 +1,6 @@
+[includeIf "gitdir:~/repos/work/"]
+    path = ~/repos/work/.gitconfig
+
 [commit]
     gpgsign = true
 
