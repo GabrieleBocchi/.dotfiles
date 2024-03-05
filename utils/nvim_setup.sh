@@ -10,6 +10,3 @@ fi
 
 # Open nvim to install plugins
 nvim --headless +"qa"
-
-# Copilot auth
-nvim --headless +"Copilot auth" +"qa"
