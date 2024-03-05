@@ -1,5 +1,5 @@
 # Load Antigen
-source /usr/share/zsh/share/antigen.zsh
+source /usr/share/antigen.zsh
 
 # Load oh-my-zsh
 antigen use oh-my-zsh
