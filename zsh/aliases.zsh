@@ -1,4 +1,4 @@
-# better commands
+# Better commands
 alias cat='bat'
 alias cdtemp='cd $(mktemp -d)'
 alias ez="exec zsh"
@@ -10,7 +10,7 @@ alias sl='sl -ade5'
 alias tmx='tmux'
 alias tree='tree -a'
 
-# docker
+# Docker
 alias docker='sudo docker'
 if command -v podman &> /dev/null; then
     alias docker="podman"
@@ -21,22 +21,27 @@ alias copilot='gh copilot'
 alias gce='gh copilot explain'
 alias gcs='gh copilot suggest'
 
-# grep
+# Grep
 alias agrep="alias | grep"
 alias hgrep="history | grep"
 alias psgrep="ps aux | grep"
 
-# ipinfo.io
+# Ipinfo.io
 alias ipinfo='curl -s ipinfo.io | jq'
 
-# mount
+# Mount
 alias mountNas='sudo mount -t cifs -o rw,vers=3.0,credentials=$NASCREDSLOCATION $NASLOCATION /mnt/NAS'
 alias umountNas='sudo umount /mnt/NAS'
 
-# network
+# Network
 alias connect='nmcli connection up'
 alias disconnect='nmcli connection down'
 
-# python
+# Python
 alias venv='python3 -m venv env'
 alias activate='source env/bin/activate'
+
+# Import work aliases
+if [ -f ~/.aliases_work ]; then
+    . ~/.aliases_work
+fi
