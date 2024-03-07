@@ -1,6 +1,3 @@
-[includeIf "gitdir:~/repos/work/"]
-    path = ~/repos/work/.gitconfig
-
 [commit]
     gpgsign = true
 
@@ -14,3 +11,6 @@
     email = 40704221+GabrieleBocchi@users.noreply.github.com
     name = Gabriele Bocchi
     signingkey = ~/.ssh/id_rsa.pub
+
+[includeIf "gitdir:~/repos/work/"]
+    path = ~/repos/work/.gitconfig
