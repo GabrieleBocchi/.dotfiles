@@ -5,7 +5,7 @@ set -e
 FONT="JetBrainsMono"
 FONT_PATH="$FONT.tar.xz"
 
-if ! [ $(fc-match -a | grep -q $FONT) ]; then
+if ! $(fc-match -a | grep -q $FONT); then
 	curl -OL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$FONT_PATH
 	tar -xf ./$FONT_PATH -C ~/.local/share/fonts/fonts/
 	rm ./$FONT_PATH
