@@ -31,7 +31,7 @@
       description: Making ZSH the default shell
     - command: if ! [ -d ~/.oh-my-zsh ]; then sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"; fi
       description: Installing Oh My Zsh
-    - command: sudo bash -c "curl -L git.io/antigen > /usr/share/antigen.zsh"
+    - command: if ! [ -f /usr/share/antigen.zsh ]; then sudo bash -c "curl -L git.io/antigen > /usr/share/antigen.zsh"; fi
       description: Installing Antigen
     - command: ./utils/install_fonts.sh
       description: Installing fonts
