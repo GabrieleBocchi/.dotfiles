@@ -7,6 +7,9 @@
 [gpg]
     format = ssh
 
+[gpg.ssh]
+    allowedSignersFile = ~/.ssh/allowed_signers
+
 [user]
     email = 40704221+GabrieleBocchi@users.noreply.github.com
     name = Gabriele Bocchi
