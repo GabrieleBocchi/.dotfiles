@@ -2,6 +2,11 @@
 
 set -e
 
+# Pull the latest changes from the repository
+git pull --prune
+
+# Update the submodules
 git submodule update --init --recursive --remote
 
+# Run the installation script
 ./dotbot_install
