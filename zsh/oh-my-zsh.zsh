@@ -17,8 +17,5 @@ antigen theme robbyrussell
 # Load SSH identities
 zstyle :omz:plugins:ssh-agent identities $(echo $SSH_IDENTITIES)
 
-# Disable async git prompt (for now because it's broken)
-zstyle ':omz:alpha:lib:git' async-prompt no
-
 # Apply changes
 antigen apply
