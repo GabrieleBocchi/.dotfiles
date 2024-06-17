@@ -1,4 +1,6 @@
 - defaults:
+    clean:
+      force: true
     link:
       create: true
       relink: true
