@@ -1,3 +1,6 @@
+# Browser
+export BROWSER=google-chrome-stable
+
 # Directories
 export DOTFILES=$HOME/.dotfiles
 export REPOS=$HOME/repos

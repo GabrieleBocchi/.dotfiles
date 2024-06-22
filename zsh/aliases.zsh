@@ -3,6 +3,8 @@ alias cat='bat'
 alias cdtemp='cd $(mktemp -d)'
 alias ez="exec zsh"
 alias gdb='gdb -q'
+alias gist_ctf_create='gist -p -c'
+alias gist_ctf_update='gist -u'
 alias grep='grep -i --color=auto'
 alias l='ls -lAh'
 alias open='xdg-open'
