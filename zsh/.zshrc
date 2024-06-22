@@ -9,9 +9,10 @@ setopt globdots
 zstyle ':completion:*' special-dirs false
 
 # Remove duplicate entries from PATH:
+pathPrepend "$HOME"/bin
+pathPrepend "$HOME"/.ghcup/bin
 pathPrepend "$HOME"/.local/bin
 pathPrepend "$HOME"/.local/share/cargo/bin
-pathPrepend "$HOME"/.ghcup/bin
 pathPrepend /usr/local/texlive/2024/bin/x86_64-linux
 
 PATH=$(echo "$PATH" | awk -v RS=':' -v ORS=":" '!a[$1]++{if (NR > 1) printf ORS; printf $a[$1]}')
