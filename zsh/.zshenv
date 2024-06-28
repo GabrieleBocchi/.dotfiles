@@ -5,6 +5,11 @@ export BROWSER=google-chrome-stable
 export DOTFILES=$HOME/.dotfiles
 export REPOS=$HOME/repos
 
+# Docker
+if command -v podman &> /dev/null; then
+    export DOCKER_HOST=unix:///etc/systemd/system/sockets.target.wants/podman.socket
+fi
+
 # Editor
 VIM="nvim"
 export EDITOR=$VIM
