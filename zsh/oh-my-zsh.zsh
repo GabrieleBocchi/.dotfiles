@@ -19,3 +19,6 @@ zstyle :omz:plugins:ssh-agent identities $(echo $SSH_IDENTITIES)
 
 # Apply changes
 antigen apply
+
+# Load The Fuck plugin
+eval $(thefuck --alias)
