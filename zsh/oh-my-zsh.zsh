@@ -1,24 +1,17 @@
-# Load Antigen
-source /usr/share/antigen.zsh
+# Load Antidote
+zsh_plugins=$DOTFILES/zsh/.zsh_plugins
 
-# Load oh-my-zsh
-antigen use oh-my-zsh
+fpath=($DOTFILES/zsh/antidote/functions $fpath)
+autoload -Uz antidote
 
-# Load plugins
-antigen bundle git
-antigen bundle colored-man-pages
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle ssh-agent
+if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
+  antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
+fi
 
-# Load theme
-antigen theme robbyrussell
+source ${zsh_plugins}.zsh
 
 # Load SSH identities
 zstyle :omz:plugins:ssh-agent identities $(echo $SSH_IDENTITIES)
-
-# Apply changes
-antigen apply
 
 # Load The Fuck plugin
 eval $(thefuck --alias)

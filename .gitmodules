@@ -13,3 +13,6 @@
 [submodule "neofetch/neofetch-themes"]
 	path = neofetch/neofetch-themes
 	url = git@github.com:Chick2D/neofetch-themes.git
+[submodule "zsh/antidote"]
+	path = zsh/antidote
+	url = git@github.com:mattmc3/antidote.git

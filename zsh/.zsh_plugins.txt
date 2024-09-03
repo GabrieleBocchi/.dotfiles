@@ -1,0 +1,11 @@
+getantidote/use-omz
+
+ohmyzsh/ohmyzsh path:lib
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages
+ohmyzsh/ohmyzsh path:plugins/git
+ohmyzsh/ohmyzsh path:plugins/ssh-agent
+
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-autosuggestions
+
+ohmyzsh/ohmyzsh path:themes/robbyrussell.zsh-theme
