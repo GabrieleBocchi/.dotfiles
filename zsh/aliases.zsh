@@ -35,6 +35,11 @@ alias ipinfo='curl -s ipinfo.io | jq'
 alias mountNas='sudo mount -t cifs -o rw,vers=3.0,credentials=$NASCREDSLOCATION $NASLOCATION /mnt/NAS'
 alias umountNas='sudo umount /mnt/NAS'
 
+# Neofetch
+if command -v fastfetch &> /dev/null; then
+    alias neofetch='fastfetch'
+fi
+
 # Network
 alias connect='nmcli connection up'
 alias disconnect='nmcli connection down'

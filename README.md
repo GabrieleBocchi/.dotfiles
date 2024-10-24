@@ -17,7 +17,6 @@ This is my dotfiles collection.
 - `Alacritty`
 - `Git`: Used to clone submodules
 - `Keyd`: Used to manage keyboard configuration
-- `Neofetch`
 - `Neovim`
 - `Tmux`
 - `Zsh`

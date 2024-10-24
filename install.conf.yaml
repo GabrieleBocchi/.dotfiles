@@ -20,7 +20,6 @@
     ~/.zshenv: zsh/.zshenv
     ~/.zshrc: zsh/.zshrc
     ~/.config/alacritty/alacritty.toml: alacritty/alacritty.toml
-    ~/.config/neofetch/config.conf: neofetch/neofetch-themes/normal/ozozPredatorFetch.conf
     ~/.config/nvim: nvim/gab.lazy
     ~/.config/tmux/tmux.conf: tmux/.tmux/.tmux.conf
     ~/.gitconfig: git/config
