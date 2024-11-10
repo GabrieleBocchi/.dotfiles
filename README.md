@@ -36,5 +36,5 @@ git clone https://github.com/GabrieleBocchi/.dotfiles ~/.dotfiles
 Execute the installation script:
 
 ```sh
-./install.sh
+./install
 ```
