@@ -48,6 +48,12 @@ alias disconnect='nmcli connection down'
 alias venv='python3 -m venv env'
 alias activate='source env/bin/activate'
 
+# Updates
+alias updatePackages='sudo dnf upgrade --refresh -y'
+alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
+alias updatePip='(pip install --upgrade pip && pip --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print(\"\n\".join([x[\"name\"] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U) || true'
+alias updateAll='updatePackages && updateNvim && updatePip && antidote update'
+
 # Import work aliases
 if [ -f ~/.aliases_work ]; then
     . ~/.aliases_work
