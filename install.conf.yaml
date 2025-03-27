@@ -32,7 +32,5 @@
       description: Making ZSH the default shell
     - command: ./utils/install_fonts.sh
       description: Installing fonts
-    - command: ./utils/nvim_setup.sh
-      description: Setup nvim
     - command: sudo ln -s -f "$DOTFILES"/keyboard/default.conf /etc/keyd/default.conf && sudo keyd reload
       description: Setup keyboard
