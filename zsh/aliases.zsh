@@ -46,7 +46,7 @@ alias disconnect='nmcli connection down'
 
 # Python
 alias venv='python3 -m venv env'
-alias activate='source env/bin/activate'
+alias activate='source */bin/activate'
 
 # Updates
 alias updatePackages='sudo dnf upgrade --refresh -y'
