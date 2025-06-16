@@ -31,28 +31,22 @@ alias psgrep="ps aux | grep"
 # Ipinfo.io
 alias ipinfo='curl -s ipinfo.io | jq'
 
-# Mount
-alias mountNas='sudo mount -t cifs -o rw,vers=3.0,credentials=$NASCREDSLOCATION $NASLOCATION /mnt/NAS'
-alias umountNas='sudo umount /mnt/NAS'
-
 # Neofetch
 if command -v fastfetch &> /dev/null; then
     alias neofetch='fastfetch'
 fi
-
-# Network
-alias connect='nmcli connection up'
-alias disconnect='nmcli connection down'
 
 # Python
 alias venv='python3 -m venv env'
 alias activate='source */bin/activate'
 
 # Updates
-alias updatePackages='sudo dnf upgrade --refresh -y'
+alias updateDotfiles='cd $DOTFILES && ./install && -'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
-alias updatePip='(pip install --upgrade pip && pip --disable-pip-version-check list --outdated --format=json | python -c "import json, sys; print(\"\n\".join([x[\"name\"] for x in json.load(sys.stdin)]))" | xargs -n1 pip install -U) || true'
-alias updateAll='updatePackages && updateNvim && updatePip && antidote update'
+alias updatePackages='sudo dnf upgrade --refresh -y'
+# The '|| true' is a temporary workaround until pyenv fixes https://github.com/pyenv/pyenv-update/issues/27
+alias updatePython='(pyenv update || true) && pip-review --auto'
+alias updateAll='updatePackages && updateNvim && updatePython && antidote update && updateDotfiles'
 
 # Import work aliases
 if [ -f ~/.aliases_work ]; then
