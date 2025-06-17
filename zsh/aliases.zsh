@@ -44,8 +44,7 @@ alias activate='source */bin/activate'
 alias updateDotfiles='cd $DOTFILES && ./install && -'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
 alias updatePackages='sudo dnf upgrade --refresh -y'
-# The '|| true' is a temporary workaround until pyenv fixes https://github.com/pyenv/pyenv-update/issues/27
-alias updatePython='(pyenv update || true) && pip-review --auto'
+alias updatePython='pyenv update && pip-review --auto'
 alias updateAll='updatePackages && updateNvim && updatePython && antidote update && updateDotfiles'
 
 # Import work aliases
