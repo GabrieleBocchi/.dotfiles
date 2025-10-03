@@ -18,11 +18,6 @@ if command -v podman &> /dev/null; then
     alias docker="podman"
 fi
 
-# GitHub CLI
-alias copilot='gh copilot'
-alias gce='gh copilot explain'
-alias gcs='gh copilot suggest'
-
 # Grep
 alias agrep="alias | grep"
 alias hgrep="history | grep"
