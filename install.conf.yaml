@@ -17,6 +17,7 @@
       recursive: true
 
 - link:
+    /etc/keyd/default.conf: keyboard/default.conf
     ~/.zshenv: zsh/.zshenv
     ~/.zshrc: zsh/.zshrc
     ~/.config/alacritty/alacritty.toml: alacritty/alacritty.toml
@@ -32,5 +33,5 @@
       description: Making ZSH the default shell
     - command: ./utils/install_fonts.sh
       description: Installing fonts
-    - command: sudo ln -s -f "$DOTFILES"/keyboard/default.conf /etc/keyd/default.conf && sudo keyd reload
+    - command: sudo systemctl start keyd && sudo keyd reload
       description: Setup keyboard
