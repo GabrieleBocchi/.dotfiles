@@ -1,5 +1,6 @@
-# Load SSH identities
-zstyle :omz:plugins:ssh-agent identities $(echo $SSH_IDENTITIES)
+# Load identities
+zstyle :omz:plugins:keychain agents gpg,ssh
+zstyle :omz:plugins:keychain identities $(echo $IDENTITIES)
 
 # Load Antidote
 zsh_plugins=$DOTFILES/zsh/.zsh_plugins

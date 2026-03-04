@@ -5,7 +5,8 @@
     editor = nvim
 
 [gpg]
-    format = ssh
+    format = openpgp
+    program = gpg
 
 [gpg.ssh]
     allowedSignersFile = ~/.ssh/allowed_signers
@@ -13,7 +14,7 @@
 [user]
     email = 40704221+GabrieleBocchi@users.noreply.github.com
     name = Gabriele Bocchi
-    signingkey = ~/.ssh/id_rsa.pub
+    signingkey = 9307A90CFA7458CB
 
 [includeIf "gitdir:~/repos/work/"]
     path = ~/repos/work/.gitconfig
