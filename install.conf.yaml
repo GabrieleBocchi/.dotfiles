@@ -33,5 +33,5 @@
       description: Making ZSH the default shell
     - command: ./utils/install_fonts.sh
       description: Installing fonts
-    - command: sudo systemctl start keyd && sudo keyd reload
+    - command: sudo systemctl restart keyd
       description: Setup keyboard
