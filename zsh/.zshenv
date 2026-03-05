@@ -7,7 +7,7 @@ export REPOS=$HOME/repos
 
 # Docker
 if command -v podman &> /dev/null; then
-    export DOCKER_HOST=unix:///etc/systemd/system/sockets.target.wants/podman.socket
+    export DOCKER_HOST=unix://$XDG_RUNTIME_DIR/podman/podman.sock
 fi
 
 # Editor
