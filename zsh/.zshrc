@@ -13,7 +13,7 @@ pathPrepend "$HOME"/bin
 pathPrepend "$HOME"/.ghcup/bin
 pathPrepend "$HOME"/.local/bin
 pathPrepend "$HOME"/.local/share/cargo/bin
-pathPrepend /usr/local/texlive/2024/bin/x86_64-linux
+pathPrepend "$HOME"/.opencode/bin
 [[ -d $HOME/.pyenv/bin ]] && export PATH="$HOME/.pyenv/bin:$PATH"
 
 PATH=$(echo "$PATH" | awk -v RS=':' -v ORS=":" '!a[$1]++{if (NR > 1) printf ORS; printf $a[$1]}')
