@@ -12,7 +12,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^home/\\.chezmoiexternal\\.toml$"],
+      "managerFilePatterns": ["^home/\\.chezmoiexternal\\.toml$"],
       "matchStrings": [
         "url\\s*=\\s*\"https://github\\.com/(?<depName>[^/]+/[^/]+)/archive/refs/tags/(?<currentValue>v[0-9][^/\"]+)\\.tar\\.gz\"",
         "url\\s*=\\s*\"https://github\\.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>v[0-9][^/\"]+)/[^\"]+\""
@@ -21,7 +21,7 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ["^\\.chezmoiversion$"],
+      "managerFilePatterns": ["^\\.chezmoiversion$"],
       "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*$"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "twpayne/chezmoi",
