@@ -22,7 +22,7 @@
     {
       "customType": "regex",
       "fileMatch": ["^\\.chezmoiversion$"],
-      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)$"],
+      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*$"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "twpayne/chezmoi",
       "extractVersionTemplate": "^v(?<version>.+)$"
