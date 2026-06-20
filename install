@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-# Pull the latest changes from the repository
-git pull --prune
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Run the installation script
-./dotbot_install
+TARGET_VERSION="$(cat "$DOTFILES_DIR/.chezmoiversion")"
 
-# Update the submodules
-git submodule update --init --remote
+# Get installed chezmoi version (if any)
+current_version() {
+    chezmoi --version 2>/dev/null | awk '{print $3}' | tr -d 'v,'
+}
+
+if ! chezmoi_version="$(current_version)" || [ "$chezmoi_version" != "$TARGET_VERSION" ]; then
+    echo "Installing chezmoi ${TARGET_VERSION}..."
+    mkdir -p "$HOME/.local/bin"
+    archive_url="https://github.com/twpayne/chezmoi/releases/download/v${TARGET_VERSION}/chezmoi_${TARGET_VERSION}_linux_amd64.tar.gz"
+    if ! curl -fsSL "$archive_url" | tar -xz -C "$HOME/.local/bin" chezmoi 2>&1; then
+        echo "ERROR: Failed to install chezmoi ${TARGET_VERSION}" >&2
+        exit 1
+    fi
+    chmod +x "$HOME/.local/bin/chezmoi"
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+chezmoi init --source "$DOTFILES_DIR" --apply

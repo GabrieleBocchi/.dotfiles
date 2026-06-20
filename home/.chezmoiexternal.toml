@@ -1,0 +1,36 @@
+# git-repo and file types track main. Archive URLs are pinned by tag or SHA.
+
+# ---- Alacritty themes ----------------------------------------
+[".config/alacritty/themes"]
+type = "archive"
+url = "https://github.com/alacritty/alacritty-theme/archive/master.tar.gz"
+exact = true
+stripComponents = 2
+include = ["*/themes/*.toml"]
+refreshPeriod = "24h"
+
+# ---- Neovim config -------------------------------------------
+[".config/nvim"]
+type = "git-repo"
+url = "https://github.com/GabrieleBocchi/gab.lazy.git"
+clone.args = ["--depth", "1"]
+pull.args = ["--rebase", "--autostash"]
+
+# ---- Tmux base config ----------------------------------------
+[".config/tmux/tmux.conf"]
+type = "file"
+url = "https://raw.githubusercontent.com/gpakosz/.tmux/master/.tmux.conf"
+refreshPeriod = "24h"
+
+# ---- Antidote ------------------------------------------------
+[".local/share/antidote"]
+type = "archive"
+url = "https://github.com/mattmc3/antidote/archive/refs/tags/v2.0.12.tar.gz"
+stripComponents = 1
+
+# ---- JetBrainsMono Nerd Font ---------------------------------
+[".local/share/fonts/JetBrainsMono"]
+type = "archive"
+url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/JetBrainsMono.tar.xz"
+exact = true
+include = ["*.ttf"]

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "{{ dir .chezmoi.sourceDir }}/scripts/install-pkg.sh"
+
+# .chezmoiexternal.toml hash: {{ include ".chezmoiexternal.toml" | sha256sum }}
+if ! command -v fc-cache &>/dev/null; then
+    echo "Installing fontconfig..."
+    install_pkg fontconfig
+fi
+
+fc-cache -f

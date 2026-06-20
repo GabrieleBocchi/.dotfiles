@@ -1,0 +1,5 @@
+# Files inside home/ that should NOT be deployed by chezmoi.
+# They are tracked in git but deployed manually by scripts.
+
+# keyboard/default.conf — deployed to /etc/keyd/ by the keyd setup script
+keyboard/

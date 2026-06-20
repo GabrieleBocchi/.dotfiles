@@ -1,5 +1,5 @@
 [general]
-import = ["~/.dotfiles/alacritty/alacritty-theme/themes/breeze.toml"]
+import = ["themes/breeze.toml"]
 
 [window]
 startup_mode = "Maximized"

@@ -36,7 +36,7 @@ alias venv='python3 -m venv env'
 alias activate='source */bin/activate'
 
 # Updates
-alias updateDotfiles='cd $DOTFILES && ./install && -'
+alias updateDotfiles='git -C "$DOTFILES" pull --prune && $DOTFILES/install'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
 alias updatePackages='sudo dnf upgrade --refresh -y'
 alias updatePython='pyenv update && pip-review --auto'

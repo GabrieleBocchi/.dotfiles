@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+src="{{ .chezmoi.sourceDir }}/keyboard/default.conf"
+
+if ! command -v keyd &>/dev/null; then
+    echo "Installing keyd from source..."
+    build_dir=$(mktemp -d)
+    git clone --depth 1 https://github.com/rvaiya/keyd "$build_dir"
+    make -C "$build_dir"
+    sudo make -C "$build_dir" install
+    rm -rf "$build_dir"
+fi
+
+if [[ ! -f /etc/keyd/default.conf ]] || ! diff -q "$src" /etc/keyd/default.conf &>/dev/null; then
+    sudo mkdir -p /etc/keyd
+    sudo cp "$src" /etc/keyd/default.conf
+    sudo systemctl restart keyd
+fi

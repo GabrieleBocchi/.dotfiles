@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source "{{ dir .chezmoi.sourceDir }}/scripts/install-pkg.sh"
+
+zsh_path="$(command -v zsh || true)"
+if [[ -z "$zsh_path" ]]; then
+    echo "Installing zsh..."
+    install_pkg zsh
+    zsh_path="$(command -v zsh)"
+fi
+
+if [[ "$SHELL" != "$zsh_path" ]]; then
+    sudo chsh -s "$zsh_path" "$(whoami)"
+fi
