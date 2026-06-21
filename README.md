@@ -11,15 +11,6 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
 - `Zsh`: Shell (antidote plugin manager)
 
-## Requirements
-
-- `chezmoi`
-- `git`
-- `zsh`
-- `keyd`
-- `neovim`
-- `tmux`
-
 ## Installation
 
 Clone this repository and run the installer:
@@ -44,6 +35,11 @@ Or use the `updateDotfiles` alias.
 ## Environment variables
 
 - `IDENTITIES`: Space-separated list of SSH/GPG key identities for keychain
+
+## Dependency management
+
+System packages and toolchain dependencies are declared in
+`home/.chezmoidata/` and installed automatically.
 
 ## External dependencies (version-pinned)
 

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
+
+{{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
+{{ $osID := .chezmoi.osRelease.id -}}
+
+echo "▸ System dependencies [{{ $osID }}]"
+
+# ──────────────────────────────────────────────────────────────────
+# Common packages (same name on all package managers)
+# ──────────────────────────────────────────────────────────────────
+install_pkgs {{ range $system.common }}{{ . }} {{ end }}
+
+# ──────────────────────────────────────────────────────────────────
+# OS-specific repositories + packages
+# ──────────────────────────────────────────────────────────────────
+{{ if eq $osID "fedora" -}}
+{{ range $system.fedora.copr -}}
+enable_copr {{ . }}
+{{ end }}
+install_pkgs {{ range $system.fedora.dnf }}{{ . }} {{ end }}
+
+{{ else if eq $osID "ubuntu" -}}
+install_pkgs {{ range $system.ubuntu.apt }}{{ . }} {{ end }}
+
+{{ else if eq $osID "alpine" -}}
+install_pkgs {{ range $system.alpine.apk }}{{ . }} {{ end }}
+
+{{ else -}}
+echo "WARNING: unsupported distribution {{ $osID }}, skipping OS-specific packages"
+{{ end }}
+echo "✓ System dependencies"
+
+# ──────────────────────────────────────────────────────────────────
+# npm global packages
+# ──────────────────────────────────────────────────────────────────
+{{ $npm := (fromYaml (include ".chezmoidata/npm.yaml")).packages -}}
+
+echo "▸ npm packages"
+{{ range $npm -}}
+sudo npm install -g {{ . }}
+{{ end -}}
+echo "✓ npm packages"
+
+{{ $cargo := (fromYaml (include ".chezmoidata/cargo.yaml")).packages -}}
+. "$HOME/.cargo/env"
+
+echo "▸ cargo packages"
+{{ range $cargo -}}
+cargo install {{ . }}
+{{ end -}}
+echo "✓ cargo packages"

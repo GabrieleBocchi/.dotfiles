@@ -1,0 +1,26 @@
+# Common packages available on all supported OS
+common:
+  - alacritty
+  - fontconfig
+  - gcc
+  - git
+  - make
+  - neovim
+  - npm
+  - tar
+  - tmux
+  - zsh
+
+fedora:
+  copr:
+    - atim/lazygit
+  dnf:
+    - lazygit
+
+ubuntu:
+  apt:
+    - lazygit
+
+alpine:
+  apk:
+    - shadow
