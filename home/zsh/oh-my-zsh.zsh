@@ -4,7 +4,7 @@ zstyle :omz:plugins:keychain identities $(echo $IDENTITIES)
 zstyle :omz:plugins:keychain options '--quiet'
 
 # Load Antidote
-zsh_plugins=$DOTFILES/zsh/.zsh_plugins
+zsh_plugins=$DOTFILES/home/zsh/.zsh_plugins
 
 fpath=($HOME/.local/share/antidote/functions $fpath)
 autoload -Uz antidote

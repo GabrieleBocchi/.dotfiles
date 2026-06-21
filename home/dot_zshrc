@@ -1,6 +1,6 @@
 # Other sources
-source "$DOTFILES"/zsh/oh-my-zsh.zsh
-source "$DOTFILES"/zsh/aliases.zsh
+source "$DOTFILES"/home/zsh/oh-my-zsh.zsh
+source "$DOTFILES"/home/zsh/aliases.zsh
 
 # Opts
 setopt extendedglob
@@ -8,4 +8,4 @@ setopt globdots
 zstyle ':completion:*' special-dirs false
 
 # Tool inits (PATH, pyenv, bun, etc.) — alphabetical order
-for f in $DOTFILES/zsh/init/*.zsh(N); do source "$f"; done
+for f in $DOTFILES/home/zsh/init/*.zsh(N); do source "$f"; done
