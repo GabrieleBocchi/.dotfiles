@@ -16,14 +16,15 @@ jobs:
     name: ${{ matrix.distro.name }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         distro:
-          - image: alpine:latest
-            name: alpine
           - image: fedora:latest
             name: fedora
           - image: ubuntu:latest
             name: ubuntu
+          - image: alpine:latest
+            name: alpine
     container:
       image: ${{ matrix.distro.image }}
 
@@ -31,6 +32,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
+      - name: Create test user
+        run: |
+          if [ "${{ matrix.distro.name }}" = "fedora" ]; then
+            useradd -m testuser
+            dnf install -y util-linux
+          elif [ "${{ matrix.distro.name }}" = "ubuntu" ]; then
+            useradd -m testuser
+          elif [ "${{ matrix.distro.name }}" = "alpine" ]; then
+            adduser -D testuser
+          fi
+
       - name: Test configuration
         run: |
+          su testuser
+          cp -r . ~/${{ github.event.repository.name }}
+          cd ~/${{ github.event.repository.name }}
           ./install
