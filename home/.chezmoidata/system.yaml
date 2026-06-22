@@ -1,6 +1,7 @@
 # Common packages available on all supported OS
 common:
   - alacritty
+  - bat
   - fontconfig
   - gcc
   - git
@@ -16,11 +17,14 @@ fedora:
     - atim/lazygit
   dnf:
     - lazygit
+    - vim-enhanced
 
 ubuntu:
   apt:
     - lazygit
+    - vim
 
 alpine:
   apk:
     - shadow
+    - vimdiff
