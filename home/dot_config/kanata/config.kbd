@@ -1,0 +1,14 @@
+;; Kanata keyboard configuration
+
+(defcfg
+  process-unmapped-keys yes)
+
+(defsrc
+  caps)
+
+(defalias
+  ;; Tap for escape, hold for left control
+  cap (tap-hold 200 200 esc lctl))
+
+(deflayer base
+  @cap)

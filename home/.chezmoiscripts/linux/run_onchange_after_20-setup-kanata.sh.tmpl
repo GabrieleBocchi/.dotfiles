@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Checksum to let run_onchange detect config changes
+# sha256: {{ sha256sum (include "dot_config/kanata/config.kbd") }}
+
+if [ ! -d /run/systemd/system ]; then
+    echo "− Skipping kanata setup (no systemd)"
+    exit 0
+fi
+
+echo "▸ Setting up kanata"
+
+# ── uinput group ──────────────────────────────────────────────────────
+if ! getent group uinput &>/dev/null; then
+    sudo groupadd --system uinput
+fi
+
+# ── Add user to input + uinput groups ─────────────────────────────────
+needs_relogin=false
+
+if ! id -nG "$USER" | grep -qw input; then
+    sudo usermod -aG input "$USER"
+    needs_relogin=true
+fi
+
+if ! id -nG "$USER" | grep -qw uinput; then
+    sudo usermod -aG uinput "$USER"
+    needs_relogin=true
+fi
+
+# ── udev rule ─────────────────────────────────────────────────────────
+udev_rule='/etc/udev/rules.d/99-input.rules'
+desired='KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"'
+
+if [[ ! -f "$udev_rule" ]] || ! grep -qF "$desired" "$udev_rule"; then
+    echo "$desired" | sudo tee "$udev_rule" > /dev/null
+    sudo udevadm control --reload-rules && sudo udevadm trigger
+fi
+
+# ── Load uinput module (persistent) ───────────────────────────────────
+if [[ ! -f /etc/modules-load.d/uinput.conf ]]; then
+    echo "uinput" | sudo tee /etc/modules-load.d/uinput.conf > /dev/null
+fi
+sudo modprobe uinput 2>/dev/null || true
+
+# ── Systemd user service ──────────────────────────────────────────────
+systemctl --user daemon-reload
+systemctl --user enable kanata.service
+systemctl --user restart kanata.service
+
+if [[ "$needs_relogin" == true ]]; then
+    echo "⚠ Added to input/uinput groups — re-login required for kanata to access /dev/input"
+fi
+
+echo "✓ Kanata"
