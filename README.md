@@ -6,7 +6,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 
 - `Alacritty`: Terminal emulator
 - `Git`: Version control system
-- `Keyboard`: Keyboard personalisation (keyd)
+- `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
 - `Zsh`: Shell (antidote plugin manager)

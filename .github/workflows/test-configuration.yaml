@@ -3,7 +3,7 @@ name: Test configuration
 on:
   push:
     branches:
-      - "**"
+      - "main"
   pull_request:
     branches:
       - "**"
