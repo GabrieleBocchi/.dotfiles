@@ -26,5 +26,6 @@ ubuntu:
 
 alpine:
   apk:
+    - musl-dev
     - shadow
     - vimdiff
