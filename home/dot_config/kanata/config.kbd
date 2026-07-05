@@ -8,7 +8,7 @@
 
 (defalias
   ;; Tap for escape, hold for left control
-  cap (tap-hold 200 200 esc lctl))
+  cap (tap-hold-press 200 200 esc lctl))
 
 (deflayer base
   @cap)
