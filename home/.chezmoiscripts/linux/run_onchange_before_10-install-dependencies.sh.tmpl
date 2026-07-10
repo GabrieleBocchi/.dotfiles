@@ -9,18 +9,14 @@ set -euo pipefail
 
 echo "▸ System dependencies [{{ $osID }}]"
 
-# ──────────────────────────────────────────────────────────────────
-# Common packages (same name on all package managers)
-# ──────────────────────────────────────────────────────────────────
+# ── Common packages ─────────────────────────────────────────────────
 install_pkgs {{ range $system.common }}{{ . }} {{ end }}
 
-# ──────────────────────────────────────────────────────────────────
-# OS-specific repositories + packages
-# ──────────────────────────────────────────────────────────────────
+# ── OS-specific repositories + packages ─────────────────────────────
 {{ if eq $osID "fedora" -}}
 {{ range $system.fedora.copr -}}
 enable_copr {{ . }}
-{{ end }}
+{{ end -}}
 install_pkgs {{ range $system.fedora.dnf }}{{ . }} {{ end }}
 
 {{ else if eq $osID "ubuntu" -}}
@@ -34,9 +30,7 @@ echo "WARNING: unsupported distribution {{ $osID }}, skipping OS-specific packag
 {{ end }}
 echo "✓ System dependencies"
 
-# ──────────────────────────────────────────────────────────────────
-# npm global packages
-# ──────────────────────────────────────────────────────────────────
+# ── npm global packages ──────────────────────────────────────────────
 {{ $npm := (fromYaml (include ".chezmoidata/npm.yaml")).packages -}}
 
 echo "▸ npm packages"
@@ -45,6 +39,7 @@ sudo npm install -g {{ . }}
 {{ end -}}
 echo "✓ npm packages"
 
+# ── cargo packages ────────────────────────────────────────────────────
 {{ $cargo := (fromYaml (include ".chezmoidata/cargo.yaml")).packages -}}
 . "$HOME/.cargo/env"
 

@@ -2,6 +2,7 @@
 common:
   - alacritty
   - bat
+  - fastfetch
   - fontconfig
   - gcc
   - git
@@ -13,10 +14,8 @@ common:
   - zsh
 
 fedora:
-  copr:
-    - atim/lazygit
+  copr: []
   dnf:
-    - lazygit
     - vim-enhanced
 
 ubuntu:
