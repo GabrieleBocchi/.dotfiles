@@ -6,11 +6,6 @@ set -euo pipefail
 
 {{ $osID := .chezmoi.osRelease.id -}}
 
-{{ if not (has $osID .supportedDistros) -}}
-echo "WARNING: unsupported distribution {{ $osID }}, skipping"
-exit 0
-{{ end -}}
-
 {{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
 
 echo "▸ System dependencies [{{ $osID }}]"
@@ -48,8 +43,9 @@ echo "✓ npm packages"
 
 echo "▸ cargo packages"
 
-{{ range $cargoPkgs -}}
 . "$HOME/.cargo/env"
+
+{{ range $cargoPkgs -}}
 cargo install {{ . }}
 {{ end -}}
 
