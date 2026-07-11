@@ -1,3 +1,13 @@
-packages:
-  - "@j178/prek"
-  - opencode-ai
+common:
+  packages:
+    - "@j178/prek"
+    - opencode-ai
+
+fedora:
+  packages: []
+
+ubuntu:
+  packages: []
+
+alpine:
+  packages: []

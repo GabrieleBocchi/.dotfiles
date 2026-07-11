@@ -1,14 +1,5 @@
 # git-repo and file types track main. Archive URLs are pinned by tag or SHA.
 
-# ---- Alacritty themes ----------------------------------------
-[".config/alacritty/themes"]
-type = "archive"
-url = "https://github.com/alacritty/alacritty-theme/archive/master.tar.gz"
-exact = true
-stripComponents = 2
-include = ["*/themes/*.toml"]
-refreshPeriod = "24h"
-
 # ---- Neovim config -------------------------------------------
 [".config/nvim"]
 type = "git-repo"
@@ -28,9 +19,20 @@ type = "archive"
 url = "https://github.com/mattmc3/antidote/archive/refs/tags/v2.1.0.tar.gz"
 stripComponents = 1
 
+{{ if .hasGUI -}}
+# ---- Alacritty themes ----------------------------------------
+[".config/alacritty/themes"]
+type = "archive"
+url = "https://github.com/alacritty/alacritty-theme/archive/master.tar.gz"
+exact = true
+stripComponents = 2
+include = ["*/themes/*.toml"]
+refreshPeriod = "24h"
+
 # ---- JetBrainsMono Nerd Font ---------------------------------
 [".local/share/fonts/JetBrainsMono"]
 type = "archive"
 url = "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.tar.xz"
 exact = true
 include = ["*.ttf"]
+{{ end -}}

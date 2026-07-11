@@ -3,3 +3,10 @@
 
 # zsh/ — sourced directly by .zshrc via $DOTFILES/home/zsh/
 zsh/
+
+# GUI/desktop tools not available on headless machines
+{{- if not .hasGUI }}
+.config/alacritty
+.config/kanata
+.config/systemd
+{{- end }}

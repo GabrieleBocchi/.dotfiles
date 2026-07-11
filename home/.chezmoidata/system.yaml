@@ -1,9 +1,6 @@
-# Common packages available on all supported OS
 common:
-  - alacritty
   - bat
   - fastfetch
-  - fontconfig
   - gcc
   - git
   - make
@@ -15,16 +12,20 @@ common:
 
 fedora:
   copr: []
-  dnf:
+  packages:
+    - alacritty
+    - fontconfig
     - vim-enhanced
 
 ubuntu:
-  apt:
+  packages:
+    - alacritty
+    - fontconfig
     - lazygit
     - vim
 
 alpine:
-  apk:
+  packages:
     - musl-dev
     - shadow
     - vimdiff
