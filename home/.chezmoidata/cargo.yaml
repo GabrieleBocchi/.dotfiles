@@ -1,2 +1,13 @@
-packages:
-  - kanata
+common:
+  packages: []
+
+fedora:
+  packages:
+    - kanata
+
+ubuntu:
+  packages:
+    - kanata
+
+alpine:
+  packages: []

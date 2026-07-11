@@ -1,1 +1,7 @@
 sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
+
+{{- $osID := .chezmoi.osRelease.id }}
+
+[data]
+  hasGUI           = {{ ne $osID "alpine" }}
+  supportedDistros = ["fedora", "ubuntu", "alpine"]
