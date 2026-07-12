@@ -1,7 +1,7 @@
 common:
   packages:
-    - "@j178/prek"
-    - opencode-ai
+    - "@j178/prek@0.4.8"
+    - opencode-ai@1.17.17
 
 fedora:
   packages: []
