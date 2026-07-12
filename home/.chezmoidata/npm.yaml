@@ -1,13 +1,6 @@
-common:
+npm:
   packages:
-    - "@j178/prek@0.4.8"
-    - opencode-ai@1.17.17
-
-fedora:
-  packages: []
-
-ubuntu:
-  packages: []
-
-alpine:
-  packages: []
+    base:
+      - "@j178/prek@0.4.8"
+      - opencode-ai@1.17.17
+    desktop: []

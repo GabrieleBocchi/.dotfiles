@@ -1,10 +1,17 @@
 sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
 
+{{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
+{{ $pm := "" -}}
+{{ range $name := keys $system -}}
+{{ if and (eq $pm "") (ne $name "common") (lookPath $name) }}{{ $pm = $name }}{{ end -}}
+{{ end -}}
+{{ if eq $pm "" }}{{ fail "Unsupported system (no supported package manager found)" }}{{ end -}}
+
 [data]
-  hasGUI           = {{
+  pm     = "{{ $pm }}"
+  hasGUI = {{
     or
       (ne (stat "/usr/share/xsessions") nil)
       (ne (stat "/usr/share/wayland-sessions") nil)
   }}
 
-  supportedDistros = ["fedora", "ubuntu", "alpine"]

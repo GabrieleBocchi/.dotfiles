@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-{{- if not (has .chezmoi.osRelease.id .supportedDistros) }}
-echo "ERROR: unsupported distribution {{ .chezmoi.osRelease.id }}, aborting"
-exit 1
-{{- end }}

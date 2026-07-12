@@ -1,13 +1,5 @@
-common:
-  packages: []
-
-fedora:
+cargo:
   packages:
-    - kanata@1.11.0
-
-ubuntu:
-  packages:
-    - kanata@1.11.0
-
-alpine:
-  packages: []
+    base:
+      - kanata@1.11.0
+    desktop: []

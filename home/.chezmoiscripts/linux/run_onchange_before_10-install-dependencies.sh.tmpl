@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
+
+{{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
+{{ $cargo := fromYaml (include ".chezmoidata/cargo.yaml") -}}
+{{ $npm   := fromYaml (include ".chezmoidata/npm.yaml") -}}
+
+echo "▸ System dependencies [{{ .pm }}]"
+{{ $pmData := index $system .pm -}}
+
+# ── OS-specific repositories ────────────────────────────────────────────────
+{{ range default (list) (get $pmData "copr") -}}
+enable_copr {{ . }}
+{{ end -}}
+
+# ── Install base + desktop packages ─────────────────────────────────────────
+{{ $allPkgs := concat $system.common.packages.base $pmData.packages.base -}}
+{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs $system.common.packages.desktop $pmData.packages.desktop }}{{ end -}}
+
+install_pkgs {{ range $allPkgs }}{{ . }} {{ end }}
+
+echo "✓ System dependencies"
+
+# ── Install cargo packages ──────────────────────────────────────────────────
+{{ $cargoPkgs := $cargo.cargo.packages.base -}}
+{{ if .hasGUI }}{{ $cargoPkgs = concat $cargoPkgs $cargo.cargo.packages.desktop }}{{ end -}}
+
+echo "▸ cargo packages"
+
+. "$HOME/.cargo/env"
+
+{{ range $cargoPkgs -}}
+cargo install {{ . }}
+{{ end -}}
+
+echo "✓ cargo packages"
+
+# ── Install npm global packages ─────────────────────────────────────────────
+{{ $npmPkgs := $npm.npm.packages.base -}}
+{{ if .hasGUI }}{{ $npmPkgs = concat $npmPkgs $npm.npm.packages.desktop }}{{ end -}}
+
+echo "▸ npm packages"
+
+{{ range $npmPkgs -}}
+sudo npm install -g {{ . }}
+{{ end -}}
+
+echo "✓ npm packages"
