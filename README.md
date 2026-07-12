@@ -17,7 +17,7 @@ Clone this repository and run the installer:
 
 ```sh
 git clone https://github.com/GabrieleBocchi/.dotfiles ~/.dotfiles
-~/.dotfiles/install
+~/.dotfiles/install.sh
 ```
 
 The installer reads the target version from `.chezmoiversion` and installs
@@ -27,7 +27,7 @@ chezmoi at that exact version via `get.chezmoi.io`.
 
 ```sh
 git -C ~/.dotfiles pull --prune
-./install
+./install.sh
 ```
 
 Or use the `updateDotfiles` alias.

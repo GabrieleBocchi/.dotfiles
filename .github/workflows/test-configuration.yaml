@@ -48,4 +48,4 @@ jobs:
           su testuser
           cp -r . ~/${{ github.event.repository.name }}
           cd ~/${{ github.event.repository.name }}
-          ./install
+          ./install.sh
