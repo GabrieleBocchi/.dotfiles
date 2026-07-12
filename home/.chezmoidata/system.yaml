@@ -18,6 +18,7 @@ common:
 apk:
   packages:
     base:
+      - github-cli
       - musl-dev
       - shadow
       - vimdiff
@@ -26,6 +27,7 @@ apk:
 apt-get:
   packages:
     base:
+      - gh
       - vim
     desktop: []
 
@@ -33,5 +35,6 @@ dnf:
   copr: []
   packages:
     base:
+      - gh
       - vim-enhanced
     desktop: []
