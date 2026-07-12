@@ -12,6 +12,14 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["^\\.chezmoiversion$"],
+      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*$"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "twpayne/chezmoi",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["^home/\\.chezmoiexternal\\.toml$"],
       "matchStrings": [
         "url\\s*=\\s*\"https://github\\.com/(?<depName>[^/]+/[^/]+)/archive/refs/tags/(?<currentValue>v[0-9][^/\"]+)\\.tar\\.gz\"",
@@ -21,11 +29,19 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["^\\.chezmoiversion$"],
-      "matchStrings": ["^(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s*$"],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "twpayne/chezmoi",
-      "extractVersionTemplate": "^v(?<version>.+)$"
+      "managerFilePatterns": ["^home/\\.chezmoidata/cargo\\.yaml$"],
+      "matchStrings": [
+        "-\\s+(?<depName>[\\w\\-]+?)@(?<currentValue>[\\w\\.\\-]+)\\s*$"
+      ],
+      "datasourceTemplate": "cargo"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["^home/\\.chezmoidata/npm\\.yaml$"],
+      "matchStrings": [
+        "-\\s+\"(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?\\s*$"
+      ],
+      "datasourceTemplate": "npm"
     }
   ]
 }

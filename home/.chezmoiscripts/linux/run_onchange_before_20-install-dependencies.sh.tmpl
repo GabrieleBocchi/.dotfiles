@@ -25,18 +25,6 @@ install_pkgs {{ range $osPkgs }}{{ . }} {{ end }}
 
 echo "✓ System dependencies"
 
-# ── npm global packages ──────────────────────────────────────────────
-{{ $npm := fromYaml (include ".chezmoidata/npm.yaml") -}}
-{{ $npmPkgs := concat $npm.common.packages (index $npm $osID).packages -}}
-
-echo "▸ npm packages"
-
-{{ range $npmPkgs -}}
-sudo npm install -g {{ . }}
-{{ end -}}
-
-echo "✓ npm packages"
-
 # ── cargo packages ────────────────────────────────────────────────────
 {{ $cargo := fromYaml (include ".chezmoidata/cargo.yaml") -}}
 {{ $cargoPkgs := concat $cargo.common.packages (index $cargo $osID).packages -}}
@@ -50,3 +38,15 @@ cargo install {{ . }}
 {{ end -}}
 
 echo "✓ cargo packages"
+
+# ── npm global packages ──────────────────────────────────────────────
+{{ $npm := fromYaml (include ".chezmoidata/npm.yaml") -}}
+{{ $npmPkgs := concat $npm.common.packages (index $npm $osID).packages -}}
+
+echo "▸ npm packages"
+
+{{ range $npmPkgs -}}
+sudo npm install -g {{ . }}
+{{ end -}}
+
+echo "✓ npm packages"

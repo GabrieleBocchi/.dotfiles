@@ -3,11 +3,11 @@ common:
 
 fedora:
   packages:
-    - kanata
+    - kanata@1.10.1
 
 ubuntu:
   packages:
-    - kanata
+    - kanata@1.10.1
 
 alpine:
   packages: []
