@@ -1,31 +1,37 @@
 common:
-  - bat
-  - fastfetch
-  - gcc
-  - git
-  - make
-  - neovim
-  - npm
-  - tar
-  - tmux
-  - zsh
+  packages:
+    base:
+      - bat
+      - fastfetch
+      - gcc
+      - git
+      - make
+      - neovim
+      - npm
+      - tar
+      - tmux
+      - zsh
+    desktop:
+      - alacritty
+      - fontconfig
 
-fedora:
+apk:
+  packages:
+    base:
+      - musl-dev
+      - shadow
+      - vimdiff
+    desktop: []
+
+apt-get:
+  packages:
+    base:
+      - vim
+    desktop: []
+
+dnf:
   copr: []
   packages:
-    - alacritty
-    - fontconfig
-    - vim-enhanced
-
-ubuntu:
-  packages:
-    - alacritty
-    - fontconfig
-    - lazygit
-    - vim
-
-alpine:
-  packages:
-    - musl-dev
-    - shadow
-    - vimdiff
+    base:
+      - vim-enhanced
+    desktop: []
