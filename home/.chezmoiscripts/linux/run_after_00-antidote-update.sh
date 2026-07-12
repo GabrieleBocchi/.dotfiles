@@ -1,11 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
-set -euo pipefail
+source ~/.zshrc
 
-echo "▸ Updating antidote plugins"
-zsh -c '
-  fpath=("$HOME/.local/share/antidote/functions" $fpath)
-  autoload -Uz antidote
-  antidote update
-'
-echo "✓ Antidote plugins updated"
+set -eo pipefail
+
+antidote update
