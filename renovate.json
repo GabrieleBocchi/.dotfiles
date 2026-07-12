@@ -20,7 +20,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["home/.chezmoiexternal.toml"],
+      "managerFilePatterns": ["home/.chezmoiexternal.toml.tmpl"],
       "matchStrings": [
         "url\\s*=\\s*\"https://github\\.com/(?<depName>[^/]+/[^/]+)/archive/refs/tags/(?<currentValue>v[0-9][^/\"]+)\\.tar\\.gz\"",
         "url\\s*=\\s*\"https://github\\.com/(?<depName>[^/]+/[^/]+)/releases/download/(?<currentValue>v[0-9][^/\"]+)/[^\"]+\""
