@@ -1,7 +1,10 @@
 sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
 
-{{- $osID := .chezmoi.osRelease.id }}
-
 [data]
-  hasGUI           = {{ ne $osID "alpine" }}
+  hasGUI           = {{
+    or
+      (ne (stat "/usr/share/xsessions") nil)
+      (ne (stat "/usr/share/wayland-sessions") nil)
+  }}
+
   supportedDistros = ["fedora", "ubuntu", "alpine"]
