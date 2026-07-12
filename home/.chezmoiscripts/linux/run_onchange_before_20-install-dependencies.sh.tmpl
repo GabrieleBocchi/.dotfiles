@@ -10,10 +10,7 @@ set -euo pipefail
 
 echo "▸ System dependencies [{{ $osID }}]"
 
-# ── Common packages ─────────────────────────────────────────────────
-install_pkgs {{ range $system.common }}{{ . }} {{ end }}
-
-# ── OS-specific repositories + packages ─────────────────────────────
+# ── OS-specific repositories ────────────────────────────────────────
 {{ $osPkgs := default (list) (get (index $system $osID | default (dict)) "packages") -}}
 {{ $coprRepos := default (list) (get (index $system $osID | default (dict)) "copr") -}}
 
@@ -21,11 +18,13 @@ install_pkgs {{ range $system.common }}{{ . }} {{ end }}
 enable_copr {{ . }}
 {{ end -}}
 
-install_pkgs {{ range $osPkgs }}{{ . }} {{ end }}
+# ── Install packages ───────────────────────────────────────────
+{{ $allPkgs := concat $system.common $osPkgs -}}
+install_pkgs {{ range $allPkgs }}{{ . }} {{ end }}
 
 echo "✓ System dependencies"
 
-# ── cargo packages ────────────────────────────────────────────────────
+# ── Install cargo packages ────────────────────────────────────────────────────
 {{ $cargo := fromYaml (include ".chezmoidata/cargo.yaml") -}}
 {{ $cargoPkgs := concat $cargo.common.packages (index $cargo $osID).packages -}}
 
@@ -39,7 +38,7 @@ cargo install {{ . }}
 
 echo "✓ cargo packages"
 
-# ── npm global packages ──────────────────────────────────────────────
+# ── Install npm global packages ──────────────────────────────────────────────
 {{ $npm := fromYaml (include ".chezmoidata/npm.yaml") -}}
 {{ $npmPkgs := concat $npm.common.packages (index $npm $osID).packages -}}
 
