@@ -23,25 +23,49 @@ bootstrap_env() {
     echo "✓ Environment bootstrapped"
 }
 
-install_pkgs() {
-    if [ $# -eq 0 ]; then
-        return 0
-    fi
-    if command -v apt >/dev/null 2>&1; then
-        sudo apt-get install -y "$@"
-    elif command -v dnf >/dev/null 2>&1; then
-        sudo dnf install -y "$@"
-    elif command -v apk >/dev/null 2>&1; then
-        sudo apk add "$@"
-    else
-        echo "ERROR: failed to install packages: $*" >&2
-        exit 1
-    fi
-}
-
 enable_copr() {
     repo="$1"
     if ! sudo dnf copr list 2>/dev/null | grep -q "$repo"; then
         sudo dnf copr enable -y "$repo"
     fi
+}
+
+install_pkgs() {
+    pm="$1"
+
+    shift
+    [ $# -eq 0 ] && return 0
+
+    echo "▸ Installing packages: $*"
+
+    case "$pm" in
+    apk) sudo apk add "$@" ;;
+    apt-get) sudo apt-get install -y "$@" ;;
+    dnf) sudo dnf install -y "$@" ;;
+    *)
+        echo "ERROR: unsupported PM: $pm" >&2
+        exit 1
+        ;;
+    esac
+
+    echo "✓ Installed packages: $*"
+}
+
+install_script() {
+    url="$1"
+    shift
+
+    tmpdir="$(mktemp -d)"
+    script="$tmpdir/installer"
+
+    echo "▸ Installing $url"
+
+    curl --proto '=https' --tlsv1.2 -sSfL -o "$script" "$url"
+    chmod +x "$script"
+
+    "$script" "$@"
+
+    rm -rf "$tmpdir"
+
+    echo "✓ Installed $url"
 }
