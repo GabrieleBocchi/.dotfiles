@@ -8,6 +8,7 @@ common:
       - make
       - neovim
       - npm
+      - podman
       - tar
       - tmux
       - zsh
