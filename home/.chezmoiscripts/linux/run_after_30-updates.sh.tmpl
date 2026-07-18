@@ -1,19 +1,20 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
-source ~/.zshrc
-
-set -eo pipefail
+set -euo pipefail
 
 # ── Antidote (zsh plugins) ──────────────────────────────────────────────────
 echo "▸ Antidote update"
 
-source $HOME/.local/share/antidote/antidote.zsh
-antidote update
+zsh -c '
+    source ~/.zshrc; source $HOME/.local/share/antidote/antidote.zsh; antidote update
+'
 
 echo "✓ Antidote update"
 
 # ── Rust toolchain ──────────────────────────────────────────────────────────
 echo "▸ Rustup update"
+
+. "$HOME/.cargo/env"
 
 rustup update
 

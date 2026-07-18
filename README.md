@@ -52,30 +52,45 @@ installed when a GUI session is detected.
 dnf:
   packages:
     base:
-      pm: [gh, vim-enhanced]
+      pm:
+        - gh
+        - vim-enhanced
     desktop:
-      pm: [alacritty]
+      pm:
+        - alacritty
 
 common:
   packages:
     base:
-      pm: [bat, git, neovim, tmux, zsh]
+      pm:
+        - bat
+        - git
+        - neovim
+        - tmux
+        - zsh
       script:
-        - url: "https://sh.rustup.rs"
+        - name: Rust
+          url: "https://sh.rustup.rs"
           args: ["-y"]
-        - url: "https://terragrunt.com/install"
+        - name: Uv
+          url: "https://astral.sh/uv/install.sh"
+          envs: ["UV_NO_MODIFY_PATH=1"]
+        - name: Terragrunt
+          url: "https://terragrunt.com/install"
           args: ["--force"]
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
 - **`script`**: List of URL-based installers to download and execute.
+  - `name`: Display name for logs.
   - `url`: Script URL.
   - `args` (optional): Arguments passed to the script.
+  - `envs` (optional): Environment variables passed to the script (e.g. `["KEY=value"]`).
 
 The install script:
 
 1. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-2. Runs script-based installers (`install_script url [args...]`)
+2. Runs script-based installers (`install_script name url [args...]`)
 3. Installs cargo packages with `--locked`
 4. Installs npm global packages
 
