@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+
+source ~/.zshrc
+
+set -eo pipefail
+
+# ── Antidote (zsh plugins) ──────────────────────────────────────────────────
+echo "▸ Antidote update"
+
+source $HOME/.local/share/antidote/antidote.zsh
+antidote update
+
+echo "✓ Antidote update"
+
+# ── Rust toolchain ──────────────────────────────────────────────────────────
+echo "▸ Rustup update"
+
+rustup update
+
+echo "✓ Rustup update"
+
+# ── Font cache (GUI only) ───────────────────────────────────────────────────
+{{ if .hasGUI -}}
+echo "▸ Rebuilding font cache"
+
+fc-cache
+
+echo "✓ Font cache rebuilt"
+{{ end -}}

@@ -39,8 +39,7 @@ alias activate='source */bin/activate'
 alias updateDotfiles='git -C "$DOTFILES" pull --prune && $DOTFILES/install.sh'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
 alias updatePackages='sudo dnf upgrade --refresh -y'
-alias updatePython='pyenv update && pip-review --auto'
-alias updateAll='updatePackages && updateNvim && updatePython && updateDotfiles'
+alias updateAll='updatePackages && updateNvim && updateDotfiles'
 
 # Import work aliases
 if [ -f ~/.aliases_work ]; then

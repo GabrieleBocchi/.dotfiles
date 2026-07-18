@@ -1,41 +1,62 @@
 common:
   packages:
     base:
-      - bat
-      - fastfetch
-      - gcc
-      - git
-      - make
-      - neovim
-      - npm
-      - podman
-      - tar
-      - tmux
-      - zsh
+      pm:
+        - bat
+        - fastfetch
+        - gcc
+        - git
+        - make
+        - neovim
+        - npm
+        - podman
+        - tar
+        - tmux
+        - zsh
+      script:
+        - url: "https://astral.sh/uv/install.sh"
+        - url: "https://sh.rustup.rs"
+          args: ["--no-modify-path", "-y"]
+        - url: "https://terragrunt.com/install"
+          args: ["--force"]
     desktop:
-      - alacritty
-      - fontconfig
+      pm:
+        - alacritty
+        - fontconfig
+      script: []
 
 apk:
   packages:
     base:
-      - github-cli
-      - musl-dev
-      - shadow
-      - vimdiff
-    desktop: []
+      pm:
+        - github-cli
+        - musl-dev
+        - shadow
+        - vimdiff
+      script: []
+    desktop:
+      pm: []
+      script: []
 
 apt-get:
   packages:
     base:
-      - gh
-      - vim
-    desktop: []
+      pm:
+        - gh
+        - vim
+      script: []
+    desktop:
+      pm: []
+      script: []
 
 dnf:
   copr: []
   packages:
     base:
-      - gh
-      - vim-enhanced
-    desktop: []
+      pm:
+        - gh
+        - vim-enhanced
+      script: []
+    desktop:
+      pm: []
+      script: []

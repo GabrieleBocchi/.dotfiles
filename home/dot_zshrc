@@ -7,5 +7,5 @@ setopt extendedglob
 setopt globdots
 zstyle ':completion:*' special-dirs false
 
-# Tool inits (PATH, pyenv, bun, etc.) — alphabetical order
+# Tool inits
 for f in $DOTFILES/home/zsh/init/*.zsh(N); do source "$f"; done

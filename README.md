@@ -38,13 +38,72 @@ Or use the `updateDotfiles` alias.
 
 ## Dependency management
 
-System packages and toolchain dependencies are declared in
-`home/.chezmoidata/` and installed automatically.
+Dependencies are declared in YAML files under `home/.chezmoidata/` and installed
+automatically by chezmoi scripts. The system is cross-distro and detects the
+package manager at apply time.
+
+### System packages
+
+`home/.chezmoidata/system.yaml` organises dependencies by package manager.
+Each PM section has `base` and `desktop` variants — desktop packages are only
+installed when a GUI session is detected.
+
+```yaml
+dnf:
+  packages:
+    base:
+      pm: [gh, vim-enhanced]
+    desktop:
+      pm: [alacritty]
+
+common:
+  packages:
+    base:
+      pm: [bat, git, neovim, tmux, zsh]
+      script:
+        - url: "https://sh.rustup.rs"
+          args: ["-y"]
+        - url: "https://terragrunt.com/install"
+          args: ["--force"]
+```
+
+- **`pm`**: List of packages to install via the native package manager.
+- **`script`**: List of URL-based installers to download and execute.
+  - `url`: Script URL.
+  - `args` (optional): Arguments passed to the script.
+
+The install script:
+
+1. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
+2. Runs script-based installers (`install_script url [args...]`)
+3. Installs cargo packages with `--locked`
+4. Installs npm global packages
+
+### GUI detection
+
+`hasGUI` is available as a chezmoi template variable. It detects a desktop
+environment by checking for the presence of `/usr/share/xsessions` or
+`/usr/share/wayland-sessions` — no distro-specific logic.
+
+### Toolchain packages
+
+`home/.chezmoidata/cargo.yaml` and `home/.chezmoidata/npm.yaml` declare
+packages installed via their respective toolchains (also split by `base`
+and `desktop`). Managed by Renovate for auto-updates.
+
+### Script-based installs
+
+URL-based installers (rustup, terragrunt, etc.) are downloaded,
+saved to a temp directory, made executable, and run respecting their shebang.
+
+## Post-install updates
+
+`run_after_00-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
 
 ## External dependencies (version-pinned)
 
-Managed via `.chezmoiexternal.toml` and `.chezmoiversion`. Renovate auto-updates
-the following:
+Managed via `.chezmoiexternal.toml.tmpl` and `.chezmoiversion`. Renovate
+auto-updates the following:
 
 | Dependency              | Tracks                                                    |
 | ----------------------- | --------------------------------------------------------- |

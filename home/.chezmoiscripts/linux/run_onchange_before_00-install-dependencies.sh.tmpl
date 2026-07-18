@@ -8,7 +8,7 @@ set -euo pipefail
 {{ $cargo := fromYaml (include ".chezmoidata/cargo.yaml") -}}
 {{ $npm   := fromYaml (include ".chezmoidata/npm.yaml") -}}
 
-echo "▸ System dependencies [{{ .pm }}]"
+echo "▸ System packages [{{ .pm }}]"
 {{ $pmData := index $system .pm -}}
 
 # ── OS-specific repositories ────────────────────────────────────────────────
@@ -16,13 +16,25 @@ echo "▸ System dependencies [{{ .pm }}]"
 enable_copr {{ . }}
 {{ end -}}
 
-# ── Install base + desktop packages ─────────────────────────────────────────
-{{ $allPkgs := concat $system.common.packages.base $pmData.packages.base -}}
-{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs $system.common.packages.desktop $pmData.packages.desktop }}{{ end -}}
+# ── Install base + desktop packages (PM) ────────────────────────────────────
+{{ $allPkgs := concat $system.common.packages.base.pm $pmData.packages.base.pm -}}
+{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs $system.common.packages.desktop.pm $pmData.packages.desktop.pm }}{{ end -}}
 
-install_pkgs {{ range $allPkgs }}{{ . }} {{ end }}
+install_pkgs {{ .pm }} {{ range $allPkgs }}{{ . }} {{ end }}
 
-echo "✓ System dependencies"
+echo "✓ System packages"
+
+# ── Script-based installs ────────────────────────────────────────────────────
+{{ $allScripts := concat $system.common.packages.base.script $pmData.packages.base.script -}}
+{{ if .hasGUI }}{{ $allScripts = concat $allScripts $system.common.packages.desktop.script $pmData.packages.desktop.script }}{{ end -}}
+
+echo "▸ Script installs"
+
+{{ range $allScripts -}}
+install_script {{ .url }}{{ range default (list) (get . "args") }} {{ . }}{{ end }}
+{{ end -}}
+
+echo "✓ Script installs"
 
 # ── Install cargo packages ──────────────────────────────────────────────────
 {{ $cargoPkgs := $cargo.cargo.packages.base -}}
@@ -33,7 +45,7 @@ echo "▸ cargo packages"
 . "$HOME/.cargo/env"
 
 {{ range $cargoPkgs -}}
-cargo install {{ . }}
+cargo install --locked {{ . }}
 {{ end -}}
 
 echo "✓ cargo packages"
