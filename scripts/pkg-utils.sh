@@ -5,17 +5,18 @@ set -eu
 bootstrap_env() {
     if command -v sudo >/dev/null 2>&1 &&
         command -v bash >/dev/null 2>&1 &&
-        command -v curl >/dev/null 2>&1; then
+        command -v curl >/dev/null 2>&1 &&
+        command -v git >/dev/null 2>&1; then
         return 0
     fi
     echo "▸ Bootstrapping environment..."
     if command -v apt-get >/dev/null 2>&1; then
         apt-get update
-        apt-get install -y sudo bash curl
+        apt-get install -y sudo bash curl git
     elif command -v dnf >/dev/null 2>&1; then
-        dnf install -y sudo bash curl
+        dnf install -y sudo bash curl git
     elif command -v apk >/dev/null 2>&1; then
-        apk add sudo bash curl
+        apk add sudo bash curl git
     else
         echo "ERROR: failed to bootstrap environment" >&2
         exit 1
@@ -52,13 +53,14 @@ install_pkgs() {
 }
 
 install_script() {
-    url="$1"
-    shift
+    name="$1"
+    url="$2"
+    shift 2
 
     tmpdir="$(mktemp -d)"
     script="$tmpdir/installer"
 
-    echo "▸ Installing $url"
+    echo "▸ Installing $name"
 
     curl --proto '=https' --tlsv1.2 -sSfL -o "$script" "$url"
     chmod +x "$script"
@@ -67,5 +69,5 @@ install_script() {
 
     rm -rf "$tmpdir"
 
-    echo "✓ Installed $url"
+    echo "✓ Installed $name"
 }

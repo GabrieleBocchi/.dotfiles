@@ -31,7 +31,7 @@ echo "✓ System packages"
 echo "▸ Script installs"
 
 {{ range $allScripts -}}
-install_script {{ .url }}{{ range default (list) (get . "args") }} {{ . }}{{ end }}
+{{ range default (list) (get . "envs") }}{{ . }} {{ end }}install_script {{ .name }} {{ .url }}{{ range default (list) (get . "args") }} {{ . }}{{ end }}
 {{ end -}}
 
 echo "✓ Script installs"

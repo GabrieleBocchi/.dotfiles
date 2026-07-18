@@ -2,7 +2,9 @@ common:
   packages:
     base:
       pm:
+        - bash
         - bat
+        - curl
         - fastfetch
         - gcc
         - git
@@ -10,14 +12,20 @@ common:
         - neovim
         - npm
         - podman
+        - sudo
         - tar
         - tmux
+        - wget
         - zsh
       script:
-        - url: "https://astral.sh/uv/install.sh"
-        - url: "https://sh.rustup.rs"
+        - name: Uv
+          url: "https://astral.sh/uv/install.sh"
+          envs: ["UV_NO_MODIFY_PATH=1"]
+        - name: Rust
+          url: "https://sh.rustup.rs"
           args: ["--no-modify-path", "-y"]
-        - url: "https://terragrunt.com/install"
+        - name: Terragrunt
+          url: "https://terragrunt.com/install"
           args: ["--force"]
     desktop:
       pm:
