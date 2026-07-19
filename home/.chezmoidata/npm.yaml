@@ -1,6 +1,6 @@
 npm:
   packages:
     base:
-      - "@j178/prek@0.4.9"
-      - opencode-ai@1.18.2
+      - "@j178/prek@0.4.10"
+      - opencode-ai@1.18.3
     desktop: []
