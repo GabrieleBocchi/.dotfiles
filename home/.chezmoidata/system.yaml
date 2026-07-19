@@ -29,7 +29,6 @@ common:
           args: ["--force"]
     desktop:
       pm:
-        - alacritty
         - fontconfig
       script: []
 
@@ -43,7 +42,8 @@ apk:
         - vimdiff
       script: []
     desktop:
-      pm: []
+      pm:
+        - ghostty
       script: []
 
 apt-get:
@@ -55,10 +55,13 @@ apt-get:
       script: []
     desktop:
       pm: []
-      script: []
+      script:
+        - name: Ghostty
+          url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
 
 dnf:
-  copr: []
+  copr:
+    - scottames/ghostty
   packages:
     base:
       pm:
@@ -66,5 +69,6 @@ dnf:
         - vim-enhanced
       script: []
     desktop:
-      pm: []
+      pm:
+        - ghostty
       script: []

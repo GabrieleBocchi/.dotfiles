@@ -4,7 +4,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 
 ## Modules
 
-- `Alacritty`: Terminal emulator
+- `Ghostty`: Terminal emulator
 - `Git`: Version control system
 - `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
@@ -57,7 +57,7 @@ dnf:
         - vim-enhanced
     desktop:
       pm:
-        - alacritty
+        - ghostty
 
 common:
   packages:
@@ -113,7 +113,7 @@ saved to a temp directory, made executable, and run respecting their shebang.
 
 ## Post-install updates
 
-`run_after_00-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
+`run_after_30-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
 
 ## External dependencies (version-pinned)
 
@@ -125,6 +125,5 @@ auto-updates the following:
 | chezmoi                 | `twpayne/chezmoi` GitHub releases — via `.chezmoiversion` |
 | antidote                | `mattmc3/antidote` GitHub releases                        |
 | JetBrainsMono Nerd Font | `ryanoasis/nerd-fonts` GitHub releases                    |
-| alacritty-theme         | main branch (no releases)                                 |
 | gpakosz/.tmux           | main branch (no releases)                                 |
 | gab.lazy (nvim)         | main branch — intentionally unpinned                      |
