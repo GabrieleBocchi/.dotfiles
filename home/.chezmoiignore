@@ -6,7 +6,7 @@ zsh/
 
 # GUI/desktop tools not available on headless machines
 {{- if not .hasGUI }}
-.config/alacritty
+.config/ghostty
 .config/kanata
 .config/systemd
 {{- end }}

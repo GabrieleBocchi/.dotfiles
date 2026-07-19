@@ -1,0 +1,19 @@
+# ── Theme ──────────────────────────────────────────────────────────────────────
+theme = Breeze
+
+# ── Font ───────────────────────────────────────────────────────────────────────
+font-family = "JetBrainsMono Nerd Font"
+font-size = 10
+
+# ── Window ─────────────────────────────────────────────────────────────────────
+maximize = true
+window-padding-x = 4
+window-padding-y = 4
+
+# ── Cursor ─────────────────────────────────────────────────────────────────────
+cursor-style = bar
+cursor-style-blink = true
+
+# ── Mouse ──────────────────────────────────────────────────────────────────────
+mouse-hide-while-typing = true
+copy-on-select = true
