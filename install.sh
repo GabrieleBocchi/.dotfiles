@@ -25,5 +25,5 @@ if [ "$current_ver" != "$TARGET_VERSION" ]; then
 fi
 
 echo "▸ Applying chezmoi configuration"
-chezmoi init --source "$DOTFILES_DIR" --apply
+chezmoi apply --source "$DOTFILES_DIR"
 echo "✓ chezmoi configuration applied"
