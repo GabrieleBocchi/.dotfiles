@@ -4,12 +4,10 @@ set -euo pipefail
 
 . "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
 
-{{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
-{{ $cargo := fromYaml (include ".chezmoidata/cargo.yaml") -}}
-{{ $npm   := fromYaml (include ".chezmoidata/npm.yaml") -}}
+# .chezmoidata/ data is automatically merged into the template root context
 
 echo "▸ System packages [{{ .pm }}]"
-{{ $pmData := index $system .pm -}}
+{{ $pmData := index . .pm -}}
 
 # ── OS-specific repositories ────────────────────────────────────────────────
 {{ range default (list) (get $pmData "copr") -}}
@@ -17,16 +15,16 @@ enable_copr {{ . }}
 {{ end -}}
 
 # ── Install base + desktop packages (PM) ────────────────────────────────────
-{{ $allPkgs := concat $system.common.packages.base.pm $pmData.packages.base.pm -}}
-{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs $system.common.packages.desktop.pm $pmData.packages.desktop.pm }}{{ end -}}
+{{ $allPkgs := concat .common.packages.base.pm $pmData.packages.base.pm -}}
+{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs .common.packages.desktop.pm $pmData.packages.desktop.pm }}{{ end -}}
 
 install_pkgs {{ .pm }} {{ range $allPkgs }}{{ . }} {{ end }}
 
 echo "✓ System packages"
 
 # ── Script-based installs ────────────────────────────────────────────────────
-{{ $allScripts := concat $system.common.packages.base.script $pmData.packages.base.script -}}
-{{ if .hasGUI }}{{ $allScripts = concat $allScripts $system.common.packages.desktop.script $pmData.packages.desktop.script }}{{ end -}}
+{{ $allScripts := concat .common.packages.base.script $pmData.packages.base.script -}}
+{{ if .hasGUI }}{{ $allScripts = concat $allScripts .common.packages.desktop.script $pmData.packages.desktop.script }}{{ end -}}
 
 echo "▸ Script installs"
 
@@ -37,8 +35,8 @@ echo "▸ Script installs"
 echo "✓ Script installs"
 
 # ── Install cargo packages ──────────────────────────────────────────────────
-{{ $cargoPkgs := $cargo.cargo.packages.base -}}
-{{ if .hasGUI }}{{ $cargoPkgs = concat $cargoPkgs $cargo.cargo.packages.desktop }}{{ end -}}
+{{ $cargoPkgs := .cargo.packages.base -}}
+{{ if .hasGUI }}{{ $cargoPkgs = concat $cargoPkgs .cargo.packages.desktop }}{{ end -}}
 
 echo "▸ cargo packages"
 
@@ -51,8 +49,8 @@ cargo install --locked {{ . }}
 echo "✓ cargo packages"
 
 # ── Install npm global packages ─────────────────────────────────────────────
-{{ $npmPkgs := $npm.npm.packages.base -}}
-{{ if .hasGUI }}{{ $npmPkgs = concat $npmPkgs $npm.npm.packages.desktop }}{{ end -}}
+{{ $npmPkgs := .npm.packages.base -}}
+{{ if .hasGUI }}{{ $npmPkgs = concat $npmPkgs .npm.packages.desktop }}{{ end -}}
 
 echo "▸ npm packages"
 
