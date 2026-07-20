@@ -17,6 +17,7 @@ mouse-scroll-multiplier = precision:0.5
 
 # ── Keybindings ────────────────────────────────────────────────────────────────
 keybind = ctrl+backspace=text:\x1b\x7f
+keybind = ctrl+enter=ignore
 
 # ── Notifications ──────────────────────────────────────────────────────────────
 app-notifications = no-clipboard-copy
