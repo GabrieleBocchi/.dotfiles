@@ -2,5 +2,5 @@ npm:
   packages:
     base:
       - "@j178/prek@0.4.10"
-      - opencode-ai@1.18.3
+      - opencode-ai@1.18.4
     desktop: []
