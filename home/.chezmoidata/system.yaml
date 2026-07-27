@@ -51,6 +51,7 @@ apt-get:
     base:
       pm:
         - gh
+        - libc6-dev
         - vim
       script: []
     desktop:
