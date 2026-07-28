@@ -1,6 +1,6 @@
 cargo:
   packages:
     base:
-      - kanata@1.11.0
       - viu@1.6.1
-    desktop: []
+    desktop:
+      - kanata@1.11.0
