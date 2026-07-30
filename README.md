@@ -45,39 +45,37 @@ package manager at apply time.
 ### System packages
 
 `home/.chezmoidata/system.yaml` organises dependencies by package manager.
-Each PM section has `base` and `desktop` variants — desktop packages are only
-installed when a GUI session is detected.
+Each PM section has `base` and `desktop` keys directly at its root — desktop
+entries are only installed when a GUI session is detected.
 
 ```yaml
 dnf:
-  packages:
-    base:
-      pm:
-        - gh
-        - vim-enhanced
-    desktop:
-      pm:
-        - ghostty
+  base:
+    pm:
+      - gh
+      - vim-enhanced
+  desktop:
+    pm:
+      - ghostty
 
 common:
-  packages:
-    base:
-      pm:
-        - bat
-        - git
-        - neovim
-        - tmux
-        - zsh
-      script:
-        - name: Rust
-          url: "https://sh.rustup.rs"
-          args: ["-y"]
-        - name: Uv
-          url: "https://astral.sh/uv/install.sh"
-          envs: ["UV_NO_MODIFY_PATH=1"]
-        - name: Terragrunt
-          url: "https://terragrunt.com/install"
-          args: ["--force"]
+  base:
+    pm:
+      - bat
+      - git
+      - neovim
+      - tmux
+      - zsh
+    script:
+      - name: Rust
+        url: "https://sh.rustup.rs"
+        args: ["-y"]
+      - name: Uv
+        url: "https://astral.sh/uv/install.sh"
+        envs: ["UV_NO_MODIFY_PATH=1"]
+      - name: Terragrunt
+        url: "https://terragrunt.com/install"
+        args: ["--force"]
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
@@ -86,13 +84,61 @@ common:
   - `url`: Script URL.
   - `args` (optional): Arguments passed to the script.
   - `envs` (optional): Environment variables passed to the script (e.g. `["KEY=value"]`).
+- **`repos`** (optional, see below): Repositories to enable before installing `pm` packages.
 
 The install script:
 
-1. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-2. Runs script-based installers (`install_script name url [args...]`)
-3. Installs cargo packages with `--locked`
-4. Installs npm global packages
+1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
+2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
+3. Runs script-based installers (`install_script name url [args...]`)
+4. Installs cargo packages with `--locked`
+5. Installs npm global packages
+
+### Repositories
+
+Some packages (e.g. Google Chrome) aren't in the default repos and need one
+enabled first. Declared per package manager as a `repos` list under `base` or
+`desktop` (usually `desktop`, since these repos are only needed when their
+package is actually going to be installed), enabled before packages are
+installed so the package itself is then just a normal entry under `pm`:
+
+```yaml
+dnf:
+  desktop:
+    pm:
+      - ghostty
+      - google-chrome-stable
+    repos:
+      - kind: copr
+        name: scottames/ghostty
+      - kind: custom
+        name: google-chrome
+        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
+        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
+
+apt-get:
+  desktop:
+    pm:
+      - google-chrome-stable
+    repos:
+      - kind: custom
+        name: google-chrome
+        uri: "https://dl.google.com/linux/chrome/deb/"
+        suites: "stable"
+        components: "main"
+        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
+```
+
+- **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
+- **`kind: custom`**: writes the repo config natively.
+  - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
+  - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored
+    into `/usr/share/keyrings/<name>.gpg` and a deb822 source file at
+    `/etc/apt/sources.list.d/<name>.sources`.
+
+Every field besides `kind`/`name` is passed to `enable_repo` as `key=value`
+pairs, so the template itself never branches on package manager or kind —
+`enable_repo` in `scripts/pkg-utils.sh` handles the dispatch entirely.
 
 ### GUI detection
 
@@ -103,8 +149,9 @@ environment by checking for the presence of `/usr/share/xsessions` or
 ### Toolchain packages
 
 `home/.chezmoidata/cargo.yaml` and `home/.chezmoidata/npm.yaml` declare
-packages installed via their respective toolchains (also split by `base`
-and `desktop`). Managed by Renovate for auto-updates.
+packages installed via their respective toolchains, each a flat list directly
+under `base`/`desktop` (e.g. `cargo.base`, `cargo.desktop`). Managed by
+Renovate for auto-updates.
 
 ### Script-based installs
 

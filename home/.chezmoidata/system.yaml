@@ -1,75 +1,86 @@
 common:
-  packages:
-    base:
-      pm:
-        - bash
-        - bat
-        - curl
-        - fastfetch
-        - gcc
-        - git
-        - make
-        - neovim
-        - npm
-        - podman
-        - sudo
-        - tar
-        - tmux
-        - wget
-        - zsh
-      script:
-        - name: Uv
-          url: "https://astral.sh/uv/install.sh"
-          envs: ["UV_NO_MODIFY_PATH=1"]
-        - name: Rust
-          url: "https://sh.rustup.rs"
-          args: ["--no-modify-path", "-y"]
-        - name: Terragrunt
-          url: "https://terragrunt.com/install"
-          args: ["--force"]
-    desktop:
-      pm:
-        - fontconfig
-      script: []
+  base:
+    pm:
+      - bash
+      - bat
+      - curl
+      - fastfetch
+      - gcc
+      - git
+      - make
+      - neovim
+      - npm
+      - podman
+      - sudo
+      - tar
+      - tmux
+      - wget
+      - zsh
+    script:
+      - name: Uv
+        url: "https://astral.sh/uv/install.sh"
+        envs: ["UV_NO_MODIFY_PATH=1"]
+      - name: Rust
+        url: "https://sh.rustup.rs"
+        args: ["--no-modify-path", "-y"]
+      - name: Terragrunt
+        url: "https://terragrunt.com/install"
+        args: ["--force"]
+  desktop:
+    pm:
+      - fontconfig
+    script: []
 
 apk:
-  packages:
-    base:
-      pm:
-        - github-cli
-        - musl-dev
-        - shadow
-        - vimdiff
-      script: []
-    desktop:
-      pm:
-        - ghostty
-      script: []
+  base:
+    pm:
+      - github-cli
+      - musl-dev
+      - shadow
+      - vimdiff
+    script: []
+  desktop:
+    pm:
+      - chromium
+      - ghostty
+    script: []
 
 apt-get:
-  packages:
-    base:
-      pm:
-        - gh
-        - libc6-dev
-        - vim
-      script: []
-    desktop:
-      pm: []
-      script:
-        - name: Ghostty
-          url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
+  base:
+    pm:
+      - gh
+      - libc6-dev
+      - vim
+    script: []
+  desktop:
+    pm:
+      - google-chrome-stable
+    script:
+      - name: Ghostty
+        url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
+    repos:
+      - kind: custom
+        name: google-chrome
+        uri: "https://dl.google.com/linux/chrome/deb/"
+        suites: "stable"
+        components: "main"
+        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
 
 dnf:
-  copr:
-    - scottames/ghostty
-  packages:
-    base:
-      pm:
-        - gh
-        - vim-enhanced
-      script: []
-    desktop:
-      pm:
-        - ghostty
-      script: []
+  base:
+    pm:
+      - gh
+      - vim-enhanced
+    script: []
+  desktop:
+    pm:
+      - ghostty
+      - google-chrome-stable
+    script: []
+    repos:
+      - kind: copr
+        name: scottames/ghostty
+      - kind: custom
+        name: google-chrome
+        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
+        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"

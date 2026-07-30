@@ -24,11 +24,82 @@ bootstrap_env() {
     echo "✓ Environment bootstrapped"
 }
 
-enable_copr() {
-    repo="$1"
-    if ! sudo dnf copr list 2>/dev/null | grep -q "$repo"; then
-        sudo dnf copr enable -y "$repo"
-    fi
+enable_repo() {
+    pm="$1"
+    kind="$2"
+    name="$3"
+    shift 3
+
+    baseurl="" gpgkey="" uri="" suites="" components="" signed_by=""
+    for arg in "$@"; do
+        case "$arg" in
+        baseurl=*) baseurl="${arg#baseurl=}" ;;
+        gpgkey=*) gpgkey="${arg#gpgkey=}" ;;
+        uri=*) uri="${arg#uri=}" ;;
+        suites=*) suites="${arg#suites=}" ;;
+        components=*) components="${arg#components=}" ;;
+        signed_by=*) signed_by="${arg#signed_by=}" ;;
+        *)
+            echo "ERROR: unknown repo field: $arg" >&2
+            exit 1
+            ;;
+        esac
+    done
+
+    case "$kind" in
+    copr)
+        if ! sudo dnf copr list 2>/dev/null | grep -q "$name"; then
+            echo "▸ Enabling COPR: $name"
+            sudo dnf copr enable -y "$name"
+            echo "✓ Enabled COPR: $name"
+        fi
+        ;;
+    custom)
+        case "$pm" in
+        dnf)
+            repofile="/etc/yum.repos.d/${name}.repo"
+            [ -f "$repofile" ] && return 0
+
+            echo "▸ Enabling repo: $name"
+            sudo tee "$repofile" >/dev/null <<EOF
+[$name]
+name=$name
+baseurl=$baseurl
+enabled=1
+gpgcheck=1
+gpgkey=$gpgkey
+EOF
+            echo "✓ Enabled repo: $name"
+            ;;
+        apt-get)
+            keyring="/usr/share/keyrings/${name}.gpg"
+            sourcefile="/etc/apt/sources.list.d/${name}.sources"
+            [ -f "$sourcefile" ] && return 0
+
+            echo "▸ Enabling repo: $name"
+            curl --proto '=https' --tlsv1.2 -sSfL "$signed_by" |
+                sudo gpg --dearmor -o "$keyring"
+            sudo tee "$sourcefile" >/dev/null <<EOF
+Types: deb
+URIs: $uri
+Suites: $suites
+Components: $components
+Signed-By: $keyring
+EOF
+            sudo apt-get update -qq
+            echo "✓ Enabled repo: $name"
+            ;;
+        *)
+            echo "ERROR: unsupported PM for custom repo: $pm" >&2
+            exit 1
+            ;;
+        esac
+        ;;
+    *)
+        echo "ERROR: unsupported repo kind: $kind" >&2
+        exit 1
+        ;;
+    esac
 }
 
 install_pkgs() {
