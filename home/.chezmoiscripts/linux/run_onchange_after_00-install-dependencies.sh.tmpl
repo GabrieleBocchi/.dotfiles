@@ -14,7 +14,7 @@ echo "▸ System packages [{{ .pm }}]"
 {{ if .hasGUI }}{{ $allRepos = concat $allRepos (default (list) (get $pmData.desktop "repos")) }}{{ end -}}
 
 {{ range $allRepos -}}
-enable_repo {{ $.pm }} {{ .kind }} {{ .name | quote }}{{ range $k, $v := omit . "kind" "name" }} {{ $k }}={{ $v }}{{ end }}
+enable_repo {{ $.pm }} {{ .kind }} {{ .name | quote }}{{ range $k, $v := omit . "kind" "name" }} {{ $k }}={{ $v | squote }}{{ end }}
 {{ end -}}
 
 # ── Install base + desktop packages (PM) ────────────────────────────────────
