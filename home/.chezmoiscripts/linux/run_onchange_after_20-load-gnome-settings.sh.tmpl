@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Checksum to let run_onchange detect config changes
+# sha256: {{ sha256sum (include "dconf/settings.ini") }}
+
+{{ if not .hasGnome -}}
+echo "− Skipping GNOME settings (no gnome-shell)"
+exit 0
+{{ end -}}
+
+echo "▸ Loading GNOME settings"
+
+dconf load / < "{{ .chezmoi.sourceDir }}/dconf/settings.ini"
+
+echo "✓ GNOME settings loaded"

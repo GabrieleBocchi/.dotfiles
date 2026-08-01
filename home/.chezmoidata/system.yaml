@@ -29,6 +29,7 @@ common:
   desktop:
     pm:
       - fontconfig
+      - papirus-icon-theme
     script: []
 
 apk:
@@ -55,6 +56,7 @@ apt-get:
     script: []
   desktop:
     pm:
+      - bibata-cursor-theme
       - google-chrome-stable
       - spotify-client
     script:
@@ -82,11 +84,14 @@ dnf:
     script: []
   desktop:
     pm:
+      - bibata-cursor-themes
       - ghostty
       - google-chrome-stable
       - spotify-client
     script: []
     repos:
+      - kind: copr
+        name: peterwu/rendezvous
       - kind: copr
         name: scottames/ghostty
       - kind: custom
