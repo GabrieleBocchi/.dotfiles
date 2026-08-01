@@ -6,6 +6,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 
 - `Ghostty`: Terminal emulator
 - `Git`: Version control system
+- `GNOME`: Desktop environment settings (dconf)
 - `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
@@ -158,9 +159,35 @@ Renovate for auto-updates.
 URL-based installers (rustup, terragrunt, etc.) are downloaded,
 saved to a temp directory, made executable, and run respecting their shebang.
 
+### GNOME settings (dconf)
+
+`home/dconf/` holds GNOME desktop settings as plain dconf keyfiles, split by
+category (`interface.ini`, `window-manager.ini`, `peripherals.ini`,
+`notifications.ini`, `keybindings.ini`, `caffeine.ini`, `favorite-apps.ini`,
+`nautilus.ini`, `datetime.ini`, `input-sources.ini`, `audio.ini`, `power.ini`). `run_after_20-load-gnome-settings.sh.tmpl`
+concatenates every `*.ini` file and renders every `*.ini.tmpl` file (via
+`chezmoi execute-template`), then feeds the result to `dconf load /`. It runs
+on every apply (not `run_onchange`), so manual drift made in the GNOME
+Settings app gets reverted back to the declared state on the next apply.
+Skipped entirely when `hasGnome` is false.
+
+`extensions.ini.tmpl` is the one templated file: it lists desired GNOME Shell
+extension UUIDs and only enables the ones actually installed, checked via
+`stat` against `/usr/share/gnome-shell/extensions/` and
+`~/.local/share/gnome-shell/extensions/` — no package-manager-specific logic,
+works regardless of which PM (or method) installed the extension.
+
+`home/.chezmoidata/gnome.yaml` declares packages (e.g. GNOME Shell extensions)
+that should only be installed when `hasGnome` is true, independently of
+`hasGUI` — a KDE/XFCE desktop has `hasGUI = true` but doesn't need
+`gnome-shell-extension-*` packages.
+
+`hasGnome` is a chezmoi template variable (like `hasGUI`), detected via
+`lookPath "gnome-shell"`.
+
 ## Post-install updates
 
-`run_after_30-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
+`run_after_40-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
 
 ## External dependencies (version-pinned)
 
