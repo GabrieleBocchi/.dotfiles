@@ -1,5 +1,5 @@
 npm:
   base:
     - "@j178/prek@0.4.12"
-    - opencode-ai@1.18.12
+    - opencode-ai@1.18.13
   desktop: []
