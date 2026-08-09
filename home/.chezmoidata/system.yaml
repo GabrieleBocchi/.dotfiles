@@ -46,6 +46,7 @@ apk:
       - chromium
       - ghostty
       - spotify-qt
+      - telegram-desktop
     script: []
 
 apt-get:
@@ -60,6 +61,8 @@ apt-get:
     pm:
       - google-chrome-stable
       - spotify-client
+      - teams-for-linux
+      - telegram
     script:
       - name: Ghostty
         url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
@@ -76,6 +79,14 @@ apt-get:
         suites: "stable"
         components: "non-free"
         signed_by: "https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.gpg"
+      - kind: custom
+        name: teams-for-linux
+        uri: "https://repo.teamsforlinux.de/debian/"
+        suites: "stable"
+        components: "main"
+        signed_by: "https://repo.teamsforlinux.de/teams-for-linux.asc"
+      - kind: ppa
+        name: atareao/telegram
 
 dnf:
   base:
@@ -89,15 +100,24 @@ dnf:
       - ghostty
       - google-chrome-stable
       - spotify-client
+      - teams-for-linux
+      - telegram-desktop
     script: []
     repos:
       - kind: copr
         name: scottames/ghostty
       - kind: custom
+        name: fedora-spotify
+        baseurl: "https://negativo17.org/repos/spotify/fedora-$releasever/$basearch/"
+        gpgkey: "https://negativo17.org/repos/RPM-GPG-KEY-slaanesh"
+      - kind: custom
         name: google-chrome
         baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
         gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
       - kind: custom
-        name: fedora-spotify
-        baseurl: "https://negativo17.org/repos/spotify/fedora-$releasever/$basearch/"
-        gpgkey: "https://negativo17.org/repos/RPM-GPG-KEY-slaanesh"
+        name: teams-for-linux
+        baseurl: "https://repo.teamsforlinux.de/rpm/"
+        gpgkey: "https://repo.teamsforlinux.de/teams-for-linux.asc"
+      - kind: rpm-release
+        name: rpmfusion-free
+        url: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$releasever.noarch.rpm"
