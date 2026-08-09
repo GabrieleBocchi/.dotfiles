@@ -30,7 +30,7 @@ enable_repo() {
     name="$3"
     shift 3
 
-    baseurl="" gpgkey="" uri="" suites="" components="" signed_by=""
+    baseurl="" gpgkey="" uri="" suites="" components="" signed_by="" url=""
     for arg in "$@"; do
         case "$arg" in
         baseurl=*) baseurl="${arg#baseurl=}" ;;
@@ -39,6 +39,7 @@ enable_repo() {
         suites=*) suites="${arg#suites=}" ;;
         components=*) components="${arg#components=}" ;;
         signed_by=*) signed_by="${arg#signed_by=}" ;;
+        url=*) url="${arg#url=}" ;;
         *)
             echo "ERROR: unknown repo field: $arg" >&2
             exit 1
@@ -53,6 +54,23 @@ enable_repo() {
             sudo dnf copr enable -y "$name"
             echo "✓ Enabled COPR: $name"
         fi
+        ;;
+    ppa)
+        command -v add-apt-repository >/dev/null 2>&1 ||
+            sudo apt-get install -y software-properties-common
+
+        echo "▸ Enabling PPA: $name"
+        sudo add-apt-repository -y "ppa:$name"
+        echo "✓ Enabled PPA: $name"
+        ;;
+    rpm-release)
+        releasever="$(rpm -E %fedora)"
+        basearch="$(rpm -E %_arch)"
+        resolved_url=$(printf '%s' "$url" | sed "s/\$releasever/$releasever/g; s/\$basearch/$basearch/g")
+
+        echo "▸ Enabling repo: $name"
+        sudo dnf install -y "$resolved_url"
+        echo "✓ Enabled repo: $name"
         ;;
     custom)
         case "$pm" in
