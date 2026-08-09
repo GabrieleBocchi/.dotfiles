@@ -7,6 +7,7 @@ common:
       - fastfetch
       - gcc
       - git
+      - keychain
       - make
       - neovim
       - npm
@@ -35,6 +36,7 @@ apk:
   base:
     pm:
       - github-cli
+      - gnupg
       - musl-dev
       - shadow
       - vimdiff
@@ -50,6 +52,7 @@ apt-get:
   base:
     pm:
       - gh
+      - gnupg
       - libc6-dev
       - vim
     script: []
@@ -78,6 +81,7 @@ dnf:
   base:
     pm:
       - gh
+      - gnupg2
       - vim-enhanced
     script: []
   desktop:

@@ -12,6 +12,15 @@ VIM="nvim"
 export EDITOR=$VIM
 export VISUAL=$VIM
 
+# GPG
+export GPG_TTY=$(tty)
+
+# Man pages
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# Rust
+export RUST_BACKTRACE=1
+
 # Import secret environment variables
 if [[ -f "$HOME/.secrets/.env" ]]; then
   source "$HOME/.secrets/.env"
