@@ -87,6 +87,13 @@ common:
   - `envs` (optional): Environment variables passed to the script (e.g. `["KEY=value"]`).
 - **`repos`** (optional, see below): Repositories to enable before installing `pm` packages.
 
+Before any of this, `install.sh` calls `bootstrap_env` (in `scripts/pkg-utils.sh`),
+which ensures the core tools the install process itself depends on (shell,
+downloader, VCS, GPG) are present, installing them with the native PM if any
+are missing. GPG is needed because `enable_repo`'s apt-get `custom` kind (see
+below) has to dearmor signing keys, and that step always runs *before* `pm`
+packages (including `gnupg` itself) are installed.
+
 The install script:
 
 1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
@@ -105,6 +112,14 @@ installed so the package itself is then just a normal entry under `pm`:
 
 ```yaml
 dnf:
+  base:
+    pm:
+      - terraform
+    repos:
+      - kind: custom
+        name: hashicorp
+        baseurl: "https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable"
+        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
   desktop:
     pm:
       - ghostty
@@ -116,8 +131,21 @@ dnf:
         name: google-chrome
         baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
         gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
+      - kind: rpm-release
+        name: rpmfusion-free
+        url: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$releasever.noarch.rpm"
 
 apt-get:
+  base:
+    pm:
+      - terraform
+    repos:
+      - kind: custom
+        name: hashicorp
+        uri: "https://apt.releases.hashicorp.com"
+        suites: "$codename"
+        components: "main"
+        signed_by: "https://apt.releases.hashicorp.com/gpg"
   desktop:
     pm:
       - google-chrome-stable
@@ -128,9 +156,15 @@ apt-get:
         suites: "stable"
         components: "main"
         signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
+      - kind: ppa
+        name: atareao/telegram
 ```
 
 - **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
+- **`kind: ppa`** (apt-get only): enables an Ubuntu PPA (`add-apt-repository`), self-installing
+  `software-properties-common` first if missing.
+- **`kind: rpm-release`** (dnf only): installs a release RPM directly (`dnf install <url>`), for
+  packages distributed as a release package rather than a repo file (e.g. RPM Fusion).
 - **`kind: custom`**: writes the repo config natively.
   - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
   - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored
@@ -140,6 +174,24 @@ apt-get:
 Every field besides `kind`/`name` is passed to `enable_repo` as `key=value`
 pairs, so the template itself never branches on package manager or kind —
 `enable_repo` in `scripts/pkg-utils.sh` handles the dispatch entirely.
+
+### Repo URL/field placeholders
+
+Some repo fields need a value only known at runtime on the target machine,
+resolved by `enable_repo` before use (not by the chezmoi template):
+
+- `$releasever` / `$basearch` (dnf `custom` baseurl, `rpm-release` url): DNF's
+  own variables. For `custom`, DNF expands them itself when reading the
+  written `.repo` file. For `rpm-release`, since the URL is passed directly as
+  a `dnf install` argument (not read from a repo file), `enable_repo` resolves
+  them itself via `rpm -E %fedora`/`rpm -E %_arch` before calling `dnf install`.
+- `$codename` (apt-get `custom` suites): resolved by `enable_repo` from
+  `/etc/os-release`'s `VERSION_CODENAME`, for repos (like HashiCorp's) that
+  publish per-codename suites instead of a generic channel name like `stable`.
+
+These fields are written with single quotes (`squote`) in the generated
+script so the literal `$...` survives shell parsing and reaches `enable_repo`
+unexpanded.
 
 ### GUI detection
 
@@ -161,10 +213,9 @@ saved to a temp directory, made executable, and run respecting their shebang.
 
 ### GNOME settings (dconf)
 
-`home/dconf/` holds GNOME desktop settings as plain dconf keyfiles, split by
-category (`interface.ini`, `window-manager.ini`, `peripherals.ini`,
-`notifications.ini`, `keybindings.ini`, `caffeine.ini`, `favorite-apps.ini`,
-`nautilus.ini`, `datetime.ini`, `input-sources.ini`, `audio.ini`, `power.ini`). `run_after_20-load-gnome-settings.sh.tmpl`
+`home/dconf/` holds GNOME desktop settings as plain dconf keyfiles, one file
+per settings category (e.g. `interface.ini`, `peripherals.ini`,
+`keybindings.ini`). `run_after_20-load-gnome-settings.sh.tmpl`
 concatenates every `*.ini` file and renders every `*.ini.tmpl` file (via
 `chezmoi execute-template`), then feeds the result to `dconf load /`. It runs
 on every apply (not `run_onchange`), so manual drift made in the GNOME

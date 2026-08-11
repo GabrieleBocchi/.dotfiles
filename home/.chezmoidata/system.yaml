@@ -60,8 +60,16 @@ apt-get:
       - gh
       - gnupg
       - libc6-dev
+      - terraform
       - vim
     script: []
+    repos:
+      - kind: custom
+        name: hashicorp
+        uri: "https://apt.releases.hashicorp.com"
+        suites: "$codename"
+        components: "main"
+        signed_by: "https://apt.releases.hashicorp.com/gpg"
   desktop:
     pm:
       - bibata-cursor-theme
@@ -100,8 +108,14 @@ dnf:
       - gh
       - gnupg2
       - procps-ng
+      - terraform
       - vim-enhanced
     script: []
+    repos:
+      - kind: custom
+        name: hashicorp
+        baseurl: "https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable"
+        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
   desktop:
     pm:
       - bibata-cursor-themes

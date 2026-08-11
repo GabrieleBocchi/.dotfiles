@@ -6,17 +6,18 @@ bootstrap_env() {
     if command -v sudo >/dev/null 2>&1 &&
         command -v bash >/dev/null 2>&1 &&
         command -v curl >/dev/null 2>&1 &&
-        command -v git >/dev/null 2>&1; then
+        command -v git >/dev/null 2>&1 &&
+        command -v gpg >/dev/null 2>&1; then
         return 0
     fi
     echo "▸ Bootstrapping environment..."
     if command -v apt-get >/dev/null 2>&1; then
         apt-get update
-        apt-get install -y sudo bash curl git
+        apt-get install -y sudo bash curl git gnupg
     elif command -v dnf >/dev/null 2>&1; then
-        dnf install -y sudo bash curl git
+        dnf install -y sudo bash curl git gnupg2
     elif command -v apk >/dev/null 2>&1; then
-        apk add sudo bash curl git
+        apk add sudo bash curl git gnupg
     else
         echo "ERROR: failed to bootstrap environment" >&2
         exit 1
@@ -93,6 +94,9 @@ EOF
             keyring="/usr/share/keyrings/${name}.gpg"
             sourcefile="/etc/apt/sources.list.d/${name}.sources"
             [ -f "$sourcefile" ] && return 0
+
+            codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+            suites=$(printf '%s' "$suites" | sed "s/\$codename/$codename/g")
 
             echo "▸ Enabling repo: $name"
             curl --proto '=https' --tlsv1.2 -sSfL "$signed_by" |
