@@ -7,5 +7,3 @@ ohmyzsh/ohmyzsh path:plugins/keychain
 
 zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-autosuggestions
-
-ohmyzsh/ohmyzsh path:themes/robbyrussell.zsh-theme
