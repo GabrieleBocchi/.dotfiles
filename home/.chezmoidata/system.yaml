@@ -39,6 +39,7 @@ apk:
       - github-cli
       - gnupg
       - musl-dev
+      - openssh-client-default
       - shadow
       - vimdiff
     script: []
@@ -95,6 +96,7 @@ dnf:
     pm:
       - gh
       - gnupg2
+      - procps-ng
       - vim-enhanced
     script: []
   desktop:
