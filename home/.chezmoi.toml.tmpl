@@ -8,10 +8,10 @@ sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
 {{ if eq $pm "" }}{{ fail "Unsupported system (no supported package manager found)" }}{{ end -}}
 
 [data]
-  pm     = "{{ $pm }}"
-  hasGUI = {{
+  pm       = "{{ $pm }}"
+  hasGUI   = {{
     or
       (ne (stat "/usr/share/xsessions") nil)
       (ne (stat "/usr/share/wayland-sessions") nil)
   }}
-
+  hasGnome = {{ ne (lookPath "gnome-shell") "" }}

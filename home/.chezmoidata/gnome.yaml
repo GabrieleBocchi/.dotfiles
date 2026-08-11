@@ -1,0 +1,11 @@
+gnome:
+  apk: []
+  apt-get:
+    - gnome-shell-extension-user-theme
+  dnf:
+    - gnome-shell-extension-appindicator
+    - gnome-shell-extension-background-logo
+    - gnome-shell-extension-blur-my-shell
+    - gnome-shell-extension-caffeine
+    - gnome-shell-extension-dash-to-dock
+    - gnome-shell-extension-user-theme

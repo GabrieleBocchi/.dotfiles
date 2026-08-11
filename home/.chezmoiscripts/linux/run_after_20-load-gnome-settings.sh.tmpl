@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+{{ if not .hasGnome -}}
+echo "− Skipping GNOME settings (no gnome-shell)"
+exit 0
+{{ end -}}
+
+echo "▸ Loading GNOME settings"
+
+dconf_dir="{{ .chezmoi.sourceDir }}/dconf"
+tmpfile="$(mktemp)"
+
+for f in "$dconf_dir"/*.ini; do
+    cat "$f" >> "$tmpfile"
+    echo >> "$tmpfile"
+done
+
+for f in "$dconf_dir"/*.ini.tmpl; do
+    [ -e "$f" ] || continue
+    chezmoi execute-template < "$f" >> "$tmpfile"
+    echo >> "$tmpfile"
+done
+
+dconf load / < "$tmpfile"
+rm -f "$tmpfile"
+
+echo "✓ GNOME settings loaded"

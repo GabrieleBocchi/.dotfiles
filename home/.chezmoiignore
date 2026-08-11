@@ -4,6 +4,9 @@
 # zsh/ — sourced directly by .zshrc via $DOTFILES/home/zsh/
 zsh/
 
+# dconf/ — loaded into the dconf database by a script, not deployed as a file
+dconf/
+
 # GUI/desktop tools not available on headless machines
 {{- if not .hasGUI }}
 .config/ghostty

@@ -1,0 +1,17 @@
+{{ $desiredExtensions := list
+    "appindicatorsupport@rgcjonas.gmail.com"
+    "background-logo@fedorahosted.org"
+    "blur-my-shell@aunetx"
+    "caffeine@patapon.info"
+    "dash-to-dock@micxgx.gmail.com"
+    "user-theme@gnome-shell-extensions.gcampax.github.com"
+-}}
+{{ $enabledExtensions := list -}}
+{{ range $desiredExtensions -}}
+{{ if or (stat (printf "/usr/share/gnome-shell/extensions/%s" .)) (stat (printf "%s/.local/share/gnome-shell/extensions/%s" $.chezmoi.homeDir .)) -}}
+{{ $enabledExtensions = append $enabledExtensions . -}}
+{{ end -}}
+{{ end -}}
+[org/gnome/shell]
+disable-user-extensions=false
+enabled-extensions=[{{ range $i, $u := $enabledExtensions }}{{ if $i }}, {{ end }}'{{ $u }}'{{ end }}]
