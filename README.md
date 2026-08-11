@@ -10,7 +10,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 - `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
-- `Zsh`: Shell (antidote plugin manager)
+- `Zsh`: Shell (antidote plugin manager, Starship prompt)
 
 ## Installation
 

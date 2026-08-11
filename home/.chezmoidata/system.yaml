@@ -23,7 +23,10 @@ common:
         envs: ["UV_NO_MODIFY_PATH=1"]
       - name: Rust
         url: "https://sh.rustup.rs"
-        args: ["--no-modify-path", "-y"]
+        args: ["--no-modify-path", "--quiet", "-y"]
+      - name: Starship
+        url: "https://starship.rs/install.sh"
+        args: ["--yes"]
       - name: Terragrunt
         url: "https://terragrunt.com/install"
         args: ["--force"]

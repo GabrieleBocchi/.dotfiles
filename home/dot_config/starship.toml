@@ -1,0 +1,50 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+
+format = """$character$directory$git_branch$git_state$git_status"""
+right_format = """$rust$terraform$docker_context$cmd_duration$jobs$hostname"""
+
+[character]
+success_symbol = '[➜](bold green) '
+error_symbol = '[➜](bold red) '
+
+[directory]
+style = 'cyan'
+format = '[$path]($style) '
+truncation_length = 1
+truncation_symbol = ''
+
+[git_branch]
+style = 'bold purple'
+format = '[$symbol$branch]($style) '
+
+[git_state]
+style = 'bold yellow'
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[git_status]
+style = 'bold yellow'
+format = '[$all_status$ahead_behind]($style) '
+
+[rust]
+format = '[$symbol$version]($style) '
+
+[terraform]
+format = '[$symbol$workspace]($style) '
+
+[docker_context]
+format = '[$symbol$context]($style) '
+
+[cmd_duration]
+min_time = 500
+format = 'took [$duration](yellow) '
+
+[jobs]
+symbol = '✦ '
+number_threshold = 1
+format = '[$symbol$number]($style) '
+
+[hostname]
+ssh_only = true
+format = 'on [$hostname](bold red) '
