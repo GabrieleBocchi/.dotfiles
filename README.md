@@ -10,6 +10,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 - `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
 - `OpenCode`: AI coding agent CLI, with permission guardrails and a security plugin
+- `SSH`: Client config with sane defaults, machine-specific hosts kept out of the repo
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
 - `Zsh`: Shell (antidote plugin manager, Starship prompt)
 
@@ -268,6 +269,24 @@ Excluded on purpose (regenerated automatically, or machine-specific state, not
 tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`,
 `~/.omo/` (model routing, see above), and
 `~/.local/share/opencode/auth.json`/`account.json` (real credentials).
+
+### SSH configuration
+
+`home/private_dot_ssh/private_config` ships a generic `~/.ssh/config` `Host *`
+block (connection multiplexing, keepalive, `known_hosts` hygiene, no global
+agent forwarding) — safe, host-agnostic defaults. `Include
+~/.ssh/config.local` at the top pulls in machine/work-specific `Host` blocks
+(VPN ranges, enterprise aliases, etc.) from an untracked file, silently
+skipped by ssh if absent.
+
+The `.ssh` directory itself is tracked as `private_dot_ssh`, so chezmoi
+enforces `700` permissions on every apply. The `cm/` subdirectory used for
+multiplexed connection sockets is tracked the same way (`private_cm/`, with
+an `empty_dot_keep` placeholder so chezmoi materialises the otherwise-empty
+directory) — no custom script needed.
+
+Keys and `known_hosts` are never tracked here — they're machine/identity
+specific and stay purely local.
 
 ## Post-install updates
 

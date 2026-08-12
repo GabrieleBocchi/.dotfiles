@@ -1,0 +1,15 @@
+# Machine/work-specific Host blocks (VPN ranges, enterprise aliases, etc.) live
+# in this untracked include, not here - kept out of the repo on purpose.
+Include ~/.ssh/config.local
+
+Host *
+    AddKeysToAgent yes
+    ControlMaster auto
+    ControlPath ~/.ssh/cm/%C
+    ControlPersist 10m
+    ForwardAgent no
+    HashKnownHosts yes
+    IdentitiesOnly yes
+    ServerAliveCountMax 3
+    ServerAliveInterval 60
+    StrictHostKeyChecking accept-new

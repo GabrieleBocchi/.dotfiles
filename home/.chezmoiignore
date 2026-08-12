@@ -7,6 +7,9 @@ zsh/
 # dconf/ — loaded into the dconf database by a script, not deployed as a file
 dconf/
 
+# placeholder to make chezmoi/git track the otherwise-empty ~/.ssh/cm/ dir
+.ssh/cm/.keep
+
 # GUI/desktop tools not available on headless machines
 {{- if not .hasGUI }}
 .config/ghostty
