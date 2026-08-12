@@ -6,8 +6,8 @@ format = """$character$directory$git_branch$git_state$git_status"""
 right_format = """$rust$terraform$docker_context$cmd_duration$jobs$hostname"""
 
 [character]
-success_symbol = '[➜](bold green) '
-error_symbol = '[➜](bold red) '
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'
 
 [directory]
 style = 'cyan'
@@ -25,7 +25,7 @@ format = '\([$state( $progress_current/$progress_total)]($style)\) '
 
 [git_status]
 style = 'bold yellow'
-format = '[$all_status$ahead_behind]($style) '
+format = '([$all_status$ahead_behind]($style) )'
 
 [rust]
 format = '[$symbol$version]($style) '
