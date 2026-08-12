@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "cc-safety-net",
+    "opencode-autotitle",
+    "opencode-dynamic-context-pruning",
+    "opencode-log-sanitizer",
+    "opencode-notify",
+    "opencode-token-tracker",
+    "oh-my-openagent@latest"
+  ]
+}

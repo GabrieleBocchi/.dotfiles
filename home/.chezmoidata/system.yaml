@@ -18,9 +18,6 @@ common:
       - wget
       - zsh
     script:
-      - name: Uv
-        url: "https://astral.sh/uv/install.sh"
-        envs: ["UV_NO_MODIFY_PATH=1"]
       - name: Rust
         url: "https://sh.rustup.rs"
         args: ["--no-modify-path", "--quiet", "-y"]
@@ -30,6 +27,9 @@ common:
       - name: Terragrunt
         url: "https://terragrunt.com/install"
         args: ["--force"]
+      - name: Uv
+        url: "https://astral.sh/uv/install.sh"
+        envs: ["UV_NO_MODIFY_PATH=1"]
   desktop:
     pm:
       - fontconfig
