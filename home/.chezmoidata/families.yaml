@@ -1,0 +1,33 @@
+# Source of truth for distro families and their package managers.
+#
+# This file is the single place that maps a distro `os-release` id to:
+#   - `pm`:      the package manager that family uses
+#   - `distros`: the `os-release` ids that belong to that family
+#
+# Both `system.yaml` and `repos.yaml` are keyed by these family names, so the
+# family + pm setup lives here only — never redeclared in the other data files.
+# A system matches exactly ONE family via `os-release` id; if none match, the
+# installed package manager is detected by `lookPath` as a fallback and only
+# the `common` sections of `system.yaml` are used (no family-specific repos or
+# packages).
+families:
+  # ── apk family ──────────────────────────────────────────────────────────────
+  alpine:
+    pm: apk
+    distros: [alpine]
+
+  # ── apt-get families ────────────────────────────────────────────────────────
+  debian:
+    pm: apt-get
+    distros: [debian]
+  ubuntu:
+    pm: apt-get
+    distros: [ubuntu]
+
+  # ── dnf families ────────────────────────────────────────────────────────────
+  fedora:
+    pm: dnf
+    distros: [fedora]
+  rhel:
+    pm: dnf
+    distros: [almalinux, ol, rocky]

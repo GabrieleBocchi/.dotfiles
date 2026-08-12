@@ -37,7 +37,7 @@ Or use the `updateDotfiles` alias.
 
 ## Environment variables
 
-- `IDENTITIES`: Space-separated list of SSH/GPG key identities for keychain
+- `IDENTITIES`: Space-separated list of SSH key identities for keychain
 
 ## Dependency management
 
@@ -45,22 +45,49 @@ Dependencies are declared in YAML files under `home/.chezmoidata/` and installed
 automatically by chezmoi scripts. The system is cross-distro and detects the
 package manager at apply time.
 
-### System packages
+### Distro families (source of truth)
 
-`home/.chezmoidata/system.yaml` organises dependencies by package manager.
-Each PM section has `base` and `desktop` keys directly at its root — desktop
-entries are only installed when a GUI session is detected.
+`home/.chezmoidata/families.yaml` is the single source of truth that maps a
+distro `os-release` id to a package manager and a "family":
 
 ```yaml
-dnf:
-  base:
-    pm:
-      - gh
-      - vim-enhanced
-  desktop:
-    pm:
-      - ghostty
+families:
+  fedora:
+    pm: dnf
+    distros: [fedora]
+  rhel:
+    pm: dnf
+    distros: [almalinux, ol, rocky]
+  debian:
+    pm: apt-get
+    distros: [debian]
+  ubuntu:
+    pm: apt-get
+    distros: [ubuntu]
+  alpine:
+    pm: apk
+    distros: [alpine]
+```
 
+A system matches **exactly one** family via `/etc/os-release`'s `id`; the
+package manager is derived from that family's `pm` field (never redeclared
+elsewhere). Both `system.yaml` and `repos.yaml` are keyed by these family
+names, so adding a distro to an existing family is just adding its id to the
+`distros` list here — no other file changes. If no family matches, the
+installed PM is detected by `lookPath` (fallback) and only the `common`
+sections are used (no family-specific repos or packages).
+
+### System packages
+
+`home/.chezmoidata/system.yaml` organises dependencies by distro **family**.
+The `common` section (cross-family, package-manager-agnostic) applies to every
+system; each family section (`fedora`, `rhel`, `debian`, `ubuntu`, `alpine`)
+holds only packages/scripts that family can actually install — a package is
+listed under a family only if that family enables a repo providing it (see
+`repos.yaml`). Each section has `base` and `desktop` keys — desktop entries are
+only installed when a GUI session is detected.
+
+```yaml
 common:
   base:
     pm:
@@ -72,13 +99,23 @@ common:
     script:
       - name: Rust
         url: "https://sh.rustup.rs"
-        args: ["-y"]
+        args: ["--no-modify-path", "--quiet", "-y"]
       - name: Uv
         url: "https://astral.sh/uv/install.sh"
         envs: ["UV_NO_MODIFY_PATH=1"]
       - name: Terragrunt
         url: "https://terragrunt.com/install"
         args: ["--force"]
+
+fedora:
+  desktop:
+    pm:
+      - ghostty   # repo scottames/ghostty (Fedora-only)
+
+rhel:
+  desktop:
+    pm:
+      - google-chrome-stable   # ghostty NOT here: its COPR is Fedora-only
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
@@ -87,13 +124,12 @@ common:
   - `url`: Script URL.
   - `args` (optional): Arguments passed to the script.
   - `envs` (optional): Environment variables passed to the script (e.g. `["KEY=value"]`).
-- **`repos`** (optional, see below): Repositories to enable before installing `pm` packages.
 
 Before any of this, `install.sh` calls `bootstrap_env` (in `scripts/pkg-utils.sh`),
 which ensures the core tools the install process itself depends on (shell,
 downloader, VCS, GPG) are present, installing them with the native PM if any
 are missing. GPG is needed because `enable_repo`'s apt-get `custom` kind (see
-below) has to dearmor signing keys, and that step always runs *before* `pm`
+below) has to dearmor signing keys, and that step always runs _before_ `pm`
 packages (including `gnupg` itself) are installed.
 
 The install script:
@@ -107,66 +143,69 @@ The install script:
 ### Repositories
 
 Some packages (e.g. Google Chrome) aren't in the default repos and need one
-enabled first. Declared per package manager as a `repos` list under `base` or
-`desktop` (usually `desktop`, since these repos are only needed when their
-package is actually going to be installed), enabled before packages are
-installed so the package itself is then just a normal entry under `pm`:
+enabled first. All repositories are declared centrally in
+`home/.chezmoidata/repos.yaml`, keyed by the **same distro family** names as
+`system.yaml` (from `families.yaml`), each with the `base`/`desktop` split, and
+enabled before packages are installed so the package itself is then just a
+normal entry under `pm`. The system's family (from `.chezmoi.toml.tmpl`) picks
+the section; there's no `common` split here because a repo is intrinsically
+package-manager-specific, so each family already carries exactly the repos its
+own PM needs (repos shared by several families of the same PM are simply
+repeated per family):
 
 ```yaml
-dnf:
-  base:
-    pm:
-      - terraform
-    repos:
+repos:
+  rhel:
+    base:
       - kind: custom
         name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable"
+        baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
-  desktop:
-    pm:
-      - ghostty
-      - google-chrome-stable
-    repos:
+      - kind: rpm-release
+        name: epel-release
+        url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm"
+  fedora:
+    base:
+      - kind: custom
+        name: hashicorp
+        baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
+        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
+    desktop:
       - kind: copr
         name: scottames/ghostty
-      - kind: custom
-        name: google-chrome
-        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
-        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: rpm-release
-        name: rpmfusion-free
-        url: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$releasever.noarch.rpm"
-
-apt-get:
-  base:
-    pm:
-      - terraform
-    repos:
+  ubuntu:
+    base:
       - kind: custom
         name: hashicorp
         uri: "https://apt.releases.hashicorp.com"
         suites: "$codename"
         components: "main"
         signed_by: "https://apt.releases.hashicorp.com/gpg"
-  desktop:
-    pm:
-      - google-chrome-stable
-    repos:
-      - kind: custom
-        name: google-chrome
-        uri: "https://dl.google.com/linux/chrome/deb/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
+    desktop:
       - kind: ppa
         name: atareao/telegram
 ```
+
+Each family section has `base` (enabled always) and `desktop` (enabled only
+when a GUI session is detected). The target system is matched to **exactly
+one** family via `/etc/os-release`'s `id` (from `families.yaml`). A package is
+listed in `system.yaml` under a family only if that family enables a repo
+providing it — e.g. `ghostty`/`spotify-client` need Fedora-only repos so they
+appear under `fedora` but NOT `rhel`, and `telegram` comes from an Ubuntu-only
+PPA so it appears under `ubuntu` but NOT `debian`. A family section here lists
+exactly the repos that family enables; adding a new family is just adding it to
+`families.yaml` plus a section in `system.yaml`/`repos.yaml`; no template
+changes needed.
 
 - **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
 - **`kind: ppa`** (apt-get only): enables an Ubuntu PPA (`add-apt-repository`), self-installing
   `software-properties-common` first if missing.
 - **`kind: rpm-release`** (dnf only): installs a release RPM directly (`dnf install <url>`), for
   packages distributed as a release package rather than a repo file (e.g. RPM Fusion).
+- **`kind: deb-release`** (apt-get only): downloads a `.deb` to a temp file and installs it
+  (`apt-get` can't install directly from a URL like `dnf` can).
+- **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo
+  (`apk add --repository ...`) without switching the whole system to edge.
 - **`kind: custom`**: writes the repo config natively.
   - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
   - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored
@@ -186,7 +225,11 @@ resolved by `enable_repo` before use (not by the chezmoi template):
   own variables. For `custom`, DNF expands them itself when reading the
   written `.repo` file. For `rpm-release`, since the URL is passed directly as
   a `dnf install` argument (not read from a repo file), `enable_repo` resolves
-  them itself via `rpm -E %fedora`/`rpm -E %_arch` before calling `dnf install`.
+  them itself via `rpm -E %fedora`/`rpm -E %_arch` before calling `dnf install`
+  (falling back to `%rhel` when `%fedora` is undefined, i.e. RHEL-family).
+- `$distro` (dnf `custom` baseurl): some vendors (HashiCorp) publish a
+  separate repo tree per distro family instead of one shared "fedora" tree —
+  resolved to `fedora` or `RHEL` the same way as above.
 - `$codename` (apt-get `custom` suites): resolved by `enable_repo` from
   `/etc/os-release`'s `VERSION_CODENAME`, for repos (like HashiCorp's) that
   publish per-codename suites instead of a generic channel name like `stable`.
@@ -198,8 +241,10 @@ unexpanded.
 ### GUI detection
 
 `hasGUI` is available as a chezmoi template variable. It detects a desktop
-environment by checking for the presence of `/usr/share/xsessions` or
-`/usr/share/wayland-sessions` — no distro-specific logic.
+environment by checking for actual session entries inside
+`/usr/share/xsessions` or `/usr/share/wayland-sessions` (not just that the
+directory exists — Fedora/RHEL ship it empty by default even on headless
+systems) — no distro-specific logic.
 
 ### Toolchain packages
 
@@ -233,7 +278,8 @@ works regardless of which PM (or method) installed the extension.
 `home/.chezmoidata/gnome.yaml` declares packages (e.g. GNOME Shell extensions)
 that should only be installed when `hasGnome` is true, independently of
 `hasGUI` — a KDE/XFCE desktop has `hasGUI = true` but doesn't need
-`gnome-shell-extension-*` packages.
+`gnome-shell-extension-*` packages. Keyed by distro **family**, so each family
+lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 
 `hasGnome` is a chezmoi template variable (like `hasGUI`), detected via
 `lookPath "gnome-shell"`.
@@ -271,20 +317,38 @@ tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`,
 ### SSH configuration
 
 `home/private_dot_ssh/private_config` ships a generic `~/.ssh/config` `Host *`
-block (connection multiplexing, keepalive, `known_hosts` hygiene, no global
-agent forwarding) — safe, host-agnostic defaults. `Include
-~/.ssh/config.local` at the top pulls in machine/work-specific `Host` blocks
-(VPN ranges, enterprise aliases, etc.) from an untracked file, silently
-skipped by ssh if absent.
+block (keepalive, `known_hosts` hygiene, no global agent forwarding) — safe,
+host-agnostic defaults. `Include ~/.ssh/config.local` at the top pulls in
+machine/work-specific `Host` blocks (VPN ranges, enterprise aliases, etc.)
+from an untracked file, silently skipped by ssh if absent. SSH connection
+multiplexing (`ControlMaster`) is intentionally disabled — it was previously
+used but caused connection issues.
 
 The `.ssh` directory itself is tracked as `private_dot_ssh`, so chezmoi
-enforces `700` permissions on every apply. The `cm/` subdirectory used for
-multiplexed connection sockets is tracked the same way (`private_cm/`, with
-an `empty_dot_keep` placeholder so chezmoi materialises the otherwise-empty
-directory) — no custom script needed.
+enforces `700` permissions on every apply.
 
 Keys and `known_hosts` are never tracked here — they're machine/identity
 specific and stay purely local.
+
+## Testing
+
+`tests/cases/*.yaml` (one file per package manager family) declares test
+cases — a distro image plus forced `hasGUI`/`hasGnome` values. `tests/run.sh`
+reads them and runs `install.sh` for one case or all of them, locally
+or in CI (docker via `CONTAINER_RUNTIME=docker`):
+
+```sh
+tests/run.sh fedora-desktop-gnome   # single case
+tests/run.sh --all                  # every case
+```
+
+Each case runs in a disposable container as a genuine non-root user (not
+root — install.sh must actually work the way a real person runs it), then
+`tests/install.bats` asserts on the result (packages present, config valid,
+permissions correct, idempotent re-run, desktop/GNOME packages present only
+when expected). `.github/workflows/test-configuration.yaml` generates its
+job matrix directly from the same `tests/cases/*.yaml` files — no case list
+duplicated between local and CI.
 
 ## Post-install updates
 

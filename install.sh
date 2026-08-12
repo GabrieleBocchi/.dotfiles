@@ -10,7 +10,7 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 TARGET_VERSION="$(cat "$DOTFILES_DIR/.chezmoiversion")"
 BIN_DIR="/usr/local/bin"
 
-current_ver=$(chezmoi --version 2>/dev/null | awk '{print $3}' | tr -d 'v,')
+current_ver=$("$BIN_DIR/chezmoi" --version 2>/dev/null | awk '{print $3}' | tr -d 'v,')
 if [ "$current_ver" != "$TARGET_VERSION" ]; then
     echo "▸ Installing chezmoi ${TARGET_VERSION}..."
     # TODO: remove when upstream get.chezmoi.io handles libc detection
@@ -25,5 +25,5 @@ if [ "$current_ver" != "$TARGET_VERSION" ]; then
 fi
 
 echo "▸ Applying chezmoi configuration"
-chezmoi init --source "$DOTFILES_DIR" --apply
+"$BIN_DIR/chezmoi" init --source "$DOTFILES_DIR" --apply
 echo "✓ chezmoi configuration applied"

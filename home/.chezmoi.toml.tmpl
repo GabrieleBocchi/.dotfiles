@@ -1,17 +1,25 @@
 sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
 
-{{ $system := fromYaml (include ".chezmoidata/system.yaml") -}}
+{{ $families := fromYaml (include ".chezmoidata/families.yaml") -}}
+{{ $family := "" -}}
 {{ $pm := "" -}}
-{{ range $name := keys $system -}}
-{{ if and (eq $pm "") (ne $name "common") (lookPath $name) }}{{ $pm = $name }}{{ end -}}
+{{ range $name, $info := $families.families -}}
+{{ if and (eq $family "") (has $.chezmoi.osRelease.id $info.distros) }}{{ $family = $name }}{{ $pm = $info.pm }}{{ end -}}
+{{ end -}}
+{{ if eq $family "" -}}
+{{/* No family matched: fall back to detecting the installed PM (common only) */ -}}
+{{ range $name, $info := $families.families -}}
+{{ if and (eq $pm "") (lookPath $info.pm) }}{{ $pm = $info.pm }}{{ end -}}
+{{ end -}}
 {{ end -}}
 {{ if eq $pm "" }}{{ fail "Unsupported system (no supported package manager found)" }}{{ end -}}
 
 [data]
   pm       = "{{ $pm }}"
+  family   = "{{ $family }}"
   hasGUI   = {{
     or
-      (ne (stat "/usr/share/xsessions") nil)
-      (ne (stat "/usr/share/wayland-sessions") nil)
+      (gt (len (glob "/usr/share/xsessions/*")) 0)
+      (gt (len (glob "/usr/share/wayland-sessions/*")) 0)
   }}
   hasGnome = {{ ne (lookPath "gnome-shell") "" }}

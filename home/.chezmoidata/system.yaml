@@ -1,3 +1,9 @@
+# System packages & script installers, keyed by distro family.
+#
+# Each section holds packages/scripts for exactly its family.
+#
+# `pm`:   native packages installed via the family's package manager.
+# `script`: URL-based installers (name/url/args/envs).
 common:
   base:
     pm:
@@ -5,9 +11,9 @@ common:
       - bat
       - btop
       - curl
-      - fastfetch
       - gcc
       - git
+      - jq
       - keychain
       - make
       - neovim
@@ -37,9 +43,12 @@ common:
       - papirus-icon-theme
     script: []
 
-apk:
+# ── apk family ──────────────────────────────────────────────────────────────
+
+alpine:
   base:
     pm:
+      - fastfetch
       - github-cli
       - gnupg
       - musl-dev
@@ -50,27 +59,41 @@ apk:
   desktop:
     pm:
       - chromium
-      - ghostty
       - spotify-qt
       - telegram-desktop
     script: []
 
-apt-get:
+# ── apt-get families ────────────────────────────────────────────────────────
+
+debian:
   base:
     pm:
       - gh
       - gnupg
       - libc6-dev
+      - procps
       - terraform
       - vim
     script: []
-    repos:
-      - kind: custom
-        name: hashicorp
-        uri: "https://apt.releases.hashicorp.com"
-        suites: "$codename"
-        components: "main"
-        signed_by: "https://apt.releases.hashicorp.com/gpg"
+  desktop:
+    pm:
+      # NOTE: NO telegram (atareao/telegram PPA is Ubuntu-only) on Debian.
+      - bibata-cursor-theme
+      - google-chrome-stable
+      - spotify-client
+      - teams-for-linux
+    script: []
+
+ubuntu:
+  base:
+    pm:
+      - gh
+      - gnupg
+      - libc6-dev
+      - procps
+      - terraform
+      - vim
+    script: []
   desktop:
     pm:
       - bibata-cursor-theme
@@ -81,42 +104,20 @@ apt-get:
     script:
       - name: Ghostty
         url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
-    repos:
-      - kind: custom
-        name: google-chrome
-        uri: "https://dl.google.com/linux/chrome/deb/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: spotify
-        uri: "https://repository.spotify.com"
-        suites: "stable"
-        components: "non-free"
-        signed_by: "https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.gpg"
-      - kind: custom
-        name: teams-for-linux
-        uri: "https://repo.teamsforlinux.de/debian/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://repo.teamsforlinux.de/teams-for-linux.asc"
-      - kind: ppa
-        name: atareao/telegram
 
-dnf:
+# ── dnf families ────────────────────────────────────────────────────────────
+
+fedora:
   base:
     pm:
+      - fastfetch
       - gh
       - gnupg2
       - procps-ng
       - terraform
+      - util-linux-user
       - vim-enhanced
     script: []
-    repos:
-      - kind: custom
-        name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable"
-        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
   desktop:
     pm:
       - bibata-cursor-themes
@@ -126,23 +127,21 @@ dnf:
       - teams-for-linux
       - telegram-desktop
     script: []
-    repos:
-      - kind: copr
-        name: peterwu/rendezvous
-      - kind: copr
-        name: scottames/ghostty
-      - kind: custom
-        name: fedora-spotify
-        baseurl: "https://negativo17.org/repos/spotify/fedora-$releasever/$basearch/"
-        gpgkey: "https://negativo17.org/repos/RPM-GPG-KEY-slaanesh"
-      - kind: custom
-        name: google-chrome
-        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
-        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: teams-for-linux
-        baseurl: "https://repo.teamsforlinux.de/rpm/"
-        gpgkey: "https://repo.teamsforlinux.de/teams-for-linux.asc"
-      - kind: rpm-release
-        name: rpmfusion-free
-        url: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$releasever.noarch.rpm"
+
+rhel:
+  base:
+    pm:
+      - fastfetch
+      - gh
+      - gnupg2
+      - procps-ng
+      - terraform
+      - util-linux-user
+      - vim-enhanced
+    script: []
+  desktop:
+    pm:
+      # NOTE: NO bibata, Ghostty, Spotify and telegram (Fedora-only / not packaged for EL10).
+      - google-chrome-stable
+      - teams-for-linux
+    script: []

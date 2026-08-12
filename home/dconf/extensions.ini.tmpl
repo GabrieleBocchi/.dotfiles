@@ -14,4 +14,4 @@
 {{ end -}}
 [org/gnome/shell]
 disable-user-extensions=false
-enabled-extensions=[{{ range $i, $u := $enabledExtensions }}{{ if $i }}, {{ end }}'{{ $u }}'{{ end }}]
+enabled-extensions=@as [{{ range $i, $u := $enabledExtensions }}{{ if $i }}, {{ end }}'{{ $u }}'{{ end }}]

@@ -4,31 +4,37 @@ set -euo pipefail
 
 . "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
 
-# .chezmoidata/ data is automatically merged into the template root context
+# .chezmoidata/ data is automatically merged into the template root context.
+# `family` (from .chezmoi.toml.tmpl) selects the family section in both
+# system.yaml (packages) and repos.yaml (repositories).
+{{ $family := .family -}}
+{{ $pmData := default (dict) (get . $family) -}}
+{{ $pmBase := default (dict) (get $pmData "base") -}}
+{{ $pmDesktop := default (dict) (get $pmData "desktop") -}}
 
-echo "▸ System packages [{{ .pm }}]"
-{{ $pmData := index . .pm -}}
+echo "▸ System packages [{{ .pm }}{{ if .family }} / {{ .family }}{{ end }}]"
 
 # ── OS-specific repositories ────────────────────────────────────────────────
-{{ $allRepos := default (list) (get $pmData.base "repos") -}}
-{{ if .hasGUI }}{{ $allRepos = concat $allRepos (default (list) (get $pmData.desktop "repos")) }}{{ end -}}
+{{ $reposData := default (dict) (get .repos $family) -}}
+{{ $allRepos := default (list) (get $reposData "base") -}}
+{{ if .hasGUI }}{{ $allRepos = concat $allRepos (default (list) (get $reposData "desktop")) }}{{ end -}}
 
 {{ range $allRepos -}}
 enable_repo {{ $.pm }} {{ .kind }} {{ .name | quote }}{{ range $k, $v := omit . "kind" "name" }} {{ $k }}={{ $v | squote }}{{ end }}
 {{ end -}}
 
 # ── Install base + desktop packages (PM) ────────────────────────────────────
-{{ $allPkgs := concat .common.base.pm $pmData.base.pm -}}
-{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs .common.desktop.pm $pmData.desktop.pm }}{{ end -}}
-{{ if .hasGnome }}{{ $allPkgs = concat $allPkgs (default (list) (get .gnome .pm)) }}{{ end -}}
+{{ $allPkgs := concat .common.base.pm (default (list) (get $pmBase "pm")) -}}
+{{ if .hasGUI }}{{ $allPkgs = concat $allPkgs .common.desktop.pm (default (list) (get $pmDesktop "pm")) }}{{ end -}}
+{{ if .hasGnome }}{{ $allPkgs = concat $allPkgs (default (list) (get .gnome $family)) }}{{ end -}}
 
 install_pkgs {{ .pm }} {{ range $allPkgs }}{{ . }} {{ end }}
 
 echo "✓ System packages"
 
 # ── Script-based installs ────────────────────────────────────────────────────
-{{ $allScripts := concat .common.base.script $pmData.base.script -}}
-{{ if .hasGUI }}{{ $allScripts = concat $allScripts .common.desktop.script $pmData.desktop.script }}{{ end -}}
+{{ $allScripts := concat .common.base.script (default (list) (get $pmBase "script")) -}}
+{{ if .hasGUI }}{{ $allScripts = concat $allScripts .common.desktop.script (default (list) (get $pmDesktop "script")) }}{{ end -}}
 
 echo "▸ Script installs"
 

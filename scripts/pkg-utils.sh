@@ -2,6 +2,54 @@
 
 set -eu
 
+detect_pm() {
+    if command -v apk >/dev/null 2>&1; then
+        echo apk
+    elif command -v apt-get >/dev/null 2>&1; then
+        echo apt-get
+    elif command -v dnf >/dev/null 2>&1; then
+        echo dnf
+    fi
+}
+
+# Single point where the supported package managers and their install command are defined.
+# Runs without sudo when root; otherwise via sudo.
+# --allowerasing only matters for dnf.
+pm_install() {
+    sudo_=sudo
+    allowerasing=0
+    [ "$(id -u)" -eq 0 ] && sudo_=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --allowerasing)
+            allowerasing=1
+            shift
+            ;;
+        *) break ;;
+        esac
+    done
+    pm="$1"
+    shift
+    case "$pm" in
+    apk) $sudo_ apk add "$@" ;;
+    apt-get)
+        $sudo_ apt-get update
+        $sudo_ apt-get install -y "$@"
+        ;;
+    dnf)
+        if [ "$allowerasing" = 1 ]; then
+            $sudo_ dnf install -y --allowerasing "$@"
+        else
+            $sudo_ dnf install -y "$@"
+        fi
+        ;;
+    *)
+        echo "ERROR: unsupported PM: $pm" >&2
+        return 1
+        ;;
+    esac
+}
+
 bootstrap_env() {
     if command -v sudo >/dev/null 2>&1 &&
         command -v bash >/dev/null 2>&1 &&
@@ -11,17 +59,23 @@ bootstrap_env() {
         return 0
     fi
     echo "▸ Bootstrapping environment..."
-    if command -v apt-get >/dev/null 2>&1; then
-        apt-get update
-        apt-get install -y sudo bash curl git gnupg
-    elif command -v dnf >/dev/null 2>&1; then
-        dnf install -y sudo bash curl git gnupg2
-    elif command -v apk >/dev/null 2>&1; then
-        apk add sudo bash curl git gnupg
-    else
+    case "$(detect_pm)" in
+    apk)
+        pm_install apk sudo bash curl git gnupg
+        ;;
+    apt-get)
+        pm_install apt-get sudo bash curl git gnupg
+        ;;
+    dnf)
+        # --allowerasing: RHEL-family minimal images (e.g. Rocky, Alma) ship
+        # curl-minimal by default, which conflicts with the full curl package.
+        pm_install --allowerasing dnf sudo bash curl git gnupg2
+        ;;
+    *)
         echo "ERROR: failed to bootstrap environment" >&2
         exit 1
-    fi
+        ;;
+    esac
     echo "✓ Environment bootstrapped"
 }
 
@@ -58,38 +112,42 @@ enable_repo() {
         ;;
     ppa)
         command -v add-apt-repository >/dev/null 2>&1 ||
-            sudo apt-get install -y software-properties-common
+            pm_install apt-get software-properties-common
 
         echo "▸ Enabling PPA: $name"
         sudo add-apt-repository -y "ppa:$name"
         echo "✓ Enabled PPA: $name"
         ;;
+    apk-testing)
+        # Pins one package from Alpine's edge/testing repo without adding it
+        # to /etc/apk/repositories or switching the whole system to edge.
+        echo "▸ Enabling repo: $name"
+        pm_install apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing "$name"
+        echo "✓ Enabled repo: $name"
+        ;;
     rpm-release)
+        # %fedora is undefined (rpm echoes it back literally) on RHEL-family
+        # systems (Rocky, Alma, RHEL) - fall back to %rhel there.
         releasever="$(rpm -E %fedora)"
+        [ "$releasever" = "%fedora" ] && releasever="$(rpm -E %rhel)"
         basearch="$(rpm -E %_arch)"
         resolved_url=$(printf '%s' "$url" | sed "s/\$releasever/$releasever/g; s/\$basearch/$basearch/g")
 
         echo "▸ Enabling repo: $name"
-        sudo dnf install -y "$resolved_url"
+        pm_install dnf "$resolved_url"
+        echo "✓ Enabled repo: $name"
+        ;;
+    deb-release)
+        tmpdeb="$(mktemp --suffix=.deb)"
+
+        echo "▸ Enabling repo: $name"
+        curl --proto '=https' --tlsv1.2 -sSfL -o "$tmpdeb" "$url"
+        pm_install apt-get "$tmpdeb"
+        rm -f "$tmpdeb"
         echo "✓ Enabled repo: $name"
         ;;
     custom)
         case "$pm" in
-        dnf)
-            repofile="/etc/yum.repos.d/${name}.repo"
-            [ -f "$repofile" ] && return 0
-
-            echo "▸ Enabling repo: $name"
-            sudo tee "$repofile" >/dev/null <<EOF
-[$name]
-name=$name
-baseurl=$baseurl
-enabled=1
-gpgcheck=1
-gpgkey=$gpgkey
-EOF
-            echo "✓ Enabled repo: $name"
-            ;;
         apt-get)
             keyring="/usr/share/keyrings/${name}.gpg"
             sourcefile="/etc/apt/sources.list.d/${name}.sources"
@@ -109,6 +167,25 @@ Components: $components
 Signed-By: $keyring
 EOF
             sudo apt-get update -qq
+            echo "✓ Enabled repo: $name"
+            ;;
+        dnf)
+            repofile="/etc/yum.repos.d/${name}.repo"
+            [ -f "$repofile" ] && return 0
+
+            distro="fedora"
+            [ "$(rpm -E %fedora)" = "%fedora" ] && distro="RHEL"
+            baseurl=$(printf '%s' "$baseurl" | sed "s/\$distro/$distro/g")
+
+            echo "▸ Enabling repo: $name"
+            sudo tee "$repofile" >/dev/null <<EOF
+[$name]
+name=$name
+baseurl=$baseurl
+enabled=1
+gpgcheck=1
+gpgkey=$gpgkey
+EOF
             echo "✓ Enabled repo: $name"
             ;;
         *)
@@ -132,15 +209,7 @@ install_pkgs() {
 
     echo "▸ Installing packages: $*"
 
-    case "$pm" in
-    apk) sudo apk add "$@" ;;
-    apt-get) sudo apt-get install -y "$@" ;;
-    dnf) sudo dnf install -y "$@" ;;
-    *)
-        echo "ERROR: unsupported PM: $pm" >&2
-        exit 1
-        ;;
-    esac
+    pm_install "$pm" "$@"
 
     echo "✓ Installed packages: $*"
 }
