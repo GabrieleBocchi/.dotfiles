@@ -9,6 +9,7 @@ This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
 - `GNOME`: Desktop environment settings (dconf)
 - `Keyboard`: Keyboard personalisation (kanata)
 - `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
+- `OpenCode`: AI coding agent CLI, with permission guardrails and a security plugin
 - `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
 - `Zsh`: Shell (antidote plugin manager, Starship prompt)
 
@@ -235,6 +236,38 @@ that should only be installed when `hasGnome` is true, independently of
 
 `hasGnome` is a chezmoi template variable (like `hasGUI`), detected via
 `lookPath "gnome-shell"`.
+
+### OpenCode configuration
+
+`home/dot_config/opencode/` holds config for [OpenCode](https://opencode.ai)
+(the CLI itself is installed via `npm.yaml`, not here): `opencode.json`
+(plugins) and `tui.json`. `model`/`small_model` are intentionally left unset —
+opencode falls back to the last model used (or a sensible internal default on
+first run), so nothing here goes stale as new models ship.
+
+Permission is left at opencode's own defaults (mostly permissive, so it
+doesn't ask for approval on every action) — the `cc-safety-net` plugin adds an
+independent guardrail that blocks destructive commands (`rm -rf`,
+`git reset --hard`, force pushes, etc.) and secret file access, running as its
+own hook rather than through opencode's own permission system, since
+pattern-based `deny` rules there have
+[known bugs](https://github.com/anomalyco/opencode/issues/28682) where they
+can be silently bypassed.
+
+Per-agent model routing for the orchestration plugin is intentionally **not**
+tracked here: it maps agents to specific model IDs, which drift as new models
+ship. Run `updateOpencodeModels` (`bunx oh-my-openagent install`, aliased in
+`home/zsh/aliases.zsh`) to (re)generate it — the official installer interviews
+you about your subscriptions (Claude, Copilot, Gemini, etc.) and picks current
+best-fit models per agent, kept up to date by the plugin maintainer instead of
+by us. It writes to `~/.omo/omo.jsonc` (the plugin's unified config location,
+not `~/.config/opencode/`), migrating any older `oh-my-openagent.json` it
+finds there automatically.
+
+Excluded on purpose (regenerated automatically, or machine-specific state, not
+tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`,
+`~/.omo/` (model routing, see above), and
+`~/.local/share/opencode/auth.json`/`account.json` (real credentials).
 
 ## Post-install updates
 
