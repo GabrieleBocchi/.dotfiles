@@ -242,9 +242,7 @@ that should only be installed when `hasGnome` is true, independently of
 
 `home/dot_config/opencode/` holds config for [OpenCode](https://opencode.ai)
 (the CLI itself is installed via `npm.yaml`, not here): `opencode.json`
-(plugins) and `tui.json`. `model`/`small_model` are intentionally left unset —
-opencode falls back to the last model used (or a sensible internal default on
-first run), so nothing here goes stale as new models ship.
+(plugins + `model`/`small_model`) and `tui.json`.
 
 Permission is left at opencode's own defaults (mostly permissive, so it
 doesn't ask for approval on every action) — the `cc-safety-net` plugin adds an
