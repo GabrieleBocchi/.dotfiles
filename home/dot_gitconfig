@@ -4,6 +4,7 @@
 [core]
     editor = nvim
     excludesFile = ~/.config/git/ignore
+    sshCommand = ssh -i ~/.ssh/id_rsa
 
 [gpg]
     format = openpgp
