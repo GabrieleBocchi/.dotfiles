@@ -12,6 +12,7 @@ alias o='opencode'
 alias open='xdg-open'
 alias sl='sl -ade5'
 alias tmx='tmux'
+alias top='btop'
 alias tree='tree -a'
 
 # Docker

@@ -3,6 +3,7 @@ common:
     pm:
       - bash
       - bat
+      - btop
       - curl
       - fastfetch
       - gcc
