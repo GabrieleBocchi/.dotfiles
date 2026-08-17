@@ -50,12 +50,24 @@
     {
       "customType": "regex",
       "description": "Pin test container images",
-      "managerFilePatterns": ["tests/cases/*.yaml"],
+      "managerFilePatterns": ["tests/cases/*.yaml", "!tests/cases/fedora.yaml"],
       "matchStrings": [
         "(?<indentation>\\s*)image:\\s+(?<depName>[^@\\s:]+):(?<currentValue>[^@\\s:]+)(@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
       "autoReplaceStringTemplate": "{{{indentation}}}image: {{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}",
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update test Fedora image only when the release is stable",
+      "managerFilePatterns": ["tests/cases/fedora.yaml"],
+      "matchStrings": [
+        "(?<indentation>\\s*)image:\\s+fedora:(?<currentValue>[^@\\s:]+)(@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ],
+      "autoReplaceStringTemplate": "{{{indentation}}}image: fedora:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}",
+      "datasourceTemplate": "endoflife-date",
+      "depNameTemplate": "fedora",
+      "versioningTemplate": "loose"
     }
   ]
 }
