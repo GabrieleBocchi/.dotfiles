@@ -47,7 +47,7 @@ alias updateOpencodeModels='bunx oh-my-openagent install'
 alias updatePackages='sudo dnf upgrade --refresh -y'
 alias updateAll='updatePackages && updateNvim && updateDotfiles'
 
-# Import work aliases
-if [ -f ~/.aliases_work ]; then
-    . ~/.aliases_work
+# Import local aliases
+if [ -f ~/.aliases_local.zsh ]; then
+    . ~/.aliases_local.zsh
 fi

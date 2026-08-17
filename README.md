@@ -314,6 +314,11 @@ tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`,
 `~/.omo/` (model routing, see above), and
 `~/.local/share/opencode/auth.json`/`account.json` (real credentials).
 
+Machines needing extra providers not shared here (e.g. a local-only provider)
+point `OPENCODE_CONFIG` at an untracked `~/.config/opencode/opencode-local.json`
+via `home/dot_zshenv` (set only if that file exists); the tracked
+`opencode.json` stays shared and host-agnostic.
+
 ### SSH configuration
 
 `home/private_dot_ssh/private_config` ships a generic `~/.ssh/config` `Host *`

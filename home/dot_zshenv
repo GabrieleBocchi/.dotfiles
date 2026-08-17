@@ -32,3 +32,8 @@ export RUST_BACKTRACE=1
 if [[ -f "$HOME/.secrets/.env" ]]; then
   source "$HOME/.secrets/.env"
 fi
+
+# OpenCode local overrides
+if [[ -f "$HOME/.config/opencode/opencode-local.json" ]]; then
+  export OPENCODE_CONFIG="$HOME/.config/opencode/opencode-local.json"
+fi
