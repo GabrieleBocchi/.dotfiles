@@ -1,0 +1,25 @@
+cases:
+  - name: almalinux-headless
+    image: almalinux:10.2@sha256:cc24bc5b6ac7e284f2f62a07bdaa1b15d3319fdcf46413c6b8fe9fa245068ddd
+    hasGUI: false
+    hasGnome: false
+
+  - name: almalinux-desktop-no-gnome
+    image: almalinux:10.2@sha256:cc24bc5b6ac7e284f2f62a07bdaa1b15d3319fdcf46413c6b8fe9fa245068ddd
+    hasGUI: true
+    hasGnome: false
+
+  - name: almalinux-desktop-gnome
+    image: almalinux:10.2@sha256:cc24bc5b6ac7e284f2f62a07bdaa1b15d3319fdcf46413c6b8fe9fa245068ddd
+    hasGUI: true
+    hasGnome: true
+
+  - name: ol-desktop-gnome
+    image: oraclelinux:10@sha256:0c27f8abb5ab5000e1ba1f5a57b4350480300d6dff7da575cf0f64de098acebf
+    hasGUI: true
+    hasGnome: true
+
+  - name: rocky-desktop-gnome
+    image: rockylinux/rockylinux:10.2@sha256:827d37bc128288ccf160ee318bb3cb92d591164cb217e92f8bc61e3982ae1834
+    hasGUI: true
+    hasGnome: true

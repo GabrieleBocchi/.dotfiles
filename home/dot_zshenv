@@ -15,8 +15,15 @@ export VISUAL=$VIM
 # GPG
 export GPG_TTY=$(tty)
 
+# bat is named "batcat" on old Debian/Ubuntu
+if command -v bat &> /dev/null; then
+    export BAT_CMD=bat
+elif command -v batcat &> /dev/null; then
+    export BAT_CMD=batcat
+fi
+
 # Man pages
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANPAGER="sh -c 'col -bx | $BAT_CMD -l man -p'"
 
 # Rust
 export RUST_BACKTRACE=1

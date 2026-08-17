@@ -1,5 +1,6 @@
+# Cargo packages, installed via `cargo install --locked`.
 cargo:
   base:
-    - viu@1.6.1
-  desktop:
     - kanata@1.11.0
+    - viu@1.6.1
+  desktop: []

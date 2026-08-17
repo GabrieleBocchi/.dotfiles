@@ -4,11 +4,14 @@
     "config:best-practices",
     ":pinDependencies",
     "group:allNonMajor",
+    "group:allDigest",
     "mergeConfidence:all-badges",
     "security:openssf-scorecard",
     ":semanticCommits",
-    ":disableDependencyDashboard"
+    ":disableDependencyDashboard",
+    "workarounds:supportRedHatImageVersion"
   ],
+  "ignorePaths": [],
   "customManagers": [
     {
       "customType": "regex",
@@ -43,6 +46,16 @@
         "-\\s+\"?(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?\\s*"
       ],
       "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "Pin test container images",
+      "managerFilePatterns": ["tests/cases/*.yaml"],
+      "matchStrings": [
+        "(?<indentation>\\s*)image:\\s+(?<depName>[^@\\s:]+):(?<currentValue>[^@\\s:]+)(@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ],
+      "autoReplaceStringTemplate": "{{{indentation}}}image: {{{depName}}}:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}",
+      "datasourceTemplate": "docker"
     }
   ]
 }

@@ -1,6 +1,5 @@
 # Better commands
 alias c='clear'
-alias cat='bat'
 alias cdtemp='cd $(mktemp -d)'
 alias ez="exec zsh"
 alias gdb='gdb -q'
@@ -14,6 +13,9 @@ alias sl='sl -ade5'
 alias tmx='tmux'
 alias top='btop'
 alias tree='tree -a'
+
+# bat (resolved to bat/batcat in dot_zshenv's $BAT_CMD)
+alias cat="$BAT_CMD"
 
 # Docker
 alias docker='sudo docker'

@@ -12,40 +12,35 @@ permissions:
   contents: read
 
 jobs:
+  generate-matrix:
+    name: Generate test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Generate matrix from tests/cases/*.yaml
+        id: set-matrix
+        run: |
+          matrix="$(yq eval-all -o=json '[.cases[]] as $i ireduce ([]; . + $i)' tests/cases/*.yaml | jq -c '{include: .}')"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   test-configuration:
-    name: ${{ matrix.distro.name }}
+    name: ${{ matrix.name }}
+    needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        distro:
-          - image: fedora:latest
-            name: fedora
-          - image: ubuntu:latest
-            name: ubuntu
-          - image: alpine:latest
-            name: alpine
-    container:
-      image: ${{ matrix.distro.image }}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Create test user
+      - name: Run case ${{ matrix.name }}
+        env:
+          CONTAINER_RUNTIME: docker
         run: |
-          if [ "${{ matrix.distro.name }}" = "fedora" ]; then
-            useradd -m testuser
-            dnf install -y util-linux
-          elif [ "${{ matrix.distro.name }}" = "ubuntu" ]; then
-            useradd -m testuser
-          elif [ "${{ matrix.distro.name }}" = "alpine" ]; then
-            adduser -D testuser
-          fi
-
-      - name: Test configuration
-        run: |
-          su testuser
-          cp -r . ~/${{ github.event.repository.name }}
-          cd ~/${{ github.event.repository.name }}
-          ./install.sh
+          ./tests/run.sh "${{ matrix.name }}"

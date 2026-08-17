@@ -1,5 +1,5 @@
 # Load identities
-zstyle :omz:plugins:keychain agents gpg,ssh
+zstyle :omz:plugins:keychain agents ssh
 zstyle :omz:plugins:keychain identities $(echo $IDENTITIES)
 zstyle :omz:plugins:keychain options '--quiet'
 

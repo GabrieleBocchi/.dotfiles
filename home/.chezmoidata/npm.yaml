@@ -1,3 +1,4 @@
+# Global npm packages, installed via `npm install -g`.
 npm:
   base:
     - "@j178/prek@0.4.13"
