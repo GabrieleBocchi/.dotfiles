@@ -1,6 +1,7 @@
 # Global npm packages, installed via `npm install -g`.
 npm:
   base:
+    - "@bitwarden/cli@2026.7.0"
     - "@j178/prek@0.4.13"
     - bun@1.3.14
     - opencode-ai@1.18.18
