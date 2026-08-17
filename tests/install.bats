@@ -143,6 +143,11 @@ script_tool_binary() {
     [ "$status" -eq 0 ]
 }
 
+@test "kanata config is valid" {
+    run kanata --check --cfg "$REPO_DIR/home/dot_config/kanata/config.kbd"
+    [ "$status" -eq 0 ]
+}
+
 @test "ssh config and directory permissions are correct" {
     [ -f "$HOME/.ssh/config" ]
     perm_ssh="$(stat -c '%a' "$HOME/.ssh")"
