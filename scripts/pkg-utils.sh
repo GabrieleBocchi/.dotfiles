@@ -61,15 +61,15 @@ bootstrap_env() {
     echo "▸ Bootstrapping environment..."
     case "$(detect_pm)" in
     apk)
-        pm_install apk sudo bash curl git gnupg
+        pm_install apk sudo bash curl git gnupg unzip
         ;;
     apt-get)
-        pm_install apt-get sudo bash curl git gnupg
+        pm_install apt-get sudo bash curl git gnupg unzip
         ;;
     dnf)
         # --allowerasing: RHEL-family minimal images (e.g. Rocky, Alma) ship
         # curl-minimal by default, which conflicts with the full curl package.
-        pm_install --allowerasing dnf sudo bash curl git gnupg2
+        pm_install --allowerasing dnf sudo bash curl git gnupg2 unzip
         ;;
     *)
         echo "ERROR: failed to bootstrap environment" >&2

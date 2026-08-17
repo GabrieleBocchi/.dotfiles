@@ -1,0 +1,3 @@
+{{- /* Private SSH key .bwSshPersonal. */ -}}
+{{- $privateKey := (bitwardenFields "item" .bwSshPersonal).privateKey.value | replaceAllRegex "-----BEGIN OPENSSH PRIVATE KEY-----" "" | replaceAllRegex "-----END OPENSSH PRIVATE KEY-----" "" | replaceAllRegex "[[:space:]]+" "" -}}
+{{- printf "-----BEGIN OPENSSH PRIVATE KEY-----\n%s\n-----END OPENSSH PRIVATE KEY-----\n" ($privateKey | replaceAllRegex "(.{70})" "$1\n") -}}

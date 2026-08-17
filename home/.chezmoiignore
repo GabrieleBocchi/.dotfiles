@@ -16,3 +16,12 @@ dconf/
 .config/kanata
 .config/systemd
 {{- end }}
+
+# SSH keys come from Bitwarden; render them only when bw exists AND the vault
+# is reachable (interactive run or BW_SESSION set).
+{{- if and (not stdinIsATTY) (not (env "BW_SESSION")) }}
+.ssh/personal
+.ssh/personal.pub
+.ssh/work
+.ssh/work.pub
+{{- end }}
