@@ -71,5 +71,13 @@
       "depNameTemplate": "fedora",
       "versioningTemplate": "loose"
     }
+  ],
+  "packageRules": [
+    {
+      "description": "Schedule test case image updates weekly",
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["tests/cases/*.yaml"],
+      "schedule": ["* 0-3 * * 1"]
+    }
   ]
 }
