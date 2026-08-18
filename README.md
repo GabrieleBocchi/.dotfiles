@@ -37,7 +37,7 @@ Or use the `updateDotfiles` alias.
 
 ## Environment variables
 
-- `IDENTITIES`: Space-separated list of SSH key identities for keychain
+- `OPENCODE_CONFIG`: path to an untracked local opencode provider config (set in `.zshenv`)
 
 ## Dependency management
 
@@ -110,12 +110,12 @@ common:
 fedora:
   desktop:
     pm:
-      - ghostty   # repo scottames/ghostty (Fedora-only)
+      - ghostty # repo scottames/ghostty (Fedora-only)
 
 rhel:
   desktop:
     pm:
-      - google-chrome-stable   # ghostty NOT here: its COPR is Fedora-only
+      - google-chrome-stable # ghostty NOT here: its COPR is Fedora-only
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
@@ -127,8 +127,9 @@ rhel:
 
 Before any of this, `install.sh` calls `bootstrap_env` (in `scripts/pkg-utils.sh`),
 which ensures the core tools the install process itself depends on (shell,
-downloader, VCS, GPG) are present, installing them with the native PM if any
-are missing. GPG is needed because `enable_repo`'s apt-get `custom` kind (see
+downloader, VCS, GPG, unzip for the Bitwarden CLI bootstrap) are present,
+installing them with the native PM if any are missing. GPG is needed because
+`enable_repo`'s apt-get `custom` kind (see
 below) has to dearmor signing keys, and that step always runs _before_ `pm`
 packages (including `gnupg` itself) are installed.
 
@@ -249,9 +250,11 @@ systems) — no distro-specific logic.
 ### Toolchain packages
 
 `home/.chezmoidata/cargo.yaml` and `home/.chezmoidata/npm.yaml` declare
-packages installed via their respective toolchains, each a flat list directly
-under `base`/`desktop` (e.g. `cargo.base`, `cargo.desktop`). Managed by
-Renovate for auto-updates.
+packages installed via their respective toolchains, each a list under
+`base`/`desktop` (e.g. `cargo.base`, `cargo.desktop`). Each package is an
+object with a `name` (`pkg@ver`) and an optional `args` list of extra
+toolchain flags (e.g. `args: ["--force"]`). Managed by Renovate for
+auto-updates.
 
 ### Script-based installs
 
@@ -332,8 +335,39 @@ used but caused connection issues.
 The `.ssh` directory itself is tracked as `private_dot_ssh`, so chezmoi
 enforces `700` permissions on every apply.
 
-Keys and `known_hosts` are never tracked here — they're machine/identity
-specific and stay purely local.
+SSH keys live in Bitwarden, not in this repo. Two note items in the vault
+(`Personal SSH Key`, `Work SSH Key`) map to `~/.ssh/personal{,.pub}` and
+`~/.ssh/work{,.pub}` via templates evaluated at apply time. Each note stores
+the key as two custom fields, `privateKey` and `publicKey` — deliberately a
+**note (secure note)** item and NOT an "SSH Key" item, whose import strips the
+passphrase bcrypt header and silently saves the key in clear (so the rendered
+key keeps its passphrase). They're rendered only when the vault is reachable —
+an interactive run (chezmoi prompts for the master password via
+`bitwarden.unlock = "auto"`) or when `BW_SESSION` is set; in a non-interactive
+run with no session (CI, container) `.chezmoiignore` skips them so `bw` is
+never invoked. `~/.ssh/config` lists both as `IdentityFile`.
+
+The Bitwarden CLI is what makes this possible on a genuinely fresh machine, where
+bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
+runs `scripts/install-password-manager.sh`, which installs the standalone `bw`
+binary (latest CLI release, resolved from GitHub at runtime) and persists a
+`BW_SESSION` key. It is a cheap no-op when bw is already present and the
+persisted token is valid, or in non-interactive CI/container runs where the keys
+are skipped anyway.
+
+The session itself lives as a persisted `BW_SESSION` in the untracked
+`~/.secrets/.env`. The installer sources it before running chezmoi, and
+`.zshenv` sources it blindly in interactive shells (0ms — no `bw` call at shell
+startup). Bitwarden session keys never expire on their own — they only die on
+`bw lock`/`bw logout` — so once persisted, `chezmoi apply` (even a no-op one)
+and `bw` are prompt-free: with `bitwarden.unlock = "auto"`, a present
+`BW_SESSION` means chezmoi neither re-unlocks nor locks. If the token is ever
+invalidated, the next `install.sh` run re-authenticates and rewrites it. npm's
+`@bitwarden/cli` is the source of truth for `bw`: its `npm install -g` uses
+`--force` so it takes over `/usr/local/bin/bw` from the bootstrap's standalone
+binary, leaving npm's
+symlink as the single persistent copy. `unzip` is ensured by both
+`bootstrap_env` and the `common` system packages.
 
 ## Testing
 

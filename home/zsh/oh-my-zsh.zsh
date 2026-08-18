@@ -1,6 +1,6 @@
-# Load identities
+# Load identities from Bitwarden-managed keys in ~/.ssh/
 zstyle :omz:plugins:keychain agents ssh
-zstyle :omz:plugins:keychain identities $(echo $IDENTITIES)
+zstyle :omz:plugins:keychain identities personal work
 zstyle :omz:plugins:keychain options '--quiet'
 
 # Load Antidote

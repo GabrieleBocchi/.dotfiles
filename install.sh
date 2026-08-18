@@ -24,6 +24,13 @@ if [ "$current_ver" != "$TARGET_VERSION" ]; then
     echo "✓ chezmoi ${TARGET_VERSION} installed"
 fi
 
+# Install password manager and login to it
+"$DOTFILES_DIR/scripts/install-password-manager.sh"
+
+# Load passoword manager session
+# shellcheck source=/dev/null
+[ -r "$HOME/.secrets/.env" ] && . "$HOME/.secrets/.env"
+
 echo "▸ Applying chezmoi configuration"
 "$BIN_DIR/chezmoi" init --source "$DOTFILES_DIR" --apply
 echo "✓ chezmoi configuration applied"

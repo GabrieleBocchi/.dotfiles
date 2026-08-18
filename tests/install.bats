@@ -40,14 +40,14 @@ expected_system_packages() {
 expected_cargo_crates() {
     jq -r --argjson gui "$(gui_flag)" '
         .cargo.base + (if $gui then .cargo.desktop else [] end)
-        | .[] | split("@")[0]
+        | .[].name | split("@")[0]
     ' "$DATA"
 }
 
 expected_npm_packages() {
     jq -r --argjson gui "$(gui_flag)" '
         .npm.base + (if $gui then .npm.desktop else [] end)
-        | .[] | match("^(@[^/]+/[^@]+|[^@]+)").string
+        | .[].name | match("^(@[^/]+/[^@]+|[^@]+)").string
     ' "$DATA"
 }
 

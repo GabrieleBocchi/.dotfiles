@@ -53,7 +53,7 @@ echo "▸ cargo packages"
 . "$HOME/.cargo/env"
 
 {{ range $cargoPkgs -}}
-cargo install --locked {{ . }}
+cargo install --locked {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
 {{ end -}}
 
 echo "✓ cargo packages"
@@ -65,7 +65,7 @@ echo "✓ cargo packages"
 echo "▸ npm packages"
 
 {{ range $npmPkgs -}}
-sudo npm install -g {{ . }}
+sudo npm install -g {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
 {{ end -}}
 
 echo "✓ npm packages"

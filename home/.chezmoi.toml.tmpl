@@ -23,3 +23,10 @@ sourceDir = "{{ .chezmoi.homeDir }}/.dotfiles"
       (gt (len (glob "/usr/share/wayland-sessions/*")) 0)
   }}
   hasGnome = {{ ne (lookPath "gnome-shell") "" }}
+
+  bwSshPersonal = "Personal SSH Key"
+  bwSshWork     = "Work SSH Key"
+
+[bitwarden]
+  command = "bw"
+  unlock  = "auto"
