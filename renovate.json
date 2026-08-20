@@ -34,7 +34,7 @@
       "customType": "regex",
       "managerFilePatterns": ["home/.chezmoidata/cargo.yaml"],
       "matchStrings": [
-        "-\\s+name:\\s*\"?(?<depName>[\\w\\-]+?)@(?<currentValue>[\\w\\.\\-]+)\"?\\s*"
+        "-\\s+name:\\s*\"?(?<depName>[\\w\\-]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"
       ],
       "autoReplaceStringTemplate": "- name: \"{{{depName}}}@{{{newValue}}}\"",
       "datasourceTemplate": "crate",
@@ -44,7 +44,7 @@
       "customType": "regex",
       "managerFilePatterns": ["home/.chezmoidata/npm.yaml"],
       "matchStrings": [
-        "-\\s+name:\\s*\"?(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?\\s*"
+        "-\\s+name:\\s*\"?(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"
       ],
       "autoReplaceStringTemplate": "- name: \"{{{depName}}}@{{{newValue}}}\"",
       "datasourceTemplate": "npm"
