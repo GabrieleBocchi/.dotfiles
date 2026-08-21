@@ -1,14 +1,36 @@
 [commit]
     gpgsign = true
+    verbose = true
+
+[branch]
+    sort = -committerdate
 
 [core]
     editor = nvim
     excludesFile = ~/.config/git/ignore
     sshCommand = ssh -i ~/.ssh/personal
 
+[diff]
+    algorithm = histogram
+    colorMoved = default
+    colorMovedWS = allow-indentation-change
+
+[fetch]
+    prune = true
+    pruneTags = true
+
 [gpg]
     format = openpgp
     program = gpg
+
+[log]
+    date = iso-local
+
+[merge]
+    conflictStyle = zdiff3
+
+[push]
+    autoSetupRemote = true
 
 [user]
     email = 40704221+GabrieleBocchi@users.noreply.github.com
