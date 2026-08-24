@@ -36,7 +36,6 @@
       "matchStrings": [
         "-\\s+name:\\s*\"?(?<depName>[\\w\\-]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"
       ],
-      "autoReplaceStringTemplate": "- name: \"{{{depName}}}@{{{newValue}}}\"",
       "datasourceTemplate": "crate",
       "versioningTemplate": "semver"
     },
@@ -46,7 +45,6 @@
       "matchStrings": [
         "-\\s+name:\\s*\"?(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"
       ],
-      "autoReplaceStringTemplate": "- name: \"{{{depName}}}@{{{newValue}}}\"",
       "datasourceTemplate": "npm"
     },
     {
