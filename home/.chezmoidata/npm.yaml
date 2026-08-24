@@ -1,9 +1,9 @@
 # Global npm packages, installed via `npm install -g`.
 npm:
   base:
-    - name: "@bitwarden/cli@2026.7.0"
+    - name: "@bitwarden/cli@2026.8.0"
       args: ["--force"] # standalone bw installed by bootstrap; --force lets npm take over
     - name: "@j178/prek@0.4.14"
-    - name: bun@1.3.14
-    - name: opencode-ai@1.18.18
+    - name: bun@1.4.0
+    - name: opencode-ai@1.18.19
   desktop: []
