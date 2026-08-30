@@ -1,5 +1,5 @@
 #!/bin/sh
-# read-source-state.pre hook: install bw if missing and persist a BW_SESSION env.
+# Invoked by the installer: install bw if missing and persist a BW_SESSION env.
 
 set -eu
 
@@ -72,6 +72,9 @@ persist_session() {
     secrets="$HOME/.secrets"
     env_file="$secrets/.env"
 
+    mkdir -p "$secrets"
+    chmod 700 "$secrets"
+
     if [ -r "$env_file" ]; then
         session="$(sed -n 's/^export BW_SESSION="\([^"]*\)"$/\1/p' "$env_file" 2>/dev/null | head -n1)"
         if [ -n "$session" ] && BW_SESSION="$session" bw unlock --check </dev/null >/dev/null 2>&1; then
@@ -88,12 +91,13 @@ persist_session() {
         ;;
     esac
 
-    mkdir -p "$secrets"
-    tmp="${env_file}.tmp"
+    tmp="$(
+        umask 077
+        mktemp "$env_file.XXXXXX"
+    )"
     # Keep every other line; rewrite only the BW_SESSION line.
     grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$tmp" || true
     printf 'export BW_SESSION="%s"\n' "$session" >>"$tmp"
-    chmod 600 "$tmp"
     mv "$tmp" "$env_file"
 }
 
