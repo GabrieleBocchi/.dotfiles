@@ -316,18 +316,19 @@ can be silently bypassed.
 
 Per-agent model routing for the orchestration plugin is intentionally **not**
 tracked here: it maps agents to specific model IDs, which drift as new models
-ship. Run `updateOpencodeModels` (`bunx oh-my-openagent install`, aliased in
-`home/zsh/aliases.zsh`) to (re)generate it — the official installer interviews
-you about your subscriptions (Claude, Copilot, Gemini, etc.) and picks current
-best-fit models per agent, kept up to date by the plugin maintainer instead of
-by us. It writes to `~/.omo/omo.jsonc` (the plugin's unified config location,
-not `~/.config/opencode/`), migrating any older `oh-my-openagent.json` it
-finds there automatically.
+ship. Run `updateOpencodeModels` (`bunx oh-my-opencode-slim install`, aliased
+in `home/zsh/aliases.zsh`) to (re)generate it — the official installer
+interviews you about your subscriptions (Claude, Copilot, Gemini, etc.) and
+picks current best-fit models per agent, kept up to date by the plugin
+maintainer instead of by us. It writes to
+`~/.config/opencode/oh-my-opencode-slim.json[c]` (the plugin's unified config
+location). Since that file isn't in the source state under
+`home/dot_config/opencode/`, chezmoi treats it as unmanaged and leaves it alone.
 
 Excluded on purpose (regenerated automatically, or machine-specific state, not
-tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`,
-`~/.omo/` (model routing, see above), and
+tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`, and
 `~/.local/share/opencode/auth.json`/`account.json` (real credentials).
+
 
 Machines needing extra providers not shared here (e.g. a local-only provider)
 point `OPENCODE_CONFIG` at an untracked `~/.config/opencode/opencode-local.json`

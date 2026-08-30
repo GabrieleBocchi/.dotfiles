@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bitwarden CLI: install (render-time), persist BW_SESSION, or uninstall.
+# Bitwarden CLI: install (render-time), persist BW_SESSION, or link.
 
 set -eu
 
@@ -99,6 +99,9 @@ link_bw() {
     per_user="$HOME/.local/share/fnm/aliases/default/bin/bw"
     [ -x "$per_user" ] || return 0
 
+    # Skip linking if the symlink already points to the per-user bw binary.
+    [ "$(readlink -- /usr/local/bin/bw 2>/dev/null)" = "$per_user" ] && return 0
+
     if [ "$(id -u)" -eq 0 ]; then
         ln -sfn "$per_user" /usr/local/bin/bw
     else
@@ -120,7 +123,7 @@ link)
     link_bw
     ;;
 *)
-    echo "usage: $0 [install|uninstall]" >&2
+    echo "usage: $0 [install|link]" >&2
     exit 1
     ;;
 esac
