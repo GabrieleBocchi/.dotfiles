@@ -1,7 +1,17 @@
-# Load identities from Bitwarden-managed keys in ~/.ssh/
-zstyle :omz:plugins:keychain agents ssh
-zstyle :omz:plugins:keychain identities personal work
-zstyle :omz:plugins:keychain options '--quiet'
+keychain_keys=(personal work)
+
+if (( $+commands[keychain] )); then
+  _kc_env="$HOME/.keychain/${(%):-%m}-sh"
+  [[ -z $SSH_AUTH_SOCK && -f $_kc_env ]] && source "$_kc_env"
+  if [[ ! -S ${SSH_AUTH_SOCK:-} ]] || ! ssh-add -l >/dev/null 2>&1; then
+    keychain add --quiet --host "${(%):-%m}" "${keychain_keys[@]}"
+    source "$_kc_env"
+  fi
+  unset _kc_env
+fi
+
+# oh-my-zsh is managed by antidote (`antidote update`)
+zstyle ':omz:update' mode disabled
 
 # Load Antidote
 zsh_plugins_list=$DOTFILES/home/zsh/.zsh_plugins.txt
