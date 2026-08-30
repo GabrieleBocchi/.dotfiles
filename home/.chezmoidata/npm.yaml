@@ -6,4 +6,5 @@ npm:
     - name: "@j178/prek@0.4.14"
     - name: bun@1.4.0
     - name: opencode-ai@1.18.23
+      args: ["--allow-scripts=opencode-ai"] # npm blocks its postinstall (binary fetch) otherwise
   desktop: []
