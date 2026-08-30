@@ -35,6 +35,11 @@ git -C ~/.dotfiles pull --prune
 
 Or use the `updateDotfiles` alias.
 
+This is the single command to update everything: it re-downloads the fnm binary
+(fnm has no `self-update`) and re-runs `fnm install --lts`, an idempotent
+operation that downloads the latest LTS node when a new one exists and keeps
+the `lts-latest` default pointing at it. No pinned node version is tracked.
+
 ## Environment variables
 
 - `OPENCODE_CONFIG`: path to an untracked local opencode provider config (set in `.zshenv`)
@@ -138,8 +143,10 @@ The install script:
 1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
 2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
 3. Runs script-based installers (`install_script name url [args...]`)
-4. Installs cargo packages with `--locked`
-5. Installs npm global packages
+4. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
+   musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
+5. Installs cargo packages with `--locked`
+6. Installs npm global packages (via fnm's per-user npm) and drops the bootstrap's root `bw`, so only the npm-installed one remains
 
 ### Repositories
 
@@ -256,6 +263,11 @@ object with a `name` (`pkg@ver`) and an optional `args` list of extra
 toolchain flags (e.g. `args: ["--force"]`). Managed by Renovate for
 auto-updates.
 
+Node itself comes from fnm (`Fnm` script installer in `system.yaml`), which
+manages one LTS node per-user and is set up in `home/zsh/init/10-fnm.zsh`;
+npm globals are installed through that same per-user npm. See "Updating" for
+how the LTS is kept current.
+
 ### Script-based installs
 
 URL-based installers (rustup, terragrunt, etc.) are downloaded,
@@ -369,7 +381,7 @@ operation prompts via pinentry for the key's existing passphrase unless
 
 The Bitwarden CLI is what makes this possible on a genuinely fresh machine, where
 bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
-runs `scripts/install-password-manager.sh`, which installs the standalone `bw`
+runs `scripts/password-manager.sh install`, which installs the standalone `bw`
 binary (latest CLI release, resolved from GitHub at runtime) and persists a
 `BW_SESSION` key. It is a cheap no-op when bw is already present and the
 persisted token is valid, or in non-interactive CI/container runs where the keys
@@ -383,11 +395,13 @@ startup). Bitwarden session keys never expire on their own — they only die on
 and `bw` are prompt-free: with `bitwarden.unlock = "auto"`, a present
 `BW_SESSION` means chezmoi neither re-unlocks nor locks. If the token is ever
 invalidated, the next `install.sh` run re-authenticates and rewrites it. npm's
-`@bitwarden/cli` is the source of truth for `bw`: its `npm install -g` uses
-`--force` so it takes over `/usr/local/bin/bw` from the bootstrap's standalone
-binary, leaving npm's
-symlink as the single persistent copy. `unzip` is ensured by both
-`bootstrap_env` and the `common` system packages.
+`@bitwarden/cli` is the source of truth for `bw`: it installs via fnm's per-user
+npm, and after the chezmoi apply `install.sh` calls
+`scripts/password-manager.sh link`, which points `/usr/local/bin/bw` at the
+per-user npm binary via symlink (`aliases/default` follows fnm's active LTS), so
+there's a single real bw that chezmoi reaches via the system PATH and that isn't
+re-downloaded on later runs. `unzip` is ensured by both `bootstrap_env` and the
+`common` system packages.
 
 ## Testing
 

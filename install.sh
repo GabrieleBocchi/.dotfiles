@@ -25,12 +25,15 @@ if [ "$current_ver" != "$TARGET_VERSION" ]; then
 fi
 
 # Install password manager and login to it
-"$DOTFILES_DIR/scripts/install-password-manager.sh"
+"$DOTFILES_DIR/scripts/password-manager.sh" install
 
-# Load passoword manager session
+# Load password manager session
 # shellcheck source=/dev/null
 [ -r "$HOME/.secrets/.env" ] && . "$HOME/.secrets/.env"
 
 echo "▸ Applying chezmoi configuration"
 "$BIN_DIR/chezmoi" init --source "$DOTFILES_DIR" --apply
 echo "✓ chezmoi configuration applied"
+
+# Point /usr/local/bin/bw at npm's per-user one
+"$DOTFILES_DIR/scripts/password-manager.sh" link
