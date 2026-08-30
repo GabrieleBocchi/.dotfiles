@@ -347,6 +347,26 @@ an interactive run (chezmoi prompts for the master password via
 run with no session (CI, container) `.chezmoiignore` skips them so `bw` is
 never invoked. `~/.ssh/config` lists both as `IdentityFile`.
 
+The passphrase-protected OpenPGP secret key is also kept out of the repository.
+Create a Bitwarden secure note named `Personal GPG Key` with one custom field named
+`privateKey`. On the source machine, export the desired secret key directly
+for copying into that field:
+
+```sh
+gpg --armor --export-secret-keys <fingerprint>
+```
+
+The export preserves the key's existing passphrase protection. When an
+interactive chezmoi run or `BW_SESSION` makes the vault reachable, the
+platform-neutral `run_before_00-import-gpg-key.sh.tmpl` script runs on every
+enabled apply. It fetches the field once, stores only its SHA-256 hash under
+the chezmoi state directory, and streams the armor directly to
+`gpg --batch --import` only if the secret key is missing locally or the armor
+changed. This also repairs a locally deleted key on the next enabled apply; no
+armored key file is created. Import should not prompt. The first signing
+operation prompts via pinentry for the key's existing passphrase unless
+`gpg-agent` already has it cached.
+
 The Bitwarden CLI is what makes this possible on a genuinely fresh machine, where
 bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
 runs `scripts/install-password-manager.sh`, which installs the standalone `bw`

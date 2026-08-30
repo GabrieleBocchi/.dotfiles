@@ -1,0 +1,37 @@
+{{- if or stdinIsATTY (env "BW_SESSION") -}}
+#!/usr/bin/env bash
+
+set -euo pipefail
+{{ $armorBody := (bitwardenFields "item" .bwGpgPersonal).privateKey.value | replaceAllRegex "(?s).*-----BEGIN PGP PRIVATE KEY BLOCK-----" "" | replaceAllRegex "(?s)-----END PGP PRIVATE KEY BLOCK-----.*" "" | replaceAllRegex "[[:space:][:cntrl:]]+" "" }}
+{{ if not (regexMatch "^[A-Za-z0-9+/]+={0,2}=[A-Za-z0-9+/]{4}$" $armorBody) }}{{ fail "invalid flattened PGP private key armor" }}{{ end }}
+{{ $armorCrc := regexFind "=[A-Za-z0-9+/]{4}$" $armorBody }}
+{{ $armorPayload := $armorBody | replaceAllRegex "=[A-Za-z0-9+/]{4}$" "" }}
+{{ $armorWrapped := $armorPayload | replaceAllRegex "(.{64})" "${1}\n" | trimSuffix "\n" }}
+armor={{ printf "-----BEGIN PGP PRIVATE KEY BLOCK-----\n\n%s\n%s\n-----END PGP PRIVATE KEY BLOCK-----" $armorWrapped $armorCrc | squote }}
+fingerprint="$(printf '%s\n' "$armor" | gpg --batch --with-colons --import-options show-only --import | awk -F: '$1 == "fpr" && !seen { print $10; seen = 1 }')"
+
+if [[ -z "$fingerprint" ]]; then
+    printf 'failed to derive GPG fingerprint from armored secret key\n' >&2
+    exit 1
+fi
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi"
+state_file="$state_dir/gpg-secret-key-$fingerprint.sha256"
+armor_hash="$(printf '%s\n' "$armor" | LC_ALL=C gpg --batch --print-md SHA256 | tr -d '[:space:]')"
+stored_hash=""
+
+if [[ -f "$state_file" ]]; then
+    stored_hash="$(<"$state_file")"
+fi
+
+if ! gpg --batch --list-secret-keys "$fingerprint" >/dev/null 2>&1 || [[ "$stored_hash" != "$armor_hash" ]]; then
+    printf '%s\n' "$armor" | gpg --batch --import
+    mkdir -p "$state_dir"
+    chmod 0700 "$state_dir"
+    (
+        umask 077
+        printf '%s\n' "$armor_hash" >"$state_file"
+    )
+    chmod 0600 "$state_file"
+fi
+{{- end -}}
