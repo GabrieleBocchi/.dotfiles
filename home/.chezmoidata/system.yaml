@@ -17,7 +17,6 @@ common:
       - keychain
       - make
       - neovim
-      - npm
       - podman
       - sudo
       - tar
@@ -38,6 +37,9 @@ common:
       - name: Uv
         url: "https://astral.sh/uv/install.sh"
         envs: ["UV_NO_MODIFY_PATH=1"]
+      - name: Fnm
+        url: "https://fnm.vercel.app/install"
+        args: ["--skip-shell"]
   desktop:
     pm:
       - fontconfig
@@ -52,6 +54,8 @@ alpine:
       - fastfetch
       - github-cli
       - gnupg
+      - libgcc
+      - libstdc++
       - musl-dev
       - openssh-client-default
       - shadow

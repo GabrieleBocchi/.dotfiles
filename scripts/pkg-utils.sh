@@ -233,3 +233,24 @@ install_script() {
 
     echo "✓ Installed $name"
 }
+
+fnm_install_lts() {
+    echo "▸ Installing Node.js LTS via fnm"
+
+    export PATH="$HOME/.local/share/fnm:$PATH"
+
+    if [ -n "$(ls /lib/ld-musl-*.so.1 2>/dev/null)" ]; then
+        export FNM_NODE_DIST_MIRROR="https://unofficial-builds.nodejs.org/download/release"
+        case "$(uname -m)" in
+        aarch64) export FNM_ARCH="arm64-musl" ;;
+        *) export FNM_ARCH="x64-musl" ;;
+        esac
+    fi
+
+    eval "$(fnm env --shell bash)"
+
+    fnm install --lts
+    fnm default lts-latest
+
+    echo "✓ Installed Node.js $(node --version)"
+}

@@ -1,10 +1,7 @@
 #!/bin/sh
-# Invoked by the installer: install bw if missing and persist a BW_SESSION env.
+# Bitwarden CLI: install (render-time), persist BW_SESSION, or uninstall.
 
 set -eu
-
-# Non-interactive run with no session (CI, container).
-[ ! -t 0 ] && [ -z "${BW_SESSION:-}" ] && exit 0
 
 install_bw() {
     case "$(uname -s)-$(uname -m)" in
@@ -25,20 +22,20 @@ install_bw() {
         suffix="-arm64"
         ;;
     *)
-        echo "install-password-manager: unsupported platform $(uname -s)/$(uname -m)" >&2
+        echo "ERROR: unsupported platform $(uname -s)/$(uname -m)" >&2
         exit 1
         ;;
     esac
 
     bw_version="$(
-        curl --proto '=https' --tlsv1.2 -fsSL \
+        curl --proto '=https' --tlsv1.2 -sSfL \
             'https://api.github.com/repos/bitwarden/clients/releases?per_page=30' |
             grep -o '"tag_name"[[:space:]]*:[[:space:]]*"cli-v[^"]*"' |
             head -n1 |
             sed 's/.*cli-v//; s/"$//'
     )"
     [ -n "$bw_version" ] || {
-        echo "install-password-manager: couldn't resolve latest bw version" >&2
+        echo "ERROR: couldn't resolve latest bw version" >&2
         exit 1
     }
 
@@ -49,11 +46,11 @@ install_bw() {
     trap 'rm -rf "$tmp"' EXIT
 
     echo "▸ Installing Bitwarden CLI $bw_version..."
-    curl --proto '=https' --tlsv1.2 -fsSL -o "$tmp/bw.zip" "$url"
+    curl --proto '=https' --tlsv1.2 -sSfL -o "$tmp/bw.zip" "$url"
     unzip -oq "$tmp/bw.zip" -d "$tmp"
 
     if [ ! -f "$tmp/bw" ]; then
-        echo "install-password-manager: '$asset' extracted no 'bw' binary" >&2
+        echo "ERROR: '$asset' extracted no 'bw' binary" >&2
         exit 1
     fi
 
@@ -64,9 +61,6 @@ install_bw() {
     fi
     echo "✓ Installed Bitwarden CLI $bw_version"
 }
-
-# Install bw when missing.
-command -v bw >/dev/null 2>&1 || install_bw
 
 persist_session() {
     secrets="$HOME/.secrets"
@@ -101,4 +95,32 @@ persist_session() {
     mv "$tmp" "$env_file"
 }
 
-persist_session
+link_bw() {
+    per_user="$HOME/.local/share/fnm/aliases/default/bin/bw"
+    [ -x "$per_user" ] || return 0
+
+    if [ "$(id -u)" -eq 0 ]; then
+        ln -sfn "$per_user" /usr/local/bin/bw
+    else
+        sudo ln -sfn "$per_user" /usr/local/bin/bw
+    fi
+}
+
+case "${1:-}" in
+install)
+    # Non-interactive run with no session (CI, container).
+    [ ! -t 0 ] && [ -z "${BW_SESSION:-}" ] && exit 0
+
+    # Install bw when missing.
+    command -v bw >/dev/null 2>&1 || install_bw
+
+    persist_session
+    ;;
+link)
+    link_bw
+    ;;
+*)
+    echo "usage: $0 [install|uninstall]" >&2
+    exit 1
+    ;;
+esac

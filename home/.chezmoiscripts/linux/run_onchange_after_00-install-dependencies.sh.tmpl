@@ -58,14 +58,16 @@ cargo install --locked {{ range default (list) (get . "args") }}{{ . }} {{ end }
 
 echo "✓ cargo packages"
 
-# ── Install npm global packages ─────────────────────────────────────────────
+# ── Install npm packages ────────────────────────────────────────────────────
+fnm_install_lts
+
 {{ $npmPkgs := .npm.base -}}
 {{ if .hasGUI }}{{ $npmPkgs = concat $npmPkgs .npm.desktop }}{{ end -}}
 
 echo "▸ npm packages"
 
 {{ range $npmPkgs -}}
-sudo npm install -g {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
+npm install -g {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
 {{ end -}}
 
 echo "✓ npm packages"
