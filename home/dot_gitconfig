@@ -7,6 +7,7 @@
 
 [core]
     editor = nvim
+    excludesFile = ~/.config/git/ignore
     sshCommand = ssh -i ~/.ssh/personal
 
 [diff]
