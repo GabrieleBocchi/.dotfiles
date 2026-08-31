@@ -10,6 +10,15 @@
     "opencode-log-sanitizer",
     "opencode-notify",
     "opencode-token-tracker",
-    "oh-my-openagent@latest"
-  ]
+    "oh-my-opencode-slim"
+  ],
+  "agent": {
+    "explore": {
+      "disable": true
+    },
+    "general": {
+      "disable": true
+    }
+  },
+  "lsp": true
 }
