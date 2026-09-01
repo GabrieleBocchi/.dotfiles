@@ -1,0 +1,22 @@
+# Flatpak remotes and applications.
+#
+# `remotes`/`apps`: each split into `base` (every machine) and `desktop` (GUI only).
+flatpak:
+  remotes:
+    base:
+      - name: flathub
+        url: "https://dl.flathub.org/repo/flathub.flatpakrepo"
+    desktop: []
+  apps:
+    base: []
+    desktop:
+      - remote: flathub
+        name: com.github.IsmaelMartinez.teams_for_linux
+      - remote: flathub
+        name: com.google.Chrome
+      - remote: flathub
+        name: com.spotify.Client
+      - remote: flathub
+        name: dev.vencord.Vesktop
+      - remote: flathub
+        name: org.telegram.desktop
