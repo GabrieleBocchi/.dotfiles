@@ -305,29 +305,27 @@ lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 (the CLI itself is installed via `npm.yaml`, not here): `opencode.json`
 (plugins + `model`/`small_model`) and `tui.json`.
 
-Permission is left at opencode's own defaults (mostly permissive, so it
-doesn't ask for approval on every action) — the `cc-safety-net` plugin adds an
-independent guardrail that blocks destructive commands (`rm -rf`,
-`git reset --hard`, force pushes, etc.) and secret file access, running as its
-own hook rather than through opencode's own permission system, since
-pattern-based `deny` rules there have
+Hybrid Slim agents allow external-directory access without prompts. `.env`
+files, other secrets, and dangerous commands remain separately protected: the
+`cc-safety-net` plugin adds an independent guardrail that blocks destructive
+commands (`rm -rf`, `git reset --hard`, force pushes, etc.) and secret file
+access, running as its own hook rather than through opencode's own permission
+system, since pattern-based `deny` rules there have
 [known bugs](https://github.com/anomalyco/opencode/issues/28682) where they
 can be silently bypassed.
 
-Per-agent model routing for the orchestration plugin is intentionally **not**
-tracked here: it maps agents to specific model IDs, which drift as new models
-ship. Run `updateOpencodeModels` (`bunx oh-my-opencode-slim install`, aliased
-in `home/zsh/aliases.zsh`) to (re)generate it — the official installer
-interviews you about your subscriptions (Claude, Copilot, Gemini, etc.) and
-picks current best-fit models per agent, kept up to date by the plugin
-maintainer instead of by us. It writes to
-`~/.config/opencode/oh-my-opencode-slim.json[c]` (the plugin's unified config
-location). Since that file isn't in the source state under
-`home/dot_config/opencode/`, chezmoi treats it as unmanaged and leaves it alone.
+The Slim routing config is tracked at
+`home/dot_config/opencode/oh-my-opencode-slim.json`. Its active `hybrid` preset
+routes across Copilot/OpenAI and protects cross-provider fallback with one
+retry. `updateOpencodeSlim` (`bunx oh-my-opencode-slim install
+--companion=no`, aliased in `home/zsh/aliases.zsh`) refreshes Slim/plugin-managed
+skills but preserves routing; it does not refresh model IDs. `--reset` replaces
+routing and creates a backup.
 
-Excluded on purpose (regenerated automatically, or machine-specific state, not
-tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`, and
-`~/.local/share/opencode/auth.json`/`account.json` (real credentials).
+Ordinary OpenCode auth and runtime state remains excluded on purpose: `logs/`
+and `~/.local/share/opencode/auth.json`/`account.json` (real credentials) are
+not tracked here. `node_modules/`, `bun.lock`, and `package*.json` are excluded
+as well.
 
 On Linux, the post-apply update script lets RTK refresh its generated
 `~/.config/opencode/plugins/rtk.ts` after each apply. RTK owns that plugin;

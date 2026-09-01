@@ -43,7 +43,7 @@ alias activate='source */bin/activate'
 # Updates
 alias updateDotfiles='git -C "$DOTFILES" pull --prune && $DOTFILES/install.sh'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
-alias updateOpencodeModels='bunx oh-my-opencode-slim install'
+alias updateOpencodeSlim='bunx oh-my-opencode-slim install --companion=no'
 alias updatePackages='sudo dnf upgrade --refresh -y'
 alias updateAll='updatePackages && updateNvim && updateDotfiles'
 
