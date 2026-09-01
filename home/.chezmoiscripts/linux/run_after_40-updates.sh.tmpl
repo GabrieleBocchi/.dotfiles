@@ -20,6 +20,11 @@ rustup update
 
 echo "✓ Rustup update"
 
+# ── RTK OpenCode integration ─────────────────────────────────────────────────
+echo "▸ RTK OpenCode integration"
+RTK_TELEMETRY_DISABLED=1 rtk init -g --opencode
+echo "✓ RTK OpenCode integration"
+
 # ── Font cache (GUI only) ───────────────────────────────────────────────────
 {{ if .hasGUI -}}
 echo "▸ Rebuilding font cache"
