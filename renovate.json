@@ -41,6 +41,16 @@
     },
     {
       "customType": "regex",
+      "managerFilePatterns": ["home/.chezmoidata/cargo.yaml"],
+      "matchStrings": [
+        "-\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)\\s+#\\s+renovate:\\s+datasource=github-releases\\s+depName=rtk-ai/rtk"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "rtk-ai/rtk",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["home/.chezmoidata/npm.yaml"],
       "matchStrings": [
         "-\\s+name:\\s*\"?(?<depName>[\\w\\-@/]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"

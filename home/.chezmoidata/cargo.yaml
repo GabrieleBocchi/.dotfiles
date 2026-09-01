@@ -2,5 +2,11 @@
 cargo:
   base:
     - name: kanata@1.11.0
+    - name: rtk
+      args:
+        - --git
+        - https://github.com/rtk-ai/rtk
+        - --tag
+        - v0.46.0 # renovate: datasource=github-releases depName=rtk-ai/rtk
     - name: viu@1.6.1
   desktop: []

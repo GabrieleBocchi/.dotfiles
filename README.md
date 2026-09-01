@@ -261,7 +261,7 @@ packages installed via their respective toolchains, each a list under
 `base`/`desktop` (e.g. `cargo.base`, `cargo.desktop`). Each package is an
 object with a `name` (`pkg@ver`) and an optional `args` list of extra
 toolchain flags (e.g. `args: ["--force"]`). Managed by Renovate for
-auto-updates.
+auto-updates. RTK is a Cargo Git dependency pinned to a GitHub release tag and managed by Renovate.
 
 Node itself comes from fnm (`Fnm` script installer in `system.yaml`), which
 manages one LTS node per-user and is set up in `home/zsh/init/10-fnm.zsh`;
@@ -329,6 +329,9 @@ Excluded on purpose (regenerated automatically, or machine-specific state, not
 tracked here): `node_modules/`, `bun.lock`, `package*.json`, `logs/`, and
 `~/.local/share/opencode/auth.json`/`account.json` (real credentials).
 
+On Linux, the post-apply update script lets RTK refresh its generated
+`~/.config/opencode/plugins/rtk.ts` after each apply. RTK owns that plugin;
+neither it nor RTK's runtime data in `~/.local/share/rtk/` is tracked here.
 
 Machines needing extra providers not shared here (e.g. a local-only provider)
 point `OPENCODE_CONFIG` at an untracked `~/.config/opencode/opencode-local.json`
@@ -371,7 +374,7 @@ gpg --armor --export-secret-keys <fingerprint>
 
 The export preserves the key's existing passphrase protection. When an
 interactive chezmoi run or `BW_SESSION` makes the vault reachable, the
-platform-neutral `run_before_00-import-gpg-key.sh.tmpl` script runs on every
+Linux-only `run_before_00-import-gpg-key.sh.tmpl` script runs on every
 enabled apply. It fetches the field once, stores only its SHA-256 hash under
 the chezmoi state directory, and streams the armor directly to
 `gpg --batch --import` only if the secret key is missing locally or the armor
@@ -427,6 +430,8 @@ duplicated between local and CI.
 ## Post-install updates
 
 `run_after_40-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
+On Linux, it also refreshes RTK's generated OpenCode plugin when RTK is
+available; a failed refresh only emits a warning.
 
 ## External dependencies (version-pinned)
 
