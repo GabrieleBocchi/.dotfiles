@@ -22,29 +22,7 @@ repos:
         suites: "$codename"
         components: "main"
         signed_by: "https://apt.releases.hashicorp.com/gpg"
-    desktop:
-      # NOTE: NO atareao/telegram PPA here — it's Ubuntu-only (see `ubuntu`).
-      - kind: custom
-        name: google-chrome
-        uri: "https://dl.google.com/linux/chrome/deb/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: spotify
-        uri: "https://repository.spotify.com"
-        suites: "stable"
-        components: "non-free"
-        signed_by: "https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.gpg"
-      - kind: custom
-        name: teams-for-linux
-        uri: "https://repo.teamsforlinux.de/debian/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://repo.teamsforlinux.de/teams-for-linux.asc"
-      - kind: deb-release
-        name: vesktop
-        url: "https://vencord.dev/download/vesktop/amd64/deb"
+    desktop: []
 
   ubuntu:
     base:
@@ -57,30 +35,7 @@ repos:
         suites: "$codename"
         components: "main"
         signed_by: "https://apt.releases.hashicorp.com/gpg"
-    desktop:
-      - kind: custom
-        name: google-chrome
-        uri: "https://dl.google.com/linux/chrome/deb/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: spotify
-        uri: "https://repository.spotify.com"
-        suites: "stable"
-        components: "non-free"
-        signed_by: "https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.gpg"
-      - kind: custom
-        name: teams-for-linux
-        uri: "https://repo.teamsforlinux.de/debian/"
-        suites: "stable"
-        components: "main"
-        signed_by: "https://repo.teamsforlinux.de/teams-for-linux.asc"
-      - kind: ppa
-        name: atareao/telegram
-      - kind: deb-release
-        name: vesktop
-        url: "https://vencord.dev/download/vesktop/amd64/deb"
+    desktop: []
 
   # ── dnf families ────────────────────────────────────────────────────────────
   fedora:
@@ -90,28 +45,10 @@ repos:
         baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
     desktop:
-      - kind: custom
-        name: google-chrome
-        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
-        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: teams-for-linux
-        baseurl: "https://repo.teamsforlinux.de/rpm/"
-        gpgkey: "https://repo.teamsforlinux.de/teams-for-linux.asc"
       - kind: copr
         name: peterwu/rendezvous
       - kind: copr
         name: scottames/ghostty
-      - kind: custom
-        name: fedora-spotify
-        baseurl: "https://negativo17.org/repos/spotify/fedora-$releasever/$basearch/"
-        gpgkey: "https://negativo17.org/repos/RPM-GPG-KEY-slaanesh"
-      - kind: rpm-release
-        name: rpmfusion-free
-        url: "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$releasever.noarch.rpm"
-      - kind: rpm-release
-        name: vesktop
-        url: "https://vencord.dev/download/vesktop/amd64/rpm"
 
   rhel:
     base:
@@ -122,13 +59,4 @@ repos:
       - kind: rpm-release
         name: epel-release
         url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm"
-    desktop:
-      # NO Ghostty, Spotify and Vesktop (Fedora-only).
-      - kind: custom
-        name: google-chrome
-        baseurl: "https://dl.google.com/linux/chrome/rpm/stable/x86_64"
-        gpgkey: "https://dl.google.com/linux/linux_signing_key.pub"
-      - kind: custom
-        name: teams-for-linux
-        baseurl: "https://repo.teamsforlinux.de/rpm/"
-        gpgkey: "https://repo.teamsforlinux.de/teams-for-linux.asc"
+    desktop: []
