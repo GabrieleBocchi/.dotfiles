@@ -6,6 +6,6 @@ npm:
     - name: bun@1.4.0
       args: ["--allow-scripts=bun"] # its postinstall (node install.js) fetches the bun binary
     - name: "npm@12.0.2"
-    - name: opencode-ai@1.18.25
+    - name: opencode-ai@1.18.26
       args: ["--allow-scripts=opencode-ai"] # npm blocks its postinstall (binary fetch) otherwise
   desktop: []
