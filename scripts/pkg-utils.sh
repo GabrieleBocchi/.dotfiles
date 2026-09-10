@@ -239,6 +239,7 @@ fnm_install_lts() {
 
     export PATH="$HOME/.local/share/fnm:$PATH"
 
+    unset FNM_ARCH FNM_NODE_DIST_MIRROR
     if [ -n "$(ls /lib/ld-musl-*.so.1 2>/dev/null)" ]; then
         export FNM_NODE_DIST_MIRROR="https://unofficial-builds.nodejs.org/download/release"
         case "$(uname -m)" in

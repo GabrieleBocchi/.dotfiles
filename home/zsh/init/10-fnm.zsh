@@ -3,7 +3,8 @@ if [[ -x "$HOME/.local/share/fnm/fnm" ]]; then
     path=("$HOME/.local/share/fnm" $path)
 
     # musl (Alpine/void): fetch musl-linked node binaries
-    if [[ -n "$(ls /lib/ld-musl-*.so.1(N) 2>/dev/null)" ]]; then
+    local musl_libs=(/lib/ld-musl-*.so.1(N))
+    if (( ${#musl_libs} )); then
         export FNM_NODE_DIST_MIRROR="https://unofficial-builds.nodejs.org/download/release"
         case "$(uname -m)" in
             aarch64) export FNM_ARCH="arm64-musl" ;;
