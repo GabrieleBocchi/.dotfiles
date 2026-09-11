@@ -32,6 +32,23 @@ install_pkgs {{ .pm }} {{ range $allPkgs }}{{ . }} {{ end }}
 
 echo "✓ System packages"
 
+# ── Flatpak remotes + apps ───────────────────────────────────────────────────
+echo "▸ Flatpak"
+
+{{ $flatpakRemotes := .flatpak.remotes.base -}}
+{{ if .hasGUI }}{{ $flatpakRemotes = concat $flatpakRemotes .flatpak.remotes.desktop }}{{ end -}}
+{{ range $flatpakRemotes -}}
+flatpak remote-add --user --if-not-exists {{ .name | quote }} {{ .url }}
+{{ end -}}
+
+{{ $flatpakApps := .flatpak.apps.base -}}
+{{ if .hasGUI }}{{ $flatpakApps = concat $flatpakApps .flatpak.apps.desktop }}{{ end -}}
+{{ range $flatpakApps -}}
+flatpak install --user -y {{ .remote | quote }} {{ .name | quote }}
+{{ end -}}
+
+echo "✓ Flatpak"
+
 # ── Script-based installs ────────────────────────────────────────────────────
 {{ $allScripts := concat .common.base.script (default (list) (get $pmBase "script")) -}}
 {{ if .hasGUI }}{{ $allScripts = concat $allScripts .common.desktop.script (default (list) (get $pmDesktop "script")) }}{{ end -}}
