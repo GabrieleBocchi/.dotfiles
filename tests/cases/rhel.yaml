@@ -15,7 +15,7 @@ cases:
     hasGnome: true
 
   - name: ol-desktop-gnome
-    image: oraclelinux:10@sha256:2f145af52abf6ee5be815b35751c65dc1531a4c709904c4fd7f72b23fdbc5015
+    image: oraclelinux:10@sha256:1628d6e6586862766a2d5925f0fab6c6e1a468bc33874ae68046c7ca57406baf
     hasGUI: true
     hasGnome: true
 
