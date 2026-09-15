@@ -5,8 +5,8 @@
     "github-copilot",
     "opencode"
   ],
-  "model": "github-copilot/claude-sonnet-5",
-  "small_model": "github-copilot/claude-haiku-4.5",
+  "model": "openai/gpt-5.6-terra",
+  "small_model": "openai/gpt-5.6-luna",
   "plugin": [
     "cc-safety-net",
     "opencode-autotitle",

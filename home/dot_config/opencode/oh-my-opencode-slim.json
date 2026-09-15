@@ -109,11 +109,11 @@
     "hybrid": {
       "orchestrator": {
         "model": [
-          "github-copilot/claude-sonnet-5",
           {
             "id": "openai/gpt-5.6-terra",
             "variant": "high"
-          }
+          },
+          "github-copilot/claude-sonnet-5"
         ],
         "skills": [
           "*"
