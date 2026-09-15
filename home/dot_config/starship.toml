@@ -3,7 +3,7 @@
 add_newline = false
 
 format = """$character$directory$git_branch$git_state$git_status"""
-right_format = """$rust$terraform$docker_context$cmd_duration$jobs$hostname"""
+right_format = """$python$nodejs$rust$terraform$docker_context$cmd_duration$jobs$hostname"""
 
 [character]
 success_symbol = '[➜](bold green)'
@@ -26,6 +26,12 @@ format = '\([$state( $progress_current/$progress_total)]($style)\) '
 [git_status]
 style = 'bold yellow'
 format = '([$all_status$ahead_behind]($style) )'
+
+[python]
+format = '[$symbol$version( ($virtualenv))]($style) '
+
+[nodejs]
+format = '[$symbol$version]($style) '
 
 [rust]
 format = '[$symbol$version]($style) '
