@@ -14,20 +14,9 @@ detect_pm() {
 
 # Single point where the supported package managers and their install command are defined.
 # Runs without sudo when root; otherwise via sudo.
-# --allowerasing only matters for dnf.
 pm_install() {
     sudo_=sudo
-    allowerasing=0
     [ "$(id -u)" -eq 0 ] && sudo_=""
-    while [ $# -gt 0 ]; do
-        case "$1" in
-        --allowerasing)
-            allowerasing=1
-            shift
-            ;;
-        *) break ;;
-        esac
-    done
     pm="$1"
     shift
     case "$pm" in
@@ -36,13 +25,7 @@ pm_install() {
         $sudo_ apt-get update
         $sudo_ apt-get install -y "$@"
         ;;
-    dnf)
-        if [ "$allowerasing" = 1 ]; then
-            $sudo_ dnf install -y --allowerasing "$@"
-        else
-            $sudo_ dnf install -y "$@"
-        fi
-        ;;
+    dnf) $sudo_ dnf install -y --allowerasing "$@" ;;
     *)
         echo "ERROR: unsupported PM: $pm" >&2
         return 1
@@ -67,9 +50,7 @@ bootstrap_env() {
         pm_install apt-get sudo bash curl git gnupg unzip
         ;;
     dnf)
-        # --allowerasing: RHEL-family minimal images (e.g. Rocky, Alma) ship
-        # curl-minimal by default, which conflicts with the full curl package.
-        pm_install --allowerasing dnf sudo bash curl git gnupg2 unzip
+        pm_install dnf sudo bash curl git gnupg2 unzip
         ;;
     *)
         echo "ERROR: failed to bootstrap environment" >&2
