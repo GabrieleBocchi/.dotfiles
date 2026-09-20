@@ -1,7 +1,7 @@
 # Global npm packages, installed via `npm install -g`.
 npm:
   base:
-    - name: "@bitwarden/cli@2026.8.0"
+    - name: "@bitwarden/cli@2026.9.0"
     - name: "@j178/prek@0.5.3"
     - name: bun@1.4.2
       args: ["--allow-scripts=bun"] # its postinstall (node install.js) fetches the bun binary
