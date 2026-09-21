@@ -1,15 +1,15 @@
 cases:
   - name: ubuntu-headless
-    image: ubuntu:26.04@sha256:513c074113a871b51a8d16ab445c88779d6452d937a164fb5cc479f32668a41d
+    image: ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78
     hasGUI: false
     hasGnome: false
 
   - name: ubuntu-desktop-no-gnome
-    image: ubuntu:26.04@sha256:513c074113a871b51a8d16ab445c88779d6452d937a164fb5cc479f32668a41d
+    image: ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78
     hasGUI: true
     hasGnome: false
 
   - name: ubuntu-desktop-gnome
-    image: ubuntu:26.04@sha256:513c074113a871b51a8d16ab445c88779d6452d937a164fb5cc479f32668a41d
+    image: ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78
     hasGUI: true
     hasGnome: true
