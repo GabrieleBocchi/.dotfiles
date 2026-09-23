@@ -9,6 +9,10 @@ CASE_HAS_GUI="${CASE_HAS_GUI:-false}"
 CASE_HAS_GNOME="${CASE_HAS_GNOME:-false}"
 TESTUSER_PASSWORD="testuser-pw-1234"
 
+# Some images ship /etc/shadow at mode 0000; recent runc breaks setuid PAM
+# helpers reading it. Owner-readable is enough.
+chmod 600 /etc/shadow 2>/dev/null || true
+
 # shellcheck source=../scripts/pkg-utils.sh
 . /repo/scripts/pkg-utils.sh
 
@@ -38,6 +42,21 @@ if [ "$CASE_HAS_GUI" = "true" ]; then
     echo "▸ Forcing hasGUI=true (creating a fake /usr/share/xsessions entry)"
     mkdir -p /usr/share/xsessions
     touch /usr/share/xsessions/fake-test-session.desktop
+
+    # Flatpak needs a D-Bus session bus even for --user installs.
+    case "$PM" in
+    apk) pm_install "$PM" dbus ;;
+    apt-get) pm_install "$PM" dbus ;;
+    dnf) pm_install "$PM" dbus-daemon ;;
+    esac
+
+    # Debian/Ubuntu's flatpak needs accountsservice (libmalcontent query) on
+    # the system bus, or install fails with "Could not connect".
+    if [ "$PM" = "apt-get" ]; then
+        pm_install "$PM" accountsservice
+        mkdir -p /run/dbus
+        dbus-daemon --system --fork
+    fi
 fi
 
 if [ "$CASE_HAS_GNOME" = "true" ]; then
@@ -46,9 +65,9 @@ if [ "$CASE_HAS_GNOME" = "true" ]; then
     chmod +x /usr/bin/gnome-shell
 
     case "$PM" in
-    apk) pm_install "$PM" dbus dconf ;;
-    apt-get) pm_install "$PM" dbus dconf-cli dconf-service ;;
-    dnf) pm_install "$PM" dbus-daemon dconf ;;
+    apk) pm_install "$PM" dconf ;;
+    apt-get) pm_install "$PM" dconf-cli dconf-service ;;
+    dnf) pm_install "$PM" dconf ;;
     esac
 fi
 
@@ -57,9 +76,9 @@ cp -r /repo "/home/testuser/$REPO_NAME"
 chown -R testuser "/home/testuser/$REPO_NAME"
 
 run_dir="/home/testuser/$REPO_NAME"
-# dconf load needs a session bus; dbus-run-session provides one, GNOME only.
+# GUI needs a session bus: Flatpak installs (any GUI case) and dconf load (GNOME).
 prefix=""
-[ "$CASE_HAS_GNOME" = "true" ] && prefix="dbus-run-session -- "
+[ "$CASE_HAS_GUI" = "true" ] && prefix="dbus-run-session -- "
 run_script="/home/testuser/run-install.sh"
 cat >"$run_script" <<EOF
 #!/bin/sh
