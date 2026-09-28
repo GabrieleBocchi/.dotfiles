@@ -66,7 +66,7 @@ enable_repo() {
     name="$3"
     shift 3
 
-    baseurl="" gpgkey="" uri="" suites="" components="" signed_by="" url=""
+    baseurl="" gpgkey="" uri="" suites="" components="" signed_by="" url="" key=""
     for arg in "$@"; do
         case "$arg" in
         baseurl=*) baseurl="${arg#baseurl=}" ;;
@@ -76,6 +76,7 @@ enable_repo() {
         components=*) components="${arg#components=}" ;;
         signed_by=*) signed_by="${arg#signed_by=}" ;;
         url=*) url="${arg#url=}" ;;
+        key=*) key="${arg#key=}" ;;
         *)
             echo "ERROR: unknown repo field: $arg" >&2
             exit 1
@@ -105,6 +106,29 @@ enable_repo() {
         echo "▸ Enabling repo: $name"
         pm_install apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/testing "$name"
         echo "✓ Enabled repo: $name"
+        ;;
+    apk-repo)
+        case "$pm" in
+        apk)
+            keyfile="/etc/apk/keys/${name}.rsa.pub"
+            repofile="/etc/apk/repositories"
+
+            if [ ! -f "$keyfile" ]; then
+                echo "▸ Enabling repo: $name"
+                curl --proto '=https' --tlsv1.2 -sSfL "$key" |
+                    sudo tee "$keyfile" >/dev/null
+            fi
+            if ! grep -qxF "$url" "$repofile"; then
+                echo "▸ Enabling repo: $name"
+                printf '%s\n' "$url" | sudo tee -a "$repofile" >/dev/null
+            fi
+            echo "✓ Enabled repo: $name"
+            ;;
+        *)
+            echo "ERROR: unsupported PM for apk-repo repo: $pm" >&2
+            exit 1
+            ;;
+        esac
         ;;
     rpm-release)
         # %fedora is undefined (rpm echoes it back literally) on RHEL-family

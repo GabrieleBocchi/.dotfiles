@@ -10,6 +10,7 @@ common:
       - bash
       - bat
       - btop
+      - claude-code
       - curl
       - gcc
       - git
@@ -58,6 +59,7 @@ alpine:
       - libstdc++
       - musl-dev
       - openssh-client-default
+      - ripgrep
       - shadow
       - vimdiff
     script: []

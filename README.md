@@ -214,6 +214,9 @@ changes needed.
   (`apt-get` can't install directly from a URL like `dnf` can).
 - **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo
   (`apk add --repository ...`) without switching the whole system to edge.
+- **`kind: apk-repo`** (apk only): downloads the public-key URL in `key` to
+  `/etc/apk/keys/<name>.rsa.pub` and adds the repository URL in `url` to
+  `/etc/apk/repositories`.
 - **`kind: custom`**: writes the repo config natively.
   - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
   - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored

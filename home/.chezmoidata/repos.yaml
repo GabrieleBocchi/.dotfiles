@@ -5,7 +5,11 @@
 repos:
   # ── apk family ──────────────────────────────────────────────────────────────
   alpine:
-    base: []
+    base:
+      - kind: apk-repo
+        name: claude-code
+        url: "https://downloads.claude.ai/claude-code/apk/stable"
+        key: "https://downloads.claude.ai/keys/claude-code.rsa.pub"
     desktop:
       - kind: apk-testing
         name: ghostty
@@ -16,6 +20,12 @@ repos:
       - kind: deb-release
         name: fastfetch
         url: "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb"
+      - kind: custom
+        name: claude-code
+        uri: "https://downloads.claude.ai/claude-code/apt/stable"
+        suites: "stable"
+        components: "main"
+        signed_by: "https://downloads.claude.ai/keys/claude-code.asc"
       - kind: custom
         name: hashicorp
         uri: "https://apt.releases.hashicorp.com"
@@ -52,6 +62,12 @@ repos:
         name: fastfetch
         url: "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb"
       - kind: custom
+        name: claude-code
+        uri: "https://downloads.claude.ai/claude-code/apt/stable"
+        suites: "stable"
+        components: "main"
+        signed_by: "https://downloads.claude.ai/keys/claude-code.asc"
+      - kind: custom
         name: hashicorp
         uri: "https://apt.releases.hashicorp.com"
         suites: "$codename"
@@ -86,6 +102,10 @@ repos:
   fedora:
     base:
       - kind: custom
+        name: claude-code
+        baseurl: "https://downloads.claude.ai/claude-code/rpm/stable"
+        gpgkey: "https://downloads.claude.ai/keys/claude-code.asc"
+      - kind: custom
         name: hashicorp
         baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
@@ -115,6 +135,10 @@ repos:
 
   rhel:
     base:
+      - kind: custom
+        name: claude-code
+        baseurl: "https://downloads.claude.ai/claude-code/rpm/stable"
+        gpgkey: "https://downloads.claude.ai/keys/claude-code.asc"
       - kind: custom
         name: hashicorp
         baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
