@@ -1,5 +1,6 @@
 # Better commands
 alias c='clear'
+alias cl='claude'
 alias cdtemp='cd $(mktemp -d)'
 alias ez="exec zsh"
 alias gdb='gdb -q'
