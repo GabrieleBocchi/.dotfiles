@@ -3,9 +3,11 @@ npm:
   base:
     - name: "@bitwarden/cli@2026.9.0"
     - name: "@j178/prek@0.5.3"
+    - name: "@playwright/mcp@0.0.83"
+    - name: "@upstash/context7-mcp@4.1.1"
     - name: bun@1.4.2
       args: ["--allow-scripts=bun"] # its postinstall (node install.js) fetches the bun binary
-    - name: "npm@12.1.0"
+    - name: npm@12.1.0
     - name: opencode-ai@1.18.32
       args: ["--allow-scripts=opencode-ai"] # npm blocks its postinstall (binary fetch) otherwise
   desktop: []

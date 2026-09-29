@@ -68,6 +68,7 @@ expected_desktop_packages() {
 # Maps a script display-name to its binary when it differs from the lowercase name.
 script_tool_binary() {
     case "$1" in
+    "Claude Code") echo claude ;;
     Rust) echo rustc ;;
     *) echo "$1" | tr '[:upper:]' '[:lower:]' ;;
     esac
@@ -133,6 +134,12 @@ script_tool_binary() {
             return 1
         }
     done < <(expected_npm_packages)
+}
+
+@test "claude settings are valid JSON with the RTK hook intact" {
+    run jq -e '.hooks.PreToolUse[] | select(.matcher == "Bash")
+        | .hooks[] | select(.command == "rtk hook claude")' "$HOME/.claude/settings.json"
+    [ "$status" -eq 0 ]
 }
 
 @test "opencode config is present and valid" {

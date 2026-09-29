@@ -214,9 +214,6 @@ changes needed.
   (`apt-get` can't install directly from a URL like `dnf` can).
 - **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo
   (`apk add --repository ...`) without switching the whole system to edge.
-- **`kind: apk-repo`** (apk only): downloads the public-key URL in `key` to
-  `/etc/apk/keys/<name>.rsa.pub` and adds the repository URL in `url` to
-  `/etc/apk/repositories`.
 - **`kind: custom`**: writes the repo config natively.
   - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
   - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored
@@ -301,6 +298,20 @@ lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 
 `hasGnome` is a chezmoi template variable (like `hasGUI`), detected via
 `lookPath "gnome-shell"`.
+
+### Claude Code configuration
+
+`home/dot_claude/settings.json` is the tracked `~/.claude/settings.json`. Its
+`permissions.deny` list blocks the agent's file tools from reading secrets kept
+outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, and the
+`claude`/`gh`/`opencode` token stores).
+
+Its `PreToolUse` hook routes Bash calls through `rtk hook claude`.
+Machine-specific tweaks go in the untracked `~/.claude/settings.local.json`;
+`/config` changes are reverted on apply.
+
+MCP servers are installed via `npm.yaml` and registered by hand with
+`claude mcp add`.
 
 ### OpenCode configuration
 

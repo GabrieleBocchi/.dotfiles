@@ -10,7 +10,6 @@ common:
       - bash
       - bat
       - btop
-      - claude-code
       - curl
       - gcc
       - git
@@ -26,6 +25,8 @@ common:
       - wget
       - zsh
     script:
+      - name: Claude Code
+        url: "https://claude.ai/install.sh"
       - name: Rust
         url: "https://sh.rustup.rs"
         args: ["--no-modify-path", "--quiet", "-y"]
