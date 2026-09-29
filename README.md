@@ -115,12 +115,12 @@ common:
 fedora:
   desktop:
     pm:
-      - ghostty # repo scottames/ghostty (Fedora-only)
+      - bibata-cursor-themes # repo peterwu/rendezvous
+      - ghostty # repo scottames/ghostty
 
 rhel:
   desktop:
-    pm:
-      - google-chrome-stable # ghostty NOT here: its COPR is Fedora-only
+    pm: []
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
@@ -148,9 +148,23 @@ The install script:
 5. Installs cargo packages with `--locked`
 6. Installs npm global packages (via fnm's per-user npm) and drops the bootstrap's root `bw`, so only the npm-installed one remains
 
+### Flatpak
+
+Flatpak is installed on every machine (base package, not desktop-only).
+Remotes and applications are declared in `home/.chezmoidata/flatpak.yaml`:
+
+- `flatpak.remotes.base`: added on every machine; `remotes.desktop`: GUI only.
+- `flatpak.apps.base`: installed on every machine; `apps.desktop`: GUI only.
+
+Configured in the same install script as system packages, right after
+`flatpak` itself is installed. Currently declared as `apps.desktop`: Google
+Chrome, Spotify, Telegram Desktop, Teams for Linux, and Vesktop — replacing
+what used to be native packages behind distro-specific custom repos/PPAs/COPRs.
+Ghostty stays a native package (not on Flathub yet).
+
 ### Repositories
 
-Some packages (e.g. Google Chrome) aren't in the default repos and need one
+Some packages (e.g. HashiCorp tools) aren't in the default repos and need one
 enabled first. All repositories are declared centrally in
 `home/.chezmoidata/repos.yaml`, keyed by the **same distro family** names as
 `system.yaml` (from `families.yaml`), each with the `base`/`desktop` split, and
@@ -180,27 +194,15 @@ repos:
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
     desktop:
       - kind: copr
-        name: scottames/ghostty
-  ubuntu:
-    base:
-      - kind: custom
-        name: hashicorp
-        uri: "https://apt.releases.hashicorp.com"
-        suites: "$codename"
-        components: "main"
-        signed_by: "https://apt.releases.hashicorp.com/gpg"
-    desktop:
-      - kind: ppa
-        name: atareao/telegram
+        name: peterwu/rendezvous
 ```
 
 Each family section has `base` (enabled always) and `desktop` (enabled only
 when a GUI session is detected). The target system is matched to **exactly
 one** family via `/etc/os-release`'s `id` (from `families.yaml`). A package is
 listed in `system.yaml` under a family only if that family enables a repo
-providing it — e.g. `ghostty`/`spotify-client` need Fedora-only repos so they
-appear under `fedora` but NOT `rhel`, and `telegram` comes from an Ubuntu-only
-PPA so it appears under `ubuntu` but NOT `debian`. A family section here lists
+providing it — e.g. `bibata-cursor-themes` needs a Fedora-only COPR so it
+appears under `fedora` but NOT `rhel`. A family section here lists
 exactly the repos that family enables; adding a new family is just adding it to
 `families.yaml` plus a section in `system.yaml`/`repos.yaml`; no template
 changes needed.

@@ -25,6 +25,11 @@ echo "▸ RTK OpenCode integration"
 RTK_TELEMETRY_DISABLED=1 rtk init -g --opencode
 echo "✓ RTK OpenCode integration"
 
+# ── Flatpak apps ─────────────────────────────────────────────────────────────
+echo "▸ Flatpak update"
+flatpak update --user -y
+echo "✓ Flatpak update"
+
 # ── Font cache (GUI only) ───────────────────────────────────────────────────
 {{ if .hasGUI -}}
 echo "▸ Rebuilding font cache"
