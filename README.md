@@ -341,9 +341,10 @@ and `~/.local/share/opencode/auth.json`/`account.json` (real credentials) are
 not tracked here. `node_modules/`, `bun.lock`, and `package*.json` are excluded
 as well.
 
-On Linux, the post-apply update script lets RTK refresh its generated
-`~/.config/opencode/plugins/rtk.ts` after each apply. RTK owns that plugin;
-neither it nor RTK's runtime data in `~/.local/share/rtk/` is tracked here.
+On Linux, the post-apply update script initializes RTK for both OpenCode and
+Claude Code after each apply. RTK owns its generated user-local integration
+files, including `~/.config/opencode/plugins/rtk.ts`; neither they nor RTK's
+runtime data in `~/.local/share/rtk/` is tracked here.
 
 Machines needing extra providers not shared here (e.g. a local-only provider)
 point `OPENCODE_CONFIG` at an untracked `~/.config/opencode/opencode-local.json`
