@@ -1,6 +1,6 @@
 {
+  "cleanupPeriodDays": 90,
   "permissions": {
-    "defaultMode": "auto",
     "deny": [
       "Read(//**/.env)",
       "Read(//**/.env.local)",
@@ -10,11 +10,9 @@
       "Read(~/.claude/.credentials.json)",
       "Read(~/.config/gh/hosts.yml)",
       "Read(~/.local/share/opencode/auth.json)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
-  "theme": "dark",
-  "timeFormat": "auto",
-  "cleanupPeriodDays": 90,
   "hooks": {
     "PreToolUse": [
       {
@@ -27,5 +25,22 @@
         ]
       }
     ]
+  },
+  "timeFormat": "auto",
+  "theme": "dark",
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "session-report@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   }
 }
