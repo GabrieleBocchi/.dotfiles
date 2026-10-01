@@ -2,7 +2,7 @@
 npm:
   base:
     - name: "@bitwarden/cli@2026.9.0"
-    - name: "@j178/prek@0.5.3"
+    - name: "@j178/prek@0.5.4"
     - name: "@playwright/mcp@0.0.83"
     - name: "@upstash/context7-mcp@4.1.1"
     - name: bun@1.4.2
