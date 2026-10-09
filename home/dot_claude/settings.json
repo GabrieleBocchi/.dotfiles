@@ -26,14 +26,13 @@
       }
     ]
   },
-  "timeFormat": "auto",
-  "theme": "dark",
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "session-report@claude-plugins-official": true
+    "session-report@claude-plugins-official": true,
+    "cc-split-diff-view@neteye-platform": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -41,6 +40,14 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    },
+    "neteye-platform": {
+      "source": {
+        "source": "github",
+        "repo": "neteye-platform/cc-split-diff-view"
+      }
     }
-  }
+  },
+  "timeFormat": "auto",
+  "theme": "dark"
 }
