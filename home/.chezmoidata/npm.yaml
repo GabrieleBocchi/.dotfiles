@@ -4,8 +4,8 @@ npm:
     - name: "@bitwarden/cli@2026.9.1"
     - name: "@j178/prek@0.5.5"
     - name: "@playwright/mcp@0.0.83"
-    - name: "@upstash/context7-mcp@4.2.0"
-    - name: bun@1.4.2
+    - name: "@upstash/context7-mcp@4.3.0"
+    - name: bun@1.4.3
       args: ["--allow-scripts=bun"] # its postinstall (node install.js) fetches the bun binary
     - name: npm@12.2.0
     - name: opencode-ai@1.18.35
