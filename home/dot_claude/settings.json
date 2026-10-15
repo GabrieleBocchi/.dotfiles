@@ -24,6 +24,16 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
@@ -49,5 +59,8 @@
     }
   },
   "timeFormat": "auto",
-  "theme": "dark"
+  "theme": "dark",
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8080"
+  }
 }

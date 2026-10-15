@@ -22,8 +22,7 @@ echo "✓ Rustup update"
 
 # ── RTK integrations ─────────────────────────────────────────────────────────
 echo "▸ RTK integrations"
-RTK_TELEMETRY_DISABLED=1 rtk init -g --opencode
-RTK_TELEMETRY_DISABLED=1 rtk init -g --auto-patch
+RTK_TELEMETRY_DISABLED=1 RTK_ONRAMP_DISABLED=1 rtk init -g --opencode --auto-patch
 echo "✓ RTK integrations"
 
 # ── Font cache (GUI only) ───────────────────────────────────────────────────
