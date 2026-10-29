@@ -1,7 +1,6 @@
 # Cargo packages, installed via `cargo install --locked`.
 cargo:
   base:
-    - name: kanata@1.11.0
     - name: rtk
       args:
         - --git
@@ -9,4 +8,5 @@ cargo:
         - --tag
         - v1.0.1 # renovate: datasource=github-releases depName=rtk-ai/rtk
     - name: viu@1.6.1
-  desktop: []
+  desktop:
+    - name: kanata@1.11.0
