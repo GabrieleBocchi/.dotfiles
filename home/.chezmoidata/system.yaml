@@ -66,9 +66,9 @@ alpine:
     script: []
   desktop:
     pm:
+      # NOTE: NO telegram-desktop (broken dependency on Alpine).
       - chromium
       - spotify-qt
-      - telegram-desktop
     script: []
 
 # ── apt-get families ────────────────────────────────────────────────────────
