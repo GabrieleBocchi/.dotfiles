@@ -5,7 +5,11 @@ set -euo pipefail
 # ── Antidote (zsh plugins) ──────────────────────────────────────────────────
 echo "▸ Antidote update"
 
-zsh -c 'source "$HOME/.local/share/antidote/antidote.zsh"; antidote update'
+zsh -c '
+    source "$HOME/.local/share/antidote/antidote.zsh"
+    antidote bundle <"{{ .chezmoi.sourceDir }}/zsh/.zsh_plugins.txt" >/dev/null
+    antidote update
+'
 
 echo "✓ Antidote update"
 
