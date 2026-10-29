@@ -21,7 +21,10 @@ as_root() {
 }
 
 is_musl() {
-    [ -n "$(ls /lib/ld-musl-*.so.1 2>/dev/null)" ]
+    case "$(ldd --version 2>&1)" in
+    *musl*) return 0 ;;
+    *) return 1 ;;
+    esac
 }
 
 # Single point where the supported package managers and their install command are defined.
@@ -157,7 +160,6 @@ Suites: $suites
 Components: $components
 Signed-By: $keyring
 EOF
-            as_root apt-get update -qq
             echo "✓ Enabled repo: $name"
             ;;
         dnf)

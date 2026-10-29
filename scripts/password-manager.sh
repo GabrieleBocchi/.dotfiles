@@ -19,14 +19,6 @@ install_bw() {
         os="linux"
         suffix="-arm64"
         ;;
-    Darwin-x86_64)
-        os="macos"
-        suffix=""
-        ;;
-    Darwin-arm64)
-        os="macos"
-        suffix="-arm64"
-        ;;
     *)
         echo "ERROR: unsupported platform $(uname -s)/$(uname -m)" >&2
         exit 1
@@ -48,7 +40,6 @@ install_bw() {
         exit 1
     fi
 
-    as_root rm -f "$BW_BIN"
     as_root install -m 755 "$tmp/bw" "$BW_BIN"
     echo "✓ Installed Bitwarden CLI $BW_VERSION"
 }
@@ -76,14 +67,14 @@ persist_session() {
         ;;
     esac
 
-    tmp="$(
+    env_tmp="$(
         umask 077
         mktemp "$env_file.XXXXXX"
     )"
     # Keep every other line; rewrite only the BW_SESSION line.
-    grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$tmp" || true
-    printf 'export BW_SESSION="%s"\n' "$session" >>"$tmp"
-    mv "$tmp" "$env_file"
+    grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$env_tmp" || true
+    printf 'export BW_SESSION="%s"\n' "$session" >>"$env_tmp"
+    mv "$env_tmp" "$env_file"
 }
 
 case "${1:-}" in
@@ -93,6 +84,7 @@ install)
 
     # The standalone bw is glibc-only; without it the keys are skipped.
     if is_musl; then
+        [ -L "$BW_BIN" ] && as_root rm -f "$BW_BIN"
         echo "− Skipping Bitwarden CLI (no musl build)"
         exit 0
     fi
@@ -102,7 +94,7 @@ install)
         install_bw
     fi
 
-    PATH="$(dirname "$BW_BIN"):$PATH"
+    PATH="/usr/local/bin:$PATH"
     persist_session
     ;;
 *)
