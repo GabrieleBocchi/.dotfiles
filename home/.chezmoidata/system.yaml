@@ -78,6 +78,7 @@ debian:
     pm:
       - gh
       - gnupg
+      - libatomic1 # needed by node
       - libc6-dev
       - procps
       - terraform
@@ -97,6 +98,7 @@ ubuntu:
     pm:
       - gh
       - gnupg
+      - libatomic1 # needed by node
       - libc6-dev
       - procps
       - terraform
@@ -121,6 +123,7 @@ fedora:
       - fastfetch
       - gh
       - gnupg2
+      - libatomic # needed by node
       - procps-ng
       - terraform
       - util-linux-user
@@ -142,6 +145,7 @@ rhel:
       - fastfetch
       - gh
       - gnupg2
+      - libatomic # needed by node
       - procps-ng
       - terraform
       - util-linux-user
