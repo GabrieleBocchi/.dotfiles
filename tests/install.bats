@@ -142,6 +142,20 @@ script_tool_binary() {
     [ "$status" -eq 0 ]
 }
 
+@test "claude settings merge the local overrides file" {
+    overrides="$HOME/.claude/settings.overrides.json"
+    echo '{"hooks":{"PreToolUse":[{"hooks":[{"type":"command","command":"local-hook"}]}]},"permissions":{"deny":["Read(~/local/**)"]},"env":{"X":"1"}}' >"$overrides"
+    settings="$(chezmoi cat "$HOME/.claude/settings.json")"
+    rm -f "$overrides"
+
+    jq -e '
+        (.hooks.PreToolUse | length) == 2
+        and (.permissions.deny | index("Read(~/.secrets/**)") != null)
+        and (.permissions.deny | index("Read(~/local/**)") != null)
+        and .env.X == "1"
+    ' <<<"$settings"
+}
+
 @test "opencode config is present and valid" {
     [ -f "$HOME/.config/opencode/opencode.json" ]
     [ -f "$HOME/.config/opencode/tui.json" ]
