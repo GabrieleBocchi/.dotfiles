@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Nothing below needs the vault
+unset BW_SESSION
+
 . "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
 
 # pkg-utils.sh sha256: {{ include (joinPath (dir .chezmoi.sourceDir) "scripts/pkg-utils.sh") | sha256sum }}

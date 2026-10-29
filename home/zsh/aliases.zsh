@@ -21,8 +21,8 @@ if [[ -n "${BAT_CMD:-}" ]]; then
 fi
 
 # Bitwarden session (not exported, see dot_zshenv)
-bw() { BW_SESSION="${BW_SESSION:-}" command bw "$@" }
-chezmoi() { BW_SESSION="${BW_SESSION:-}" command chezmoi "$@" }
+bw() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} bw "$@" }
+chezmoi() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} chezmoi "$@" }
 
 # Docker
 alias docker='sudo docker'
@@ -51,7 +51,7 @@ alias activate='source */bin/activate'
 alias updateDotfiles='git -C "$DOTFILES" pull --prune && $DOTFILES/install.sh'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
 alias updateOpencodeSlim='bunx oh-my-opencode-slim install --companion=no'
-updatePackages() {
+function updatePackages {
     if (( $+commands[apk] )); then
         sudo apk upgrade --update-cache
     elif (( $+commands[apt-get] )); then

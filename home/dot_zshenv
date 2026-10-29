@@ -31,10 +31,11 @@ if [[ -f "$HOME/.secrets/.env" ]]; then
   source "$HOME/.secrets/.env"
 fi
 
-# Keep the Bitwarden session out of child processes (e.g. AI agents);
-# the bw and chezmoi wrappers in aliases.zsh pass it explicitly.
-if [[ -n "${BW_SESSION:-}" ]]; then
-  typeset +x BW_SESSION
+# Bitwarden session: only interactive shells keep it, unexported (see aliases.zsh)
+if [[ -o interactive ]]; then
+  typeset +x BW_SESSION 2>/dev/null
+else
+  unset BW_SESSION
 fi
 
 # OpenCode local overrides
