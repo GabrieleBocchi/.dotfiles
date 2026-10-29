@@ -1,10 +1,13 @@
-{{- /* Untracked machine-specific settings: hooks are appended, other keys override. */ -}}
+{{- /* Untracked machine-specific settings: hooks and deny rules are appended, other keys override. */ -}}
 {{- $settings := include ".chezmoitemplates/claude-settings.json" | fromJson -}}
 {{- $localFile := joinPath .chezmoi.homeDir ".claude/settings.overrides.json" -}}
 {{- if stat $localFile -}}
 {{-   $local := include $localFile | fromJson -}}
-{{-   range $event, $entries := $local.hooks -}}
+{{-   range $event, $entries := default (dict) (get $local "hooks") -}}
 {{-     $_ := set $settings.hooks $event (concat (default (list) (get $settings.hooks $event)) $entries) -}}
+{{-   end -}}
+{{-   with get $local "permissions" -}}
+{{-     $_ := set . "deny" (concat $settings.permissions.deny (default (list) (get . "deny"))) -}}
 {{-   end -}}
 {{-   $settings = mergeOverwrite $settings (omit $local "hooks") -}}
 {{- end -}}
