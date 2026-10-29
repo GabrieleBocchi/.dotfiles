@@ -5,9 +5,7 @@ set -euo pipefail
 # ── Antidote (zsh plugins) ──────────────────────────────────────────────────
 echo "▸ Antidote update"
 
-zsh -c '
-    source ~/.zshrc; source $HOME/.local/share/antidote/antidote.zsh; antidote update
-'
+zsh -c 'source "$HOME/.local/share/antidote/antidote.zsh"; antidote update'
 
 echo "✓ Antidote update"
 
@@ -22,8 +20,11 @@ echo "✓ Rustup update"
 
 # ── RTK integrations ─────────────────────────────────────────────────────────
 echo "▸ RTK integrations"
-RTK_TELEMETRY_DISABLED=1 RTK_ONRAMP_DISABLED=1 rtk init -g --opencode --auto-patch
-echo "✓ RTK integrations"
+if RTK_TELEMETRY_DISABLED=1 RTK_ONRAMP_DISABLED=1 rtk init -g --opencode --auto-patch; then
+    echo "✓ RTK integrations"
+else
+    echo "⚠ RTK integrations failed" >&2
+fi
 
 # ── Font cache (GUI only) ───────────────────────────────────────────────────
 {{ if .hasGUI -}}
