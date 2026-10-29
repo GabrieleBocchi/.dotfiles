@@ -35,10 +35,10 @@ git -C ~/.dotfiles pull --prune
 
 Or use the `updateDotfiles` alias.
 
-This is the single command to update everything: it re-downloads the fnm binary
-(fnm has no `self-update`) and re-runs `fnm install --lts`, an idempotent
-operation that downloads the latest LTS node when a new one exists and keeps
-the `lts-latest` default pointing at it. No pinned node version is tracked.
+This is the single command to update everything. The dependency script is
+`run_onchange`: it re-runs (re-downloading fnm and running `fnm install --lts`)
+only when its rendered content changes, i.e. when a declared package, its
+version or `scripts/pkg-utils.sh` changes. No pinned node version is tracked.
 
 ## Environment variables
 
@@ -146,7 +146,7 @@ The install script:
 4. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
    musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
 5. Installs cargo packages with `--locked`
-6. Installs npm global packages (via fnm's per-user npm) and drops the bootstrap's root `bw`, so only the npm-installed one remains
+6. Installs npm global packages (via fnm's per-user npm)
 
 ### Repositories
 
@@ -278,8 +278,9 @@ saved to a temp directory, made executable, and run respecting their shebang.
 `home/dconf/` holds GNOME desktop settings as plain dconf keyfiles, one file
 per settings category (e.g. `interface.ini`, `peripherals.ini`,
 `keybindings.ini`). `run_after_20-load-gnome-settings.sh.tmpl`
-concatenates every `*.ini` file and renders every `*.ini.tmpl` file (via
-`chezmoi execute-template`), then feeds the result to `dconf load /`. It runs
+pipes the output of `scripts/render-dconf.sh` (every `*.ini` file plus every
+`*.ini.tmpl` file rendered via `chezmoi execute-template`) to `dconf load /`.
+The tests use the same script. It runs
 on every apply (not `run_onchange`), so manual drift made in the GNOME
 Settings app gets reverted back to the declared state on the next apply.
 Skipped entirely when `hasGnome` is false.
@@ -301,14 +302,18 @@ lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 
 ### Claude Code configuration
 
-`home/dot_claude/settings.json` is the tracked `~/.claude/settings.json`. Its
+`home/.chezmoitemplates/claude-settings.json` is the tracked base of
+`~/.claude/settings.json`. Its
 `permissions.deny` list blocks the agent's file tools from reading secrets kept
-outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, and the
-`claude`/`gh`/`opencode` token stores).
+outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, the
+Bitwarden CLI data, and the `claude`/`gh`/`opencode` token stores).
 
 Its `PreToolUse` hook routes Bash calls through `rtk hook claude`.
-Machine-specific tweaks go in the untracked `~/.claude/settings.local.json`;
-`/config` changes are reverted on apply.
+Machine-specific settings go in the untracked
+`~/.claude/settings.overrides.json`: `home/dot_claude/settings.json.tmpl`
+merges it at apply time (its hooks are appended to the tracked ones, any
+other key overrides the tracked value). `/config` changes are reverted on
+apply.
 
 MCP servers are installed via `npm.yaml` and registered by hand with
 `claude mcp add`.
@@ -374,7 +379,7 @@ key keeps its passphrase). They're rendered only when the vault is reachable —
 an interactive run (chezmoi prompts for the master password via
 `bitwarden.unlock = "auto"`) or when `BW_SESSION` is set; in a non-interactive
 run with no session (CI, container) `.chezmoiignore` skips them so `bw` is
-never invoked. `~/.ssh/config` lists both as `IdentityFile`.
+never invoked. Git uses the personal key via `core.sshCommand`.
 
 The passphrase-protected OpenPGP secret key is also kept out of the repository.
 Create a Bitwarden secure note named `Personal GPG Key` with one custom field named
@@ -399,26 +404,23 @@ operation prompts via pinentry for the key's existing passphrase unless
 The Bitwarden CLI is what makes this possible on a genuinely fresh machine, where
 bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
 runs `scripts/password-manager.sh install`, which installs the standalone `bw`
-binary (latest CLI release, resolved from GitHub at runtime) and persists a
-`BW_SESSION` key. It is a cheap no-op when bw is already present and the
-persisted token is valid, or in non-interactive CI/container runs where the keys
-are skipped anyway.
+binary at `/usr/local/bin/bw` (version pinned in the script and managed by
+Renovate) and persists a `BW_SESSION` key. It is a cheap no-op when the pinned
+bw is already present and the persisted token is valid, or in non-interactive
+CI/container runs where the keys are skipped anyway. The standalone binary is
+glibc-only: on musl systems it is not installed and the keys are skipped.
 
 The session itself lives as a persisted `BW_SESSION` in the untracked
 `~/.secrets/.env`. The installer sources it before running chezmoi, and
-`.zshenv` sources it blindly in interactive shells (0ms — no `bw` call at shell
-startup). Bitwarden session keys never expire on their own — they only die on
+`.zshenv` sources it in every zsh (0ms — no `bw` call at shell startup) but
+keeps `BW_SESSION` unexported, so child processes (AI agents included) don't
+inherit it. The `bw` and `chezmoi` shell functions in `home/zsh/aliases.zsh`
+pass it to those two commands only. Bitwarden session keys never expire on their own — they only die on
 `bw lock`/`bw logout` — so once persisted, `chezmoi apply` (even a no-op one)
 and `bw` are prompt-free: with `bitwarden.unlock = "auto"`, a present
 `BW_SESSION` means chezmoi neither re-unlocks nor locks. If the token is ever
-invalidated, the next `install.sh` run re-authenticates and rewrites it. npm's
-`@bitwarden/cli` is the source of truth for `bw`: it installs via fnm's per-user
-npm, and after the chezmoi apply `install.sh` calls
-`scripts/password-manager.sh link`, which points `/usr/local/bin/bw` at the
-per-user npm binary via symlink (`aliases/default` follows fnm's active LTS), so
-there's a single real bw that chezmoi reaches via the system PATH and that isn't
-re-downloaded on later runs. `unzip` is ensured by both `bootstrap_env` and the
-`common` system packages.
+invalidated, the next `install.sh` run re-authenticates and rewrites it.
+`unzip` is ensured by both `bootstrap_env` and the `common` system packages.
 
 ## Testing
 
@@ -443,8 +445,8 @@ duplicated between local and CI.
 ## Post-install updates
 
 `run_after_40-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
-On Linux, it also refreshes RTK's generated OpenCode plugin when RTK is
-available; a failed refresh only emits a warning.
+On Linux, it also refreshes RTK's generated OpenCode plugin; a failed refresh
+only emits a warning.
 
 ## External dependencies (version-pinned)
 
@@ -456,5 +458,8 @@ auto-updates the following:
 | chezmoi                 | `twpayne/chezmoi` GitHub releases — via `.chezmoiversion` |
 | antidote                | `mattmc3/antidote` GitHub releases                        |
 | JetBrainsMono Nerd Font | `ryanoasis/nerd-fonts` GitHub releases                    |
-| gpakosz/.tmux           | main branch (no releases)                                 |
-| gab.lazy (nvim)         | main branch — intentionally unpinned                      |
+| Bitwarden CLI           | `bitwarden/clients` GitHub releases (`cli-v*`)            |
+| gpakosz/.tmux           | main branch commit SHA (no releases)                      |
+
+gab.lazy (nvim) is not managed by Renovate: it tracks its main branch,
+intentionally unpinned, and is pulled at most once every 24h.
