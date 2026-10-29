@@ -32,6 +32,23 @@
     },
     {
       "customType": "regex",
+      "managerFilePatterns": ["home/.chezmoiexternal.toml.tmpl"],
+      "matchStrings": [
+        "https://raw\\.githubusercontent\\.com/(?<depName>gpakosz/\\.tmux)/(?<currentDigest>[0-9a-f]{40})/"
+      ],
+      "datasourceTemplate": "git-refs",
+      "packageNameTemplate": "https://github.com/gpakosz/.tmux",
+      "currentValueTemplate": "master"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["scripts/password-manager.sh"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) extractVersion=(?<extractVersion>\\S+)\\n[A-Z_]+=\"(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["home/.chezmoidata/cargo.yaml"],
       "matchStrings": [
         "-\\s+name:\\s*\"?(?<depName>[\\w\\-]+?)@(?<currentValue>[\\w\\.\\-]+)\"?"

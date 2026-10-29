@@ -1,7 +1,6 @@
 # Global npm packages, installed via `npm install -g`.
 npm:
   base:
-    - name: "@bitwarden/cli@2026.10.0"
     - name: "@j178/prek@0.5.6"
     - name: "@playwright/mcp@0.0.83"
     - name: "@upstash/context7-mcp@4.4.4"
