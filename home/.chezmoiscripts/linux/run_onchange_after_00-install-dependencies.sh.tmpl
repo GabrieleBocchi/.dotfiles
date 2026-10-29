@@ -4,6 +4,8 @@ set -euo pipefail
 
 . "{{ dir .chezmoi.sourceDir }}/scripts/pkg-utils.sh"
 
+# pkg-utils.sh sha256: {{ include (joinPath (dir .chezmoi.sourceDir) "scripts/pkg-utils.sh") | sha256sum }}
+
 # .chezmoidata/ data is automatically merged into the template root context.
 # `family` (from .chezmoi.toml.tmpl) selects the family section in both
 # system.yaml (packages) and repos.yaml (repositories).
@@ -39,7 +41,7 @@ echo "✓ System packages"
 echo "▸ Script installs"
 
 {{ range $allScripts -}}
-{{ range default (list) (get . "envs") }}{{ . }} {{ end }}install_script {{ .name | quote }} {{ .url }}{{ range default (list) (get . "args") }} {{ . }}{{ end }}
+{{ range default (list) (get . "envs") }}{{ . }} {{ end }}install_script {{ .name | quote }} {{ .url | squote }}{{ range default (list) (get . "args") }} {{ . | squote }}{{ end }}
 {{ end -}}
 
 echo "✓ Script installs"
@@ -53,7 +55,7 @@ echo "▸ cargo packages"
 . "$HOME/.cargo/env"
 
 {{ range $cargoPkgs -}}
-cargo install --locked {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
+cargo install --locked {{ range default (list) (get . "args") }}{{ . | squote }} {{ end }}{{ .name | squote }}
 {{ end -}}
 
 echo "✓ cargo packages"
@@ -67,7 +69,12 @@ fnm_install_lts
 echo "▸ npm packages"
 
 {{ range $npmPkgs -}}
-npm install -g {{ range default (list) (get . "args") }}{{ . }} {{ end }}{{ .name }}
+npm install -g {{ range default (list) (get . "args") }}{{ . | squote }} {{ end }}{{ .name | squote }}
 {{ end -}}
+
+# bw now comes from scripts/password-manager.sh
+if npm ls -g --depth=0 @bitwarden/cli >/dev/null 2>&1; then
+    npm uninstall -g @bitwarden/cli
+fi
 
 echo "✓ npm packages"

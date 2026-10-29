@@ -12,20 +12,29 @@ detect_pm() {
     fi
 }
 
+as_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
+is_musl() {
+    [ -n "$(ls /lib/ld-musl-*.so.1 2>/dev/null)" ]
+}
+
 # Single point where the supported package managers and their install command are defined.
-# Runs without sudo when root; otherwise via sudo.
 pm_install() {
-    sudo_=sudo
-    [ "$(id -u)" -eq 0 ] && sudo_=""
     pm="$1"
     shift
     case "$pm" in
-    apk) $sudo_ apk add "$@" ;;
+    apk) as_root apk add "$@" ;;
     apt-get)
-        $sudo_ apt-get update
-        $sudo_ apt-get install -y "$@"
+        as_root apt-get update
+        as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@"
         ;;
-    dnf) $sudo_ dnf install -y --allowerasing "$@" ;;
+    dnf) as_root dnf install -y --allowerasing "$@" ;;
     *)
         echo "ERROR: unsupported PM: $pm" >&2
         return 1
@@ -38,7 +47,8 @@ bootstrap_env() {
         command -v bash >/dev/null 2>&1 &&
         command -v curl >/dev/null 2>&1 &&
         command -v git >/dev/null 2>&1 &&
-        command -v gpg >/dev/null 2>&1; then
+        command -v gpg >/dev/null 2>&1 &&
+        command -v unzip >/dev/null 2>&1; then
         return 0
     fi
     echo "▸ Bootstrapping environment..."
@@ -85,9 +95,9 @@ enable_repo() {
 
     case "$kind" in
     copr)
-        if ! sudo dnf copr list 2>/dev/null | grep -q "$name"; then
+        if ! as_root dnf copr list 2>/dev/null | grep -q "$name"; then
             echo "▸ Enabling COPR: $name"
-            sudo dnf copr enable -y "$name"
+            as_root dnf copr enable -y "$name"
             echo "✓ Enabled COPR: $name"
         fi
         ;;
@@ -96,7 +106,7 @@ enable_repo() {
             pm_install apt-get software-properties-common
 
         echo "▸ Enabling PPA: $name"
-        sudo add-apt-repository -y "ppa:$name"
+        as_root add-apt-repository -y "ppa:$name"
         echo "✓ Enabled PPA: $name"
         ;;
     apk-testing)
@@ -132,22 +142,22 @@ enable_repo() {
         apt-get)
             keyring="/usr/share/keyrings/${name}.gpg"
             sourcefile="/etc/apt/sources.list.d/${name}.sources"
-            [ -f "$sourcefile" ] && return 0
 
             codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
             suites=$(printf '%s' "$suites" | sed "s/\$codename/$codename/g")
 
+            # Rewritten on every run, so a vendor key rotation is picked up.
             echo "▸ Enabling repo: $name"
             curl --proto '=https' --tlsv1.2 -sSfL "$signed_by" |
-                sudo gpg --dearmor -o "$keyring"
-            sudo tee "$sourcefile" >/dev/null <<EOF
+                as_root gpg --dearmor --yes -o "$keyring"
+            as_root tee "$sourcefile" >/dev/null <<EOF
 Types: deb
 URIs: $uri
 Suites: $suites
 Components: $components
 Signed-By: $keyring
 EOF
-            sudo apt-get update -qq
+            as_root apt-get update -qq
             echo "✓ Enabled repo: $name"
             ;;
         dnf)
@@ -159,7 +169,7 @@ EOF
             baseurl=$(printf '%s' "$baseurl" | sed "s/\$distro/$distro/g")
 
             echo "▸ Enabling repo: $name"
-            sudo tee "$repofile" >/dev/null <<EOF
+            as_root tee "$repofile" >/dev/null <<EOF
 [$name]
 name=$name
 baseurl=$baseurl
@@ -221,7 +231,7 @@ fnm_install_lts() {
     export PATH="$HOME/.local/share/fnm:$PATH"
 
     unset FNM_ARCH FNM_NODE_DIST_MIRROR
-    if [ -n "$(ls /lib/ld-musl-*.so.1 2>/dev/null)" ]; then
+    if is_musl; then
         export FNM_NODE_DIST_MIRROR="https://unofficial-builds.nodejs.org/download/release"
         case "$(uname -m)" in
         aarch64) export FNM_ARCH="arm64-musl" ;;
