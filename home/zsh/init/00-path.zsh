@@ -3,7 +3,6 @@ path=(
     $HOME/.local/bin
     $HOME/bin(N/)
     $HOME/.cargo/bin(N/)
-    $HOME/.opencode/bin(N/)
     $HOME/.terragrunt/bin(N/)
     $path
 )

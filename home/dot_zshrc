@@ -2,6 +2,9 @@
 source "$DOTFILES"/home/zsh/oh-my-zsh.zsh
 source "$DOTFILES"/home/zsh/aliases.zsh
 
+# GPG
+export GPG_TTY=$TTY
+
 # Opts
 setopt extendedglob
 setopt globdots
