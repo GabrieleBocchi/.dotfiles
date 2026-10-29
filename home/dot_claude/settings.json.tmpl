@@ -1,0 +1,11 @@
+{{- /* Untracked machine-specific settings: hooks are appended, other keys override. */ -}}
+{{- $settings := include ".chezmoitemplates/claude-settings.json" | fromJson -}}
+{{- $localFile := joinPath .chezmoi.homeDir ".claude/settings.overrides.json" -}}
+{{- if stat $localFile -}}
+{{-   $local := include $localFile | fromJson -}}
+{{-   range $event, $entries := $local.hooks -}}
+{{-     $_ := set $settings.hooks $event (concat (default (list) (get $settings.hooks $event)) $entries) -}}
+{{-   end -}}
+{{-   $settings = mergeOverwrite $settings (omit $local "hooks") -}}
+{{- end -}}
+{{ toPrettyJson $settings }}

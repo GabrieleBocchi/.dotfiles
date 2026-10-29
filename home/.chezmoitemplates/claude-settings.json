@@ -9,7 +9,10 @@
       "Read(~/.secrets/**)",
       "Read(~/.claude/.credentials.json)",
       "Read(~/.config/gh/hosts.yml)",
-      "Read(~/.local/share/opencode/auth.json)"
+      "Read(~/.local/share/opencode/auth.json)",
+      "Read(~/.config/opencode/opencode-local.json)",
+      "Read(~/.local/share/opencode/account.json)",
+      "Read(~/.config/Bitwarden CLI/**)"
     ],
     "defaultMode": "auto"
   },
@@ -59,8 +62,5 @@
     }
   },
   "timeFormat": "auto",
-  "theme": "dark",
-  "env": {
-    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8080"
-  }
+  "theme": "dark"
 }
