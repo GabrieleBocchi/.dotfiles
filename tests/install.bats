@@ -136,6 +136,18 @@ script_tool_binary() {
     done < <(expected_npm_packages)
 }
 
+@test "declared flatpak apps are installed" {
+    [ "$CASE_HAS_GUI" != "true" ] && skip "flatpak is desktop-only"
+
+    installed="$(flatpak list --user --app --columns=application)"
+    while IFS= read -r app; do
+        grep -qx "$app" <<<"$installed" || {
+            echo "missing flatpak app: $app" >&2
+            return 1
+        }
+    done < <(jq -r '.flatpak.apps[].name' "$DATA")
+}
+
 @test "claude settings are valid JSON with the RTK hook intact" {
     run jq -e '.hooks.PreToolUse[] | select(.matcher == "Bash")
         | .hooks[] | select(.command == "rtk hook claude")' "$HOME/.claude/settings.json"
@@ -207,7 +219,7 @@ script_tool_binary() {
 @test "install.sh second run" {
     cd "$REPO_DIR"
     cmd="./install.sh"
-    [ "$CASE_HAS_GNOME" = "true" ] && cmd="dbus-run-session -- $cmd"
+    [ "$CASE_HAS_GUI" = "true" ] && cmd="dbus-run-session -- $cmd"
     run $cmd
     [ "$status" -eq 0 ]
 }

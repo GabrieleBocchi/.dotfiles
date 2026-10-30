@@ -129,12 +129,12 @@ common:
 fedora:
   desktop:
     pm:
-      - ghostty # repo scottames/ghostty (Fedora-only)
+      - bibata-cursor-themes # repo peterwu/rendezvous
+      - ghostty # repo scottames/ghostty
 
 rhel:
   desktop:
-    pm:
-      - google-chrome-stable # ghostty NOT here: its COPR is Fedora-only
+    pm: []
 ```
 
 - **`pm`**: List of packages to install via the native package manager.
@@ -156,15 +156,29 @@ The install script:
 
 1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
 2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-3. Runs script-based installers (`install_script name url [args...]`)
-4. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
+3. Adds Flatpak remotes and installs Flatpak apps (GUI only, see below)
+4. Runs script-based installers (`install_script name url [args...]`)
+5. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
    musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
-5. Installs cargo packages with `--locked`
-6. Installs npm global packages (via fnm's per-user npm)
+6. Installs cargo packages with `--locked`
+7. Installs npm global packages (via fnm's per-user npm)
+
+### Flatpak
+
+Flatpak is desktop-only: `flatpak` is a `common.desktop` package, and the
+remotes (`flatpak.remotes`) and apps (`flatpak.apps`) declared in
+`home/.chezmoidata/flatpak.yaml` are added only when a GUI session is detected.
+They are installed per user (`--user`), in the same install script as system
+packages, right after `flatpak` itself; `run_after_40-updates.sh` runs
+`flatpak update --user` on every apply.
+
+Currently declared: Google Chrome, Spotify, Telegram Desktop, Teams for Linux
+and Vesktop — replacing what used to be native packages behind distro-specific
+custom repos, PPAs and COPRs. Ghostty stays a native package (not on Flathub).
 
 ### Repositories
 
-Some packages (e.g. Google Chrome) aren't in the default repos and need one
+Some packages (e.g. HashiCorp tools) aren't in the default repos and need one
 enabled first. All repositories are declared centrally in
 `home/.chezmoidata/repos.yaml`, keyed by the **same distro family** names as
 `system.yaml` (from `families.yaml`), each with the `base`/`desktop` split, and
@@ -194,36 +208,22 @@ repos:
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
     desktop:
       - kind: copr
-        name: scottames/ghostty
-  ubuntu:
-    base:
-      - kind: custom
-        name: hashicorp
-        uri: "https://apt.releases.hashicorp.com"
-        suites: "$codename"
-        components: "main"
-        signed_by: "https://apt.releases.hashicorp.com/gpg"
-    desktop:
-      - kind: ppa
-        name: atareao/telegram
+        name: peterwu/rendezvous
 ```
 
 Each family section has `base` (enabled always) and `desktop` (enabled only
 when a GUI session is detected). The target system is matched to **exactly
 one** family via `/etc/os-release`'s `id` (from `families.yaml`). A package is
 listed in `system.yaml` under a family only if that family enables a repo
-providing it — e.g. `ghostty`/`spotify-client` need Fedora-only repos so they
-appear under `fedora` but NOT `rhel`, and `telegram` comes from an Ubuntu-only
-PPA so it appears under `ubuntu` but NOT `debian`. A family section here lists
+providing it — e.g. `bibata-cursor-themes` needs a Fedora-only COPR so it
+appears under `fedora` but NOT `rhel`. A family section here lists
 exactly the repos that family enables; adding a new family is just adding it to
 `families.yaml` plus a section in `system.yaml`/`repos.yaml`; no template
 changes needed.
 
 - **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
-- **`kind: ppa`** (apt-get only): enables an Ubuntu PPA (`add-apt-repository`), self-installing
-  `software-properties-common` first if missing.
 - **`kind: rpm-release`** (dnf only): installs a release RPM directly (`dnf install <url>`), for
-  packages distributed as a release package rather than a repo file (e.g. RPM Fusion).
+  packages distributed as a release package rather than a repo file (e.g. EPEL).
 - **`kind: deb-release`** (apt-get only): downloads a `.deb` to a temp file and installs it
   (`apt-get` can't install directly from a URL like `dnf` can).
 - **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo

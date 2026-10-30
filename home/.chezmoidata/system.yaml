@@ -44,6 +44,7 @@ common:
         args: ["--skip-shell"]
   desktop:
     pm:
+      - flatpak
       - fontconfig
       - papirus-icon-theme
     script: []
@@ -65,10 +66,7 @@ alpine:
       - vimdiff
     script: []
   desktop:
-    pm:
-      # NOTE: NO telegram-desktop (broken dependency on Alpine).
-      - chromium
-      - spotify-qt
+    pm: []
     script: []
 
 # ── apt-get families ────────────────────────────────────────────────────────
@@ -86,11 +84,7 @@ debian:
     script: []
   desktop:
     pm:
-      # NOTE: NO telegram (atareao/telegram PPA is Ubuntu-only) on Debian.
       - bibata-cursor-theme
-      - google-chrome-stable
-      - spotify-client
-      - teams-for-linux
     script: []
 
 ubuntu:
@@ -107,10 +101,6 @@ ubuntu:
   desktop:
     pm:
       - bibata-cursor-theme
-      - google-chrome-stable
-      - spotify-client
-      - teams-for-linux
-      - telegram
     script:
       - name: Ghostty
         url: "https://raw.githubusercontent.com/mkasberg/ghostty-ubuntu/HEAD/install.sh"
@@ -133,10 +123,6 @@ fedora:
     pm:
       - bibata-cursor-themes
       - ghostty
-      - google-chrome-stable
-      - spotify-client
-      - teams-for-linux
-      - telegram-desktop
     script: []
 
 rhel:
@@ -152,8 +138,5 @@ rhel:
       - vim-enhanced
     script: []
   desktop:
-    pm:
-      # NOTE: NO bibata, Ghostty, Spotify and telegram (Fedora-only / not packaged for EL10).
-      - google-chrome-stable
-      - teams-for-linux
+    pm: []
     script: []
