@@ -7,7 +7,8 @@ export GPG_TTY=$TTY
 
 # Opts
 setopt extendedglob
-setopt globdots
+# Not in Claude Code's shell: `*` there must not match dotfiles
+[[ -z $CLAUDECODE ]] && setopt globdots
 zstyle ':completion:*' special-dirs false
 
 # Tool inits

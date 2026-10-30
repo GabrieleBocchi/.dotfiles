@@ -182,9 +182,26 @@ script_tool_binary() {
     [ "$status" -eq 0 ]
 }
 
+@test "podman socket is enabled for the user" {
+    [ "$(readlink "$HOME/.config/systemd/user/sockets.target.wants/podman.socket")" = /usr/lib/systemd/user/podman.socket ]
+}
+
 @test "zsh is the login shell of the user, not of root" {
     [ "$(getent passwd "$(id -un)" | cut -d: -f7)" = "$(command -v zsh)" ]
     [ "$(getent passwd root | cut -d: -f7)" != "$(command -v zsh)" ]
+}
+
+@test "non-interactive zsh finds user tools on PATH" {
+    run env -i HOME="$HOME" PATH=/usr/bin:/bin zsh -c 'command -v rtk node claude'
+    [ "$status" -eq 0 ]
+}
+
+@test "secrets from ~/.secrets/.env are not exported" {
+    mkdir -p "$HOME/.secrets"
+    echo 'export DOTFILES_TEST_SECRET=1' >"$HOME/.secrets/.env"
+    run zsh -ic '[[ $DOTFILES_TEST_SECRET == 1 ]] && ! env | grep -q DOTFILES_TEST_SECRET' </dev/null
+    rm -f "$HOME/.secrets/.env"
+    [ "$status" -eq 0 ]
 }
 
 @test "install.sh second run" {

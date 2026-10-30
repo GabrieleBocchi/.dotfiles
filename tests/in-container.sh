@@ -46,9 +46,8 @@ if [ "$CASE_HAS_GNOME" = "true" ]; then
     chmod +x /usr/bin/gnome-shell
 
     case "$PM" in
-    apk) pm_install "$PM" dbus dconf ;;
-    apt-get) pm_install "$PM" dbus dconf-cli dconf-service ;;
-    dnf) pm_install "$PM" dbus-daemon dconf ;;
+    dnf) pm_install "$PM" dbus-daemon ;;
+    *) pm_install "$PM" dbus ;;
     esac
 fi
 

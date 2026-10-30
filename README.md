@@ -36,8 +36,8 @@ git -C ~/.dotfiles pull --prune
 
 Or use the `updateDotfiles` alias.
 
-Every apply updates the zsh plugins, the Rust toolchain and the nvim config
-(at most once every 24h). The dependency script is
+Every apply updates the zsh plugins and the Rust toolchain. The nvim config
+updates at most once every 24h. The dependency script is
 `run_onchange`: it re-runs (system packages, script installers, fnm and
 `fnm install --lts`, cargo and npm packages) only when its rendered content
 changes, i.e. when a declared package, its version or `scripts/pkg-utils.sh`
@@ -46,6 +46,17 @@ changes. No pinned node version is tracked.
 ## Environment variables
 
 - `OPENCODE_CONFIG`: path to an untracked local opencode provider config (set in `.zshenv`)
+- `PATH`: set in `.zshenv` from `home/zsh/init/00-path.zsh`, so non-interactive
+  shells (`ssh host cmd`, cron, scripts) also find `~/.local/bin`, cargo and the
+  default fnm node. `.zshrc` loads it again, since some `/etc/profile` (Alpine)
+  reset `PATH` in login shells.
+- `~/.secrets/.env`: untracked secrets, loaded only by interactive shells as
+  unexported variables: `$VAR` works in commands you type, but child processes
+  (agents, MCP servers, scripts) do not get them. Pass one explicitly when a tool
+  needs it: `VAR=$VAR cmd`.
+- `DOCKER_HOST`: the rootless podman socket. chezmoi enables `podman.socket`
+  with the `sockets.target.wants` symlink in `home/dot_config/systemd/user/`,
+  so it starts from the next login.
 
 ## Dependency management
 
@@ -65,7 +76,7 @@ families:
     distros: [fedora]
   rhel:
     pm: dnf
-    distros: [almalinux, ol, rocky]
+    distros: [almalinux, centos, ol, rhel, rocky]
   debian:
     pm: apt-get
     distros: [debian]
@@ -311,7 +322,7 @@ lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, the
 Bitwarden CLI data, and the `claude`/`gh`/`opencode` token stores).
 
-Its `PreToolUse` hook routes Bash calls through `rtk hook claude`.
+Its `PreToolUse` and `SessionStart` hooks run `rtk hook claude`.
 Machine-specific settings go in the untracked
 `~/.claude/settings.overrides.json`: `home/dot_claude/settings.json.tmpl`
 merges it at apply time (its hooks and `permissions.deny` rules are appended to
@@ -408,24 +419,22 @@ The Bitwarden CLI is what makes this possible on a genuinely fresh machine, wher
 bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
 runs `scripts/password-manager.sh install`, which installs the standalone `bw`
 binary at `/usr/local/bin/bw` (version pinned in the script and managed by
-Renovate) and persists a `BW_SESSION` key. It is a cheap no-op when the pinned
+Renovate) and persists the session key in `~/.secrets/bw-session`. It is a cheap no-op when the pinned
 bw is already present and the persisted token is valid, or in non-interactive
 CI/container runs where the keys are skipped anyway. The standalone binary is
 glibc-only: on musl systems it is not installed and the keys are skipped.
 
-The session itself lives as a persisted `BW_SESSION` in the untracked
-`~/.secrets/.env`. The installer sources it before running chezmoi, and
-`.zshenv` sources it (0ms — no `bw` call at shell startup). Only interactive
-shells keep `BW_SESSION`, unexported; non-interactive ones (scripts, the GNOME
-session, AI agents' tool shells) drop it, and the chezmoi scripts that run
-third-party installers unset it. The `bw` and `chezmoi` shell functions in
-`home/zsh/aliases.zsh` pass it to those two commands only. This limits
-accidental exposure; it is not a hard boundary, since anything running as the
-user can still read `~/.secrets/.env`. Bitwarden session keys never expire on their own — they only die on
-`bw lock`/`bw logout` — so once persisted, `chezmoi apply` (even a no-op one)
-and `bw` are prompt-free: with `bitwarden.unlock = "auto"`, a present
-`BW_SESSION` means chezmoi neither re-unlocks nor locks. If the token is ever
-invalidated, the next `install.sh` run re-authenticates and rewrites it.
+The session key lives in the untracked `~/.secrets/bw-session`, and no shell
+loads it. The installer exports it before running chezmoi, the `bw` and
+`chezmoi` shell functions in `home/zsh/aliases.zsh` pass it to those two
+commands only, and the chezmoi scripts that run third-party installers unset
+it. This limits accidental exposure; it is not a hard boundary, since anything
+running as the user can still read the file. Bitwarden session keys never
+expire on their own — they only die on `bw lock`/`bw logout` — so once
+persisted, `chezmoi apply` (even a no-op one) and `bw` are prompt-free: with
+`bitwarden.unlock = "auto"`, a present `BW_SESSION` means chezmoi neither
+re-unlocks nor locks. If the key is ever invalidated, the next `install.sh` run
+re-authenticates and rewrites it.
 `unzip` is ensured by both `bootstrap_env` and the `common` system packages.
 
 ## Testing

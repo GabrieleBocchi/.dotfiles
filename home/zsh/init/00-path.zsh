@@ -4,6 +4,7 @@ path=(
     $HOME/bin(N/)
     $HOME/.cargo/bin(N/)
     $HOME/.terragrunt/bin(N/)
+    $HOME/.local/share/fnm/aliases/default/bin(N/)
     $path
 )
 typeset -U path

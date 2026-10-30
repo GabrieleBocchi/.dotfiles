@@ -4,7 +4,7 @@ if (( $+commands[keychain] )); then
   _kc_env="$HOME/.keychain/${(%):-%m}-sh"
   [[ -z $SSH_AUTH_SOCK && -f $_kc_env ]] && source "$_kc_env"
   if [[ ! -S ${SSH_AUTH_SOCK:-} ]] || ! ssh-add -l >/dev/null 2>&1; then
-    keychain add --quiet --host "${(%):-%m}" "${keychain_keys[@]}"
+    keychain --quiet --host "${(%):-%m}" "${keychain_keys[@]}"
     source "$_kc_env"
   fi
   unset _kc_env
