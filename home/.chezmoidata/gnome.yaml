@@ -1,11 +1,15 @@
 # GNOME packages per family, installed only when a GNOME session is detected.
 gnome:
-  alpine: []
+  alpine:
+    - dconf
   debian:
+    - dconf-cli
     - gnome-shell-extension-user-theme
   ubuntu:
+    - dconf-cli
     - gnome-shell-extension-user-theme
   fedora:
+    - dconf
     - gnome-shell-extension-appindicator
     - gnome-shell-extension-background-logo
     - gnome-shell-extension-blur-my-shell
@@ -13,6 +17,7 @@ gnome:
     - gnome-shell-extension-dash-to-dock
     - gnome-shell-extension-user-theme
   rhel:
+    - dconf
     - gnome-shell-extension-background-logo
     - gnome-shell-extension-dash-to-dock
     - gnome-shell-extension-user-theme

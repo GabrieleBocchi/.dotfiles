@@ -36,8 +36,8 @@ git -C ~/.dotfiles pull --prune
 
 Or use the `updateDotfiles` alias.
 
-Every apply updates the zsh plugins, the Rust toolchain and the nvim config
-(at most once every 24h). The dependency script is
+Every apply updates the zsh plugins and the Rust toolchain. The nvim config
+updates at most once every 24h. The dependency script is
 `run_onchange`: it re-runs (system packages, script installers, fnm and
 `fnm install --lts`, cargo and npm packages) only when its rendered content
 changes, i.e. when a declared package, its version or `scripts/pkg-utils.sh`
@@ -311,7 +311,7 @@ lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
 outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, the
 Bitwarden CLI data, and the `claude`/`gh`/`opencode` token stores).
 
-Its `PreToolUse` hook routes Bash calls through `rtk hook claude`.
+Its `PreToolUse` and `SessionStart` hooks run `rtk hook claude`.
 Machine-specific settings go in the untracked
 `~/.claude/settings.overrides.json`: `home/dot_claude/settings.json.tmpl`
 merges it at apply time (its hooks and `permissions.deny` rules are appended to

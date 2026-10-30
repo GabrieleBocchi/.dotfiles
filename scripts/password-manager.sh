@@ -62,6 +62,9 @@ persist_session() {
     *'"status":"unauthenticated"'* | '')
         session="$(bw login --raw)"
         ;;
+    *'"status":"unlocked"'*)
+        session="$BW_SESSION"
+        ;;
     *)
         session="$(bw unlock --raw)"
         ;;
