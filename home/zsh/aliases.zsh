@@ -16,7 +16,13 @@ alias top='btop'
 alias tree='tree -a'
 
 # bat (resolved to bat/batcat in dot_zshenv's $BAT_CMD)
-alias cat="$BAT_CMD"
+if [[ -n "${BAT_CMD:-}" ]]; then
+    alias cat="$BAT_CMD"
+fi
+
+# Bitwarden session (not exported, see dot_zshenv)
+bw() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} bw "$@" }
+chezmoi() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} chezmoi "$@" }
 
 # Docker
 alias docker='sudo docker'
@@ -45,8 +51,16 @@ alias activate='source */bin/activate'
 alias updateDotfiles='git -C "$DOTFILES" pull --prune && $DOTFILES/install.sh'
 alias updateNvim='nvim --headless "+Lazy! sync" +qa >/dev/null'
 alias updateOpencodeSlim='bunx oh-my-opencode-slim install --companion=no'
-alias updatePackages='sudo dnf upgrade --refresh -y'
-alias updateAll='updatePackages && updateNvim && updateDotfiles'
+function updatePackages {
+    if (( $+commands[apk] )); then
+        sudo apk upgrade --update-cache
+    elif (( $+commands[apt-get] )); then
+        sudo apt-get update && sudo apt-get upgrade -y
+    else
+        sudo dnf upgrade --refresh -y
+    fi
+}
+alias updateAll='updatePackages && updateDotfiles && updateNvim'
 
 # Import local aliases
 if [ -f ~/.aliases_local.zsh ]; then

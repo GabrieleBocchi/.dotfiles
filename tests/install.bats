@@ -142,6 +142,20 @@ script_tool_binary() {
     [ "$status" -eq 0 ]
 }
 
+@test "claude settings merge the local overrides file" {
+    overrides="$HOME/.claude/settings.overrides.json"
+    echo '{"hooks":{"PreToolUse":[{"hooks":[{"type":"command","command":"local-hook"}]}]},"permissions":{"deny":["Read(~/local/**)"]},"env":{"X":"1"}}' >"$overrides"
+    settings="$(chezmoi cat "$HOME/.claude/settings.json")"
+    rm -f "$overrides"
+
+    jq -e '
+        (.hooks.PreToolUse | length) == 2
+        and (.permissions.deny | index("Read(~/.secrets/**)") != null)
+        and (.permissions.deny | index("Read(~/local/**)") != null)
+        and .env.X == "1"
+    ' <<<"$settings"
+}
+
 @test "opencode config is present and valid" {
     [ -f "$HOME/.config/opencode/opencode.json" ]
     [ -f "$HOME/.config/opencode/tui.json" ]
@@ -151,6 +165,8 @@ script_tool_binary() {
 }
 
 @test "kanata config is valid" {
+    [ "$CASE_HAS_GUI" != "true" ] && skip "kanata is desktop-only"
+
     run kanata --check --cfg "$REPO_DIR/home/dot_config/kanata/config.kbd"
     [ "$status" -eq 0 ]
 }
@@ -164,6 +180,11 @@ script_tool_binary() {
 
     run ssh -G localhost </dev/null
     [ "$status" -eq 0 ]
+}
+
+@test "zsh is the login shell of the user, not of root" {
+    [ "$(getent passwd "$(id -un)" | cut -d: -f7)" = "$(command -v zsh)" ]
+    [ "$(getent passwd root | cut -d: -f7)" != "$(command -v zsh)" ]
 }
 
 @test "install.sh second run" {
@@ -197,15 +218,7 @@ script_tool_binary() {
 
     local tmp
     tmp="$(mktemp)"
-    for f in "$DCONF_DIR"/*.ini; do
-        cat "$f" >>"$tmp"
-        echo >>"$tmp"
-    done
-    for f in "$DCONF_DIR"/*.ini.tmpl; do
-        [ -e "$f" ] || continue
-        (cd "$REPO_DIR" && chezmoi execute-template <"$f") >>"$tmp"
-        echo >>"$tmp"
-    done
+    "$REPO_DIR/scripts/render-dconf.sh" "$DCONF_DIR" >"$tmp"
 
     run dbus-run-session -- sh -c "dconf load / < '$tmp'"
     local status_of_load=$status

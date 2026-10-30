@@ -9,21 +9,6 @@ exit 0
 
 echo "▸ Loading GNOME settings"
 
-dconf_dir="{{ .chezmoi.sourceDir }}/dconf"
-tmpfile="$(mktemp)"
-
-for f in "$dconf_dir"/*.ini; do
-    cat "$f" >> "$tmpfile"
-    echo >> "$tmpfile"
-done
-
-for f in "$dconf_dir"/*.ini.tmpl; do
-    [ -e "$f" ] || continue
-    chezmoi execute-template < "$f" >> "$tmpfile"
-    echo >> "$tmpfile"
-done
-
-dconf load / < "$tmpfile"
-rm -f "$tmpfile"
+"{{ dir .chezmoi.sourceDir }}/scripts/render-dconf.sh" "{{ .chezmoi.sourceDir }}/dconf" | dconf load /
 
 echo "✓ GNOME settings loaded"

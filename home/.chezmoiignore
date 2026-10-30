@@ -7,9 +7,6 @@ zsh/
 # dconf/ — loaded into the dconf database by a script, not deployed as a file
 dconf/
 
-# placeholder to make chezmoi/git track the otherwise-empty ~/.ssh/cm/ dir
-.ssh/cm/.keep
-
 # GUI/desktop tools not available on headless machines
 {{- if not .hasGUI }}
 .config/ghostty
@@ -18,8 +15,8 @@ dconf/
 {{- end }}
 
 # SSH keys come from Bitwarden; render them only when bw exists AND the vault
-# is reachable (interactive run or BW_SESSION set).
-{{- if and (not stdinIsATTY) (not (env "BW_SESSION")) }}
+# is reachable.
+{{- if not (includeTemplate "bitwarden-available" .) }}
 .ssh/personal
 .ssh/personal.pub
 .ssh/work

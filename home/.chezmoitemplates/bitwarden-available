@@ -1,0 +1,2 @@
+{{- /* "true" when bw exists and the vault is reachable (interactive run or BW_SESSION set). */ -}}
+{{- if and (lookPath "bw") (or stdinIsATTY (env "BW_SESSION")) }}true{{ end -}}

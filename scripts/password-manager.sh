@@ -1,7 +1,13 @@
 #!/bin/sh
-# Bitwarden CLI: install (render-time), persist BW_SESSION, or link.
+# Bitwarden CLI: install (render-time) and persist BW_SESSION.
 
 set -eu
+
+. "$(dirname "$0")/pkg-utils.sh"
+
+# renovate: datasource=github-releases depName=bitwarden/clients extractVersion=^cli-v(?<version>.+)$
+BW_VERSION="2026.10.0"
+BW_BIN="/usr/local/bin/bw"
 
 install_bw() {
     case "$(uname -s)-$(uname -m)" in
@@ -13,39 +19,19 @@ install_bw() {
         os="linux"
         suffix="-arm64"
         ;;
-    Darwin-x86_64)
-        os="macos"
-        suffix=""
-        ;;
-    Darwin-arm64)
-        os="macos"
-        suffix="-arm64"
-        ;;
     *)
         echo "ERROR: unsupported platform $(uname -s)/$(uname -m)" >&2
         exit 1
         ;;
     esac
 
-    bw_version="$(
-        curl --proto '=https' --tlsv1.2 -sSfL \
-            'https://api.github.com/repos/bitwarden/clients/releases?per_page=30' |
-            grep -o '"tag_name"[[:space:]]*:[[:space:]]*"cli-v[^"]*"' |
-            head -n1 |
-            sed 's/.*cli-v//; s/"$//'
-    )"
-    [ -n "$bw_version" ] || {
-        echo "ERROR: couldn't resolve latest bw version" >&2
-        exit 1
-    }
-
-    asset="bw-${os}${suffix}-${bw_version}.zip"
-    url="https://github.com/bitwarden/clients/releases/download/cli-v${bw_version}/${asset}"
+    asset="bw-${os}${suffix}-${BW_VERSION}.zip"
+    url="https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/${asset}"
 
     tmp="$(mktemp -d)"
     trap 'rm -rf "$tmp"' EXIT
 
-    echo "▸ Installing Bitwarden CLI $bw_version..."
+    echo "▸ Installing Bitwarden CLI $BW_VERSION..."
     curl --proto '=https' --tlsv1.2 -sSfL -o "$tmp/bw.zip" "$url"
     unzip -oq "$tmp/bw.zip" -d "$tmp"
 
@@ -54,12 +40,8 @@ install_bw() {
         exit 1
     fi
 
-    if [ "$(id -u)" -eq 0 ]; then
-        install -m 755 "$tmp/bw" /usr/local/bin/bw
-    else
-        sudo install -m 755 "$tmp/bw" /usr/local/bin/bw
-    fi
-    echo "✓ Installed Bitwarden CLI $bw_version"
+    as_root install -m 755 "$tmp/bw" "$BW_BIN"
+    echo "✓ Installed Bitwarden CLI $BW_VERSION"
 }
 
 persist_session() {
@@ -85,28 +67,14 @@ persist_session() {
         ;;
     esac
 
-    tmp="$(
+    env_tmp="$(
         umask 077
         mktemp "$env_file.XXXXXX"
     )"
     # Keep every other line; rewrite only the BW_SESSION line.
-    grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$tmp" || true
-    printf 'export BW_SESSION="%s"\n' "$session" >>"$tmp"
-    mv "$tmp" "$env_file"
-}
-
-link_bw() {
-    per_user="$HOME/.local/share/fnm/aliases/default/bin/bw"
-    [ -x "$per_user" ] || return 0
-
-    # Skip linking if the symlink already points to the per-user bw binary.
-    [ "$(readlink -- /usr/local/bin/bw 2>/dev/null)" = "$per_user" ] && return 0
-
-    if [ "$(id -u)" -eq 0 ]; then
-        ln -sfn "$per_user" /usr/local/bin/bw
-    else
-        sudo ln -sfn "$per_user" /usr/local/bin/bw
-    fi
+    grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$env_tmp" || true
+    printf 'export BW_SESSION="%s"\n' "$session" >>"$env_tmp"
+    mv "$env_tmp" "$env_file"
 }
 
 case "${1:-}" in
@@ -114,16 +82,23 @@ install)
     # Non-interactive run with no session (CI, container).
     [ ! -t 0 ] && [ -z "${BW_SESSION:-}" ] && exit 0
 
-    # Install bw when missing.
-    command -v bw >/dev/null 2>&1 || install_bw
+    # The standalone bw is glibc-only; without it the keys are skipped.
+    if is_musl; then
+        [ -L "$BW_BIN" ] && as_root rm -f "$BW_BIN"
+        echo "− Skipping Bitwarden CLI (no musl build)"
+        exit 0
+    fi
 
+    # Also replaces the old symlink to npm's bw, which needs node on PATH.
+    if [ -L "$BW_BIN" ] || [ "$("$BW_BIN" --version 2>/dev/null)" != "$BW_VERSION" ]; then
+        install_bw
+    fi
+
+    PATH="/usr/local/bin:$PATH"
     persist_session
     ;;
-link)
-    link_bw
-    ;;
 *)
-    echo "usage: $0 [install|link]" >&2
+    echo "usage: $0 install" >&2
     exit 1
     ;;
 esac

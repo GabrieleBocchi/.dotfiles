@@ -1,4 +1,4 @@
-# git-repo and file types track main. Archive URLs are pinned by tag or SHA.
+# git-repo tracks main. File and archive URLs are pinned by tag or SHA.
 
 # ---- Neovim config -------------------------------------------
 [".config/nvim"]
@@ -6,12 +6,12 @@ type = "git-repo"
 url = "https://github.com/GabrieleBocchi/gab.lazy.git"
 clone.args = ["--depth", "1"]
 pull.args = ["--rebase", "--autostash"]
+refreshPeriod = "24h"
 
 # ---- Tmux base config ----------------------------------------
 [".config/tmux/tmux.conf"]
 type = "file"
-url = "https://raw.githubusercontent.com/gpakosz/.tmux/master/.tmux.conf"
-refreshPeriod = "24h"
+url = "https://raw.githubusercontent.com/gpakosz/.tmux/58a3dcc0d718ec0fa1c0d5a2fddd640a1ad7a5b7/.tmux.conf"
 
 # ---- Antidote ------------------------------------------------
 [".local/share/antidote"]

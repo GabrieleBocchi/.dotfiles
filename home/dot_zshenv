@@ -8,12 +8,8 @@ if command -v podman &> /dev/null && [[ -n "${XDG_RUNTIME_DIR:-}" ]]; then
 fi
 
 # Editor
-VIM="nvim"
-export EDITOR=$VIM
-export VISUAL=$VIM
-
-# GPG
-export GPG_TTY=$(tty)
+export EDITOR=nvim
+export VISUAL=nvim
 
 # bat is named "batcat" on old Debian/Ubuntu
 if command -v bat &> /dev/null; then
@@ -23,7 +19,9 @@ elif command -v batcat &> /dev/null; then
 fi
 
 # Man pages
-export MANPAGER="sh -c 'col -bx | $BAT_CMD -l man -p'"
+if [[ -n "${BAT_CMD:-}" ]]; then
+    export MANPAGER="sh -c 'col -bx | $BAT_CMD -l man -p'"
+fi
 
 # Rust
 export RUST_BACKTRACE=1
@@ -31,6 +29,13 @@ export RUST_BACKTRACE=1
 # Import secret environment variables
 if [[ -f "$HOME/.secrets/.env" ]]; then
   source "$HOME/.secrets/.env"
+fi
+
+# Bitwarden session: only interactive shells keep it, unexported (see aliases.zsh)
+if [[ -o interactive ]]; then
+  typeset +x BW_SESSION 2>/dev/null
+else
+  unset BW_SESSION
 fi
 
 # OpenCode local overrides
