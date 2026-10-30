@@ -33,10 +33,12 @@ else
     echo "⚠ RTK integrations failed" >&2
 fi
 
-# ── Flatpak apps ─────────────────────────────────────────────────────────────
+# ── Flatpak apps (GUI only) ─────────────────────────────────────────────────
+{{ if .hasGUI -}}
 echo "▸ Flatpak update"
 flatpak update --user -y
 echo "✓ Flatpak update"
+{{ end -}}
 
 # ── Font cache (GUI only) ───────────────────────────────────────────────────
 {{ if .hasGUI -}}

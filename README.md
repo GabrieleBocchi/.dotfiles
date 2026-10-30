@@ -156,7 +156,7 @@ The install script:
 
 1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
 2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-3. Adds Flatpak remotes and installs Flatpak apps (see below)
+3. Adds Flatpak remotes and installs Flatpak apps (GUI only, see below)
 4. Runs script-based installers (`install_script name url [args...]`)
 5. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
    musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
@@ -165,17 +165,16 @@ The install script:
 
 ### Flatpak
 
-Flatpak is installed on every machine (base package, not desktop-only).
-Remotes and applications are declared in `home/.chezmoidata/flatpak.yaml`:
+Flatpak is desktop-only: `flatpak` is a `common.desktop` package, and the
+remotes (`flatpak.remotes`) and apps (`flatpak.apps`) declared in
+`home/.chezmoidata/flatpak.yaml` are added only when a GUI session is detected.
+They are installed per user (`--user`), in the same install script as system
+packages, right after `flatpak` itself; `run_after_40-updates.sh` runs
+`flatpak update --user` on every apply.
 
-- `flatpak.remotes.base`: added on every machine; `remotes.desktop`: GUI only.
-- `flatpak.apps.base`: installed on every machine; `apps.desktop`: GUI only.
-
-Configured in the same install script as system packages, right after
-`flatpak` itself is installed. Currently declared as `apps.desktop`: Google
-Chrome, Spotify, Telegram Desktop, Teams for Linux, and Vesktop — replacing
-what used to be native packages behind distro-specific custom repos, PPAs and COPRs.
-Ghostty stays a native package (not on Flathub yet).
+Currently declared: Google Chrome, Spotify, Telegram Desktop, Teams for Linux
+and Vesktop — replacing what used to be native packages behind distro-specific
+custom repos, PPAs and COPRs. Ghostty stays a native package (not on Flathub).
 
 ### Repositories
 

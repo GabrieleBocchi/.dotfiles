@@ -11,7 +11,6 @@ common:
       - bat
       - btop
       - curl
-      - flatpak
       - gcc
       - git
       - jq
@@ -45,6 +44,7 @@ common:
         args: ["--skip-shell"]
   desktop:
     pm:
+      - flatpak
       - fontconfig
       - papirus-icon-theme
     script: []
