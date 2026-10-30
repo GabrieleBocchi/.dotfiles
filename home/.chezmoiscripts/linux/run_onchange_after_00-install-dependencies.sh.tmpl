@@ -43,7 +43,7 @@ echo "▸ Flatpak"
 {{ $flatpakRemotes := .flatpak.remotes.base -}}
 {{ if .hasGUI }}{{ $flatpakRemotes = concat $flatpakRemotes .flatpak.remotes.desktop }}{{ end -}}
 {{ range $flatpakRemotes -}}
-flatpak remote-add --user --if-not-exists {{ .name | quote }} {{ .url }}
+flatpak remote-add --user --if-not-exists {{ .name | quote }} {{ .url | squote }}
 {{ end -}}
 
 {{ $flatpakApps := .flatpak.apps.base -}}

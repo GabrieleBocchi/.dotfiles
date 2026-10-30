@@ -51,6 +51,13 @@ expected_npm_packages() {
     ' "$DATA"
 }
 
+expected_flatpak_apps() {
+    jq -r --argjson gui "$(gui_flag)" '
+        .flatpak.apps.base + (if $gui then .flatpak.apps.desktop else [] end)
+        | .[].name
+    ' "$DATA"
+}
+
 expected_scripts() {
     jq -r --arg family "$FAMILY" --argjson gui "$(gui_flag)" '
         (.common.base.script + .[$family].base.script)
@@ -136,6 +143,26 @@ script_tool_binary() {
     done < <(expected_npm_packages)
 }
 
+@test "declared flatpak apps are installed, desktop ones only with a GUI" {
+    installed="$(flatpak list --user --app --columns=application)"
+
+    while IFS= read -r app; do
+        [ -z "$app" ] && continue
+        grep -qx "$app" <<<"$installed" || {
+            echo "missing flatpak app: $app" >&2
+            return 1
+        }
+    done < <(expected_flatpak_apps)
+
+    [ "$CASE_HAS_GUI" = "true" ] && return 0
+    while IFS= read -r app; do
+        if grep -qx "$app" <<<"$installed"; then
+            echo "$app should NOT be installed (hasGUI=false)" >&2
+            return 1
+        fi
+    done < <(jq -r '.flatpak.apps.desktop[].name' "$DATA")
+}
+
 @test "claude settings are valid JSON with the RTK hook intact" {
     run jq -e '.hooks.PreToolUse[] | select(.matcher == "Bash")
         | .hooks[] | select(.command == "rtk hook claude")' "$HOME/.claude/settings.json"
@@ -207,7 +234,7 @@ script_tool_binary() {
 @test "install.sh second run" {
     cd "$REPO_DIR"
     cmd="./install.sh"
-    [ "$CASE_HAS_GNOME" = "true" ] && cmd="dbus-run-session -- $cmd"
+    [ "$CASE_HAS_GUI" = "true" ] && cmd="dbus-run-session -- $cmd"
     run $cmd
     [ "$status" -eq 0 ]
 }

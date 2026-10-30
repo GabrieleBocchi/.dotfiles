@@ -156,11 +156,12 @@ The install script:
 
 1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
 2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-3. Runs script-based installers (`install_script name url [args...]`)
-4. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
+3. Adds Flatpak remotes and installs Flatpak apps (see below)
+4. Runs script-based installers (`install_script name url [args...]`)
+5. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
    musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
-5. Installs cargo packages with `--locked`
-6. Installs npm global packages (via fnm's per-user npm)
+6. Installs cargo packages with `--locked`
+7. Installs npm global packages (via fnm's per-user npm)
 
 ### Flatpak
 
@@ -173,7 +174,7 @@ Remotes and applications are declared in `home/.chezmoidata/flatpak.yaml`:
 Configured in the same install script as system packages, right after
 `flatpak` itself is installed. Currently declared as `apps.desktop`: Google
 Chrome, Spotify, Telegram Desktop, Teams for Linux, and Vesktop — replacing
-what used to be native packages behind distro-specific custom repos/PPAs/COPRs.
+what used to be native packages behind distro-specific custom repos, PPAs and COPRs.
 Ghostty stays a native package (not on Flathub yet).
 
 ### Repositories
@@ -222,10 +223,8 @@ exactly the repos that family enables; adding a new family is just adding it to
 changes needed.
 
 - **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
-- **`kind: ppa`** (apt-get only): enables an Ubuntu PPA (`add-apt-repository`), self-installing
-  `software-properties-common` first if missing.
 - **`kind: rpm-release`** (dnf only): installs a release RPM directly (`dnf install <url>`), for
-  packages distributed as a release package rather than a repo file (e.g. RPM Fusion).
+  packages distributed as a release package rather than a repo file (e.g. EPEL).
 - **`kind: deb-release`** (apt-get only): downloads a `.deb` to a temp file and installs it
   (`apt-get` can't install directly from a URL like `dnf` can).
 - **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo

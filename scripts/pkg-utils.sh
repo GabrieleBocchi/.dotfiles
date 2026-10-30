@@ -104,14 +104,6 @@ enable_repo() {
             echo "✓ Enabled COPR: $name"
         fi
         ;;
-    ppa)
-        command -v add-apt-repository >/dev/null 2>&1 ||
-            pm_install apt-get software-properties-common
-
-        echo "▸ Enabling PPA: $name"
-        as_root add-apt-repository -y "ppa:$name"
-        echo "✓ Enabled PPA: $name"
-        ;;
     apk-testing)
         # Pins one package from Alpine's edge/testing repo without adding it
         # to /etc/apk/repositories or switching the whole system to edge.
