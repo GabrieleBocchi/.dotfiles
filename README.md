@@ -172,9 +172,8 @@ They are installed per user (`--user`), in the same install script as system
 packages, right after `flatpak` itself; `run_after_40-updates.sh` runs
 `flatpak update --user` on every apply.
 
-Currently declared: Google Chrome, Spotify, Telegram Desktop, Teams for Linux
-and Vesktop — replacing what used to be native packages behind distro-specific
-custom repos, PPAs and COPRs. Ghostty stays a native package (not on Flathub).
+Currently declared: Google Chrome, RustConn, Spotify, Telegram Desktop, Teams
+for Linux and Vesktop. Ghostty stays a native package (not on Flathub).
 
 ### Repositories
 

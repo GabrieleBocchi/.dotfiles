@@ -13,4 +13,6 @@ flatpak:
     - remote: flathub
       name: dev.vencord.Vesktop
     - remote: flathub
+      name: io.github.totoshko88.RustConn
+    - remote: flathub
       name: org.telegram.desktop
