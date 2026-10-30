@@ -11,7 +11,7 @@ dconf/
 {{- if not .hasGUI }}
 .config/ghostty
 .config/kanata
-.config/systemd
+.config/systemd/user/kanata.service
 {{- end }}
 
 # SSH keys come from Bitwarden; render them only when bw exists AND the vault

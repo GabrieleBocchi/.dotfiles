@@ -54,8 +54,9 @@ changes. No pinned node version is tracked.
   unexported variables: `$VAR` works in commands you type, but child processes
   (agents, MCP servers, scripts) do not get them. Pass one explicitly when a tool
   needs it: `VAR=$VAR cmd`.
-- `DOCKER_HOST`: the rootless podman socket, enabled by `run_once_after_35-enable-podman-socket.sh`
-  (`systemctl --user enable --now podman.socket`).
+- `DOCKER_HOST`: the rootless podman socket. chezmoi enables `podman.socket`
+  with the `sockets.target.wants` symlink in `home/dot_config/systemd/user/`,
+  so it starts from the next login.
 
 ## Dependency management
 
