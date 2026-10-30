@@ -26,16 +26,12 @@ fi
 # Rust
 export RUST_BACKTRACE=1
 
-# Import secret environment variables
-if [[ -f "$HOME/.secrets/.env" ]]; then
-  source "$HOME/.secrets/.env"
-fi
+# PATH (.zshrc loads it again: some /etc/profile reset PATH in login shells)
+source "$DOTFILES/home/zsh/init/00-path.zsh"
 
-# Bitwarden session: only interactive shells keep it, unexported (see aliases.zsh)
-if [[ -o interactive ]]; then
-  typeset +x BW_SESSION 2>/dev/null
-else
-  unset BW_SESSION
+# Secrets: interactive shells only, as unexported variables
+if [[ -o interactive && -f "$HOME/.secrets/.env" ]]; then
+  source <(sed 's/^export //' "$HOME/.secrets/.env")
 fi
 
 # OpenCode local overrides

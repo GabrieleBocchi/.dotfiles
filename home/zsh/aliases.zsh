@@ -20,9 +20,10 @@ if [[ -n "${BAT_CMD:-}" ]]; then
     alias cat="$BAT_CMD"
 fi
 
-# Bitwarden session (not exported, see dot_zshenv)
-bw() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} bw "$@" }
-chezmoi() { env ${BW_SESSION:+BW_SESSION=$BW_SESSION} chezmoi "$@" }
+# Bitwarden session: only bw and chezmoi get it (see scripts/password-manager.sh)
+bw_session_env() { [[ -r ~/.secrets/bw-session ]] && print -r -- "BW_SESSION=$(<~/.secrets/bw-session)" }
+bw() { env $(bw_session_env) bw "$@" }
+chezmoi() { env $(bw_session_env) chezmoi "$@" }
 
 # Docker
 alias docker='sudo docker'

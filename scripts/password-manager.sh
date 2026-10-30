@@ -45,17 +45,14 @@ install_bw() {
 }
 
 persist_session() {
-    secrets="$HOME/.secrets"
-    env_file="$secrets/.env"
+    session_file="$HOME/.secrets/bw-session"
 
-    mkdir -p "$secrets"
-    chmod 700 "$secrets"
+    mkdir -p "$HOME/.secrets"
+    chmod 700 "$HOME/.secrets"
 
-    if [ -r "$env_file" ]; then
-        session="$(sed -n 's/^export BW_SESSION="\([^"]*\)"$/\1/p' "$env_file" 2>/dev/null | head -n1)"
-        if [ -n "$session" ] && BW_SESSION="$session" bw unlock --check </dev/null >/dev/null 2>&1; then
-            return 0
-        fi
+    session="$(cat "$session_file" 2>/dev/null || true)"
+    if [ -n "$session" ] && BW_SESSION="$session" bw unlock --check </dev/null >/dev/null 2>&1; then
+        return 0
     fi
 
     case "$(bw status 2>/dev/null)" in
@@ -70,14 +67,10 @@ persist_session() {
         ;;
     esac
 
-    env_tmp="$(
+    (
         umask 077
-        mktemp "$env_file.XXXXXX"
-    )"
-    # Keep every other line; rewrite only the BW_SESSION line.
-    grep -v '^export BW_SESSION=' "$env_file" 2>/dev/null >"$env_tmp" || true
-    printf 'export BW_SESSION="%s"\n' "$session" >>"$env_tmp"
-    mv "$env_tmp" "$env_file"
+        printf '%s\n' "$session" >"$session_file"
+    )
 }
 
 case "${1:-}" in

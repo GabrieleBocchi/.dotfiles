@@ -81,3 +81,8 @@ if npm ls -g --depth=0 @bitwarden/cli >/dev/null 2>&1; then
 fi
 
 echo "✓ npm packages"
+
+# ── Docker API socket for podman (DOCKER_HOST in dot_zshenv) ────────────────
+if [ -d /run/systemd/system ]; then
+    systemctl --user enable --now podman.socket
+fi

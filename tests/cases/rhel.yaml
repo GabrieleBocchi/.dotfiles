@@ -23,3 +23,8 @@ cases:
     image: rockylinux/rockylinux:10.2@sha256:827d37bc128288ccf160ee318bb3cb92d591164cb217e92f8bc61e3982ae1834
     hasGUI: true
     hasGnome: true
+
+  - name: centos-desktop-gnome
+    image: quay.io/centos/centos:stream10@sha256:99b8fe27dd4958b5dc2630ce35f5f6a7ff7bf9b2b1a72078102fde50d3277550
+    hasGUI: true
+    hasGnome: true

@@ -31,8 +31,10 @@ fi
 "$DOTFILES_DIR/scripts/password-manager.sh" install
 
 # Load password manager session
-# shellcheck source=/dev/null
-[ -r "$HOME/.secrets/.env" ] && . "$HOME/.secrets/.env"
+if [ -r "$HOME/.secrets/bw-session" ]; then
+    BW_SESSION="$(cat "$HOME/.secrets/bw-session")"
+    export BW_SESSION
+fi
 
 echo "▸ Applying chezmoi configuration"
 "$BIN_DIR/chezmoi" init --source "$DOTFILES_DIR" --apply

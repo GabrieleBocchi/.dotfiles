@@ -30,4 +30,4 @@ families:
     distros: [fedora]
   rhel:
     pm: dnf
-    distros: [almalinux, ol, rocky]
+    distros: [almalinux, centos, ol, rhel, rocky]
