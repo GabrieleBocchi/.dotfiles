@@ -6,7 +6,7 @@ set -eu
 . "$(dirname "$0")/pkg-utils.sh"
 
 # renovate: datasource=github-releases depName=bitwarden/clients extractVersion=^cli-v(?<version>.+)$
-BW_VERSION="2026.10.0"
+BW_VERSION="2026.10.1"
 BW_BIN="/usr/local/bin/bw"
 
 install_bw() {
