@@ -28,7 +28,7 @@ style = 'bold yellow'
 format = '([$all_status$ahead_behind]($style) )'
 
 [python]
-format = '[$symbol$version( ($virtualenv))]($style) '
+format = '[$symbol$version( \($virtualenv\))]($style) '
 
 [nodejs]
 format = '[$symbol$version]($style) '
