@@ -9,6 +9,10 @@ CASE_HAS_GUI="${CASE_HAS_GUI:-false}"
 CASE_HAS_GNOME="${CASE_HAS_GNOME:-false}"
 TESTUSER_PASSWORD="testuser-pw-1234"
 
+# Some images ship /etc/shadow at mode 0000; recent runc breaks setuid PAM
+# helpers reading it. Owner-readable is enough.
+chmod 600 /etc/shadow 2>/dev/null || true
+
 # shellcheck source=../scripts/pkg-utils.sh
 . /repo/scripts/pkg-utils.sh
 
