@@ -40,12 +40,13 @@
     ]
   },
   "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "hookify@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
     "session-report@claude-plugins-official": true,
-    "cc-split-diff-view@neteye-platform": true
+    "cc-split-diff-view@neteye-platform": true,
+    "cc-side-session-summary@neteye-platform": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -57,7 +58,7 @@
     "neteye-platform": {
       "source": {
         "source": "github",
-        "repo": "neteye-platform/cc-split-diff-view"
+        "repo": "neteye-platform/ai-agents-tools"
       }
     }
   },
