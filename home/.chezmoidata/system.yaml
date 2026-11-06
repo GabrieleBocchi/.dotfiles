@@ -54,6 +54,7 @@ common:
 alpine:
   base:
     pm:
+      - aws-cli
       - fastfetch
       - github-cli
       - gnupg
@@ -74,6 +75,7 @@ alpine:
 debian:
   base:
     pm:
+      - awscli
       - gh
       - gnupg
       - libatomic1 # needed by node
@@ -90,6 +92,7 @@ debian:
 ubuntu:
   base:
     pm:
+      - awscli
       - gh
       - gnupg
       - libatomic1 # needed by node
@@ -110,6 +113,7 @@ ubuntu:
 fedora:
   base:
     pm:
+      - awscli2
       - fastfetch
       - gh
       - gnupg2
@@ -128,6 +132,7 @@ fedora:
 rhel:
   base:
     pm:
+      - awscli2
       - fastfetch
       - gh
       - gnupg2
