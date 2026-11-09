@@ -328,6 +328,11 @@ merges it at apply time (its hooks and `permissions.deny` rules are appended to
 the tracked ones, any other key overrides the tracked value). `/config` changes are reverted on
 apply.
 
+Both plugin marketplaces in `extraKnownMarketplaces` set `autoUpdate: true`.
+Claude Code updates their plugins in the background after each session starts,
+so the apply does not update them. Third-party marketplaces do not auto-update
+by default.
+
 MCP servers are installed via `npm.yaml` and registered by hand with
 `claude mcp add`.
 

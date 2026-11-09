@@ -53,13 +53,15 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
+      },
+      "autoUpdate": true
     },
     "neteye-platform": {
       "source": {
         "source": "github",
         "repo": "neteye-platform/ai-agents-tools"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "timeFormat": "auto",
