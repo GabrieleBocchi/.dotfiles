@@ -170,7 +170,9 @@ script_tool_binary() {
 
 @test "opencode config is present and valid" {
     [ -f "$HOME/.config/opencode/opencode.json" ]
-    [ -f "$HOME/.config/opencode/tui.json" ]
+    [ -f "$HOME/.config/opencode/cli.json" ]
+    [ "$(stat -c '%a' "$HOME/.config/opencode/cli.json")" = "600" ]
+    opencode --version | grep -Eq '^(opencode )?v?2\.'
 
     run opencode debug config
     [ "$status" -eq 0 ]

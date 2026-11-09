@@ -334,8 +334,10 @@ MCP servers are installed via `npm.yaml` and registered by hand with
 ### OpenCode configuration
 
 `home/dot_config/opencode/` holds config for [OpenCode](https://opencode.ai)
-(the CLI itself is installed via `npm.yaml`, not here): `opencode.json`
-(plugins + `model`/`small_model`) and `tui.json`.
+(the CLI itself is installed via `npm.yaml` as `@opencode/cli`, not here). The
+files use the native V2 format: `opencode.json` (model, provider allow-list
+policies, agents, plugins, and MCP servers) and `cli.json` (terminal client
+settings).
 
 Hybrid Slim agents allow external-directory access without prompts. `.env`
 files, other secrets, and dangerous commands remain separately protected: the
@@ -459,8 +461,10 @@ duplicated between local and CI.
 ## Post-install updates
 
 `run_after_40-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
-On Linux, it also refreshes RTK's generated OpenCode plugin; a failed refresh
-only emits a warning.
+On Linux, it also refreshes RTK's generated OpenCode plugin and updates the
+OpenCode plugins with `opencode plugin update`. The plugins are unpinned, and
+OpenCode only checks them for updates. A failed refresh or update only emits a
+warning.
 
 ## External dependencies (version-pinned)
 

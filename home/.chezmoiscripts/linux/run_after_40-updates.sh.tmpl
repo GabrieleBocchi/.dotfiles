@@ -33,6 +33,16 @@ else
     echo "⚠ RTK integrations failed" >&2
 fi
 
+# ── OpenCode plugins ────────────────────────────────────────────────────────
+# Plugins are unpinned in opencode.json; opencode only checks them for updates.
+echo "▸ OpenCode plugins"
+# opencode is an npm global under fnm's default Node, not on PATH in a fresh install
+if PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH" opencode plugin update; then
+    echo "✓ OpenCode plugins"
+else
+    echo "⚠ OpenCode plugin update failed" >&2
+fi
+
 # ── Flatpak apps (GUI only) ─────────────────────────────────────────────────
 {{ if .hasGUI -}}
 echo "▸ Flatpak update"

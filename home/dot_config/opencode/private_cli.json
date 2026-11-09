@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "plugins": [
+    "@tarquinen/opencode-dcp",
+    "oh-my-opencode-slim"
+  ],
+  "diffs": {
+    "wrap": "word"
+  },
+  "prompt": {
+    "paste": "compact"
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": false,
+    "thinking": "hide"
+  },
+  "animations": true
+}
