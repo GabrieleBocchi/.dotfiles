@@ -27,6 +27,9 @@ common:
     script:
       - name: Claude Code
         url: "https://claude.ai/install.sh"
+      - name: Fnm
+        url: "https://fnm.vercel.app/install"
+        args: ["--skip-shell"]
       - name: Rust
         url: "https://sh.rustup.rs"
         args: ["--no-modify-path", "--quiet", "-y"]
@@ -39,9 +42,6 @@ common:
       - name: Uv
         url: "https://astral.sh/uv/install.sh"
         envs: ["UV_NO_MODIFY_PATH=1"]
-      - name: Fnm
-        url: "https://fnm.vercel.app/install"
-        args: ["--skip-shell"]
   desktop:
     pm:
       - flatpak
