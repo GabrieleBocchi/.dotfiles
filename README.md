@@ -323,7 +323,7 @@ Bitwarden CLI data, and the `claude`/`gh`/`opencode` token stores).
 
 Its `PreToolUse` and `SessionStart` hooks run `rtk hook claude`.
 Machine-specific settings go in the untracked
-`~/.claude/settings.overrides.json`: `home/dot_claude/settings.json.tmpl`
+`~/.claude/settings.overrides.json`: `home/dot_claude/private_settings.json.tmpl`
 merges it at apply time (its hooks and `permissions.deny` rules are appended to
 the tracked ones, any other key overrides the tracked value). `/config` changes are reverted on
 apply.
