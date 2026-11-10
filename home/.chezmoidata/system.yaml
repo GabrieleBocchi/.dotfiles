@@ -1,9 +1,4 @@
-# System packages & script installers, keyed by distro family.
-#
-# Each section holds packages/scripts for exactly its family.
-#
-# `pm`:   native packages installed via the family's package manager.
-# `script`: URL-based installers (name/url/args/envs).
+# System packages (`pm`) and URL-based installers (`script`), keyed by family.
 common:
   base:
     pm:

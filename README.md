@@ -1,497 +1,144 @@
 # Dotfiles
 
-This is my dotfiles collection, managed with [chezmoi](https://chezmoi.io/).
+My dotfiles, managed with [chezmoi](https://chezmoi.io/): Ghostty, Git, GNOME
+(dconf), kanata, Neovim ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy)),
+OpenCode, Claude Code, SSH, tmux ([gpakosz/.tmux](https://github.com/gpakosz/.tmux))
+and zsh (antidote, Starship).
 
-## Modules
-
-- `Ghostty`: Terminal emulator
-- `Git`: Version control system
-- `GNOME`: Desktop environment settings (dconf)
-- `Keyboard`: Keyboard personalisation (kanata)
-- `Neovim`: Text editor ([gab.lazy](https://github.com/GabrieleBocchi/gab.lazy))
-- `OpenCode`: AI coding agent CLI, with permission guardrails and a security plugin
-- `SSH`: Client config with sane defaults, machine-specific hosts kept out of the repo
-- `Tmux`: Terminal multiplexer (gpakosz/.tmux base)
-- `Zsh`: Shell (antidote plugin manager, Starship prompt)
-
-## Installation
-
-Clone this repository and run the installer:
+## Install and update
 
 ```sh
 git clone https://github.com/GabrieleBocchi/.dotfiles ~/.dotfiles
 ~/.dotfiles/install.sh
 ```
 
-The installer reads the target version from `.chezmoiversion` and installs
-chezmoi at that exact version via `get.chezmoi.io` (on musl x86_64 it
-downloads the musl release binary directly).
+To update, run `updateDotfiles`, or `git -C ~/.dotfiles pull --prune` and then
+`install.sh` again. `install.sh` installs the chezmoi version from
+`.chezmoiversion`, sets up the Bitwarden CLI, and applies the config.
 
-## Updating
+Every apply updates the zsh plugins, the Rust toolchain, the OpenCode plugins
+and the Flatpak apps. The dependency script re-runs only when its rendered
+content changes: a package, a version, or `scripts/pkg-utils.sh`.
+
+## Shell
+
+- `PATH` is set in `.zshenv`, so non-interactive shells (`ssh host cmd`, cron)
+  also find it. `.zshrc` sets it again because some `/etc/profile` files
+  (Alpine) reset it.
+- `~/.secrets/.env` (untracked) loads only in interactive shells, as
+  unexported variables. Child processes (agents, MCP servers, scripts) do not
+  get them. Pass one explicitly: `VAR=$VAR cmd`.
+- `DOCKER_HOST` points to the rootless podman socket.
+
+## Dependencies
+
+All dependencies are data in `home/.chezmoidata/`:
+
+| File            | Content                                              |
+| --------------- | ---------------------------------------------------- |
+| `families.yaml` | os-release id → family → package manager             |
+| `system.yaml`   | native packages and URL installers, per family       |
+| `repos.yaml`    | repositories to enable before packages, per family   |
+| `gnome.yaml`    | GNOME packages, per family (only when `hasGnome`)    |
+| `flatpak.yaml`  | Flatpak remotes and apps (user install, GUI only)    |
+| `cargo.yaml`    | `cargo install --locked` packages                    |
+| `npm.yaml`      | `npm install -g` packages (Node comes from fnm, LTS) |
+
+Rules:
+
+- A system matches exactly one family. If none matches, chezmoi detects the
+  package manager and uses only the `common` sections.
+- To support a new distro of an existing family, add its id to
+  `families.yaml`. No template change is necessary.
+- `base` entries install everywhere. `desktop` entries install only when
+  `hasGUI` is true.
+- List a package under a family only if that family has a repo for it.
+- `hasGUI` is true when `/usr/share/{x,wayland-}sessions` contains a session
+  file. The directory alone is not enough: Fedora and RHEL ship it empty.
+  `hasGnome` is true when `gnome-shell` is on `PATH`.
+
+Repo kinds (`enable_repo` in `scripts/pkg-utils.sh`): `copr` and `rpm-release`
+(dnf), `deb-release` (apt-get), `apk-testing` (one package from Alpine
+edge/testing), and `custom` (writes a `.repo` file or a deb822 source with a
+dearmored key).
+
+`enable_repo` resolves these placeholders on the target machine:
+`$releasever`, `$basearch`, `$distro` (`fedora` or `RHEL`) and `$codename`. The
+template quotes them with `squote` so that the shell does not expand them.
+
+## GNOME
+
+`home/dconf/*.ini` files are loaded with `dconf load /` on every apply, so
+changes made in GNOME Settings are reverted. `extensions.ini.tmpl` enables only
+the extensions that are installed.
+
+## Claude Code
+
+- `home/.chezmoitemplates/claude-settings.json` is the tracked base of
+  `~/.claude/settings.json`. Its `permissions.deny` rules block reads of
+  secrets.
+- Put machine-specific settings in the untracked
+  `~/.claude/settings.overrides.json`. Its hooks and deny rules are appended;
+  other keys override the base.
+- Apply reverts changes made with `/config`. Claude Code also rewrites the
+  file in its own key order, so chezmoi can report a diff after `/config` or
+  `/effort`. Accept the overwrite.
+- The status line is [ccstatusline](https://github.com/sirmalloc/ccstatusline).
+  After you change it in its TUI, run
+  `chezmoi re-add ~/.config/ccstatusline/settings.json`. Do not use the TUI
+  install/uninstall option: it edits `~/.claude/settings.json`.
+- Register MCP servers by hand with `claude mcp add`.
+
+## OpenCode
+
+- `home/dot_config/opencode/` holds `opencode.json`, `cli.json` and the
+  oh-my-opencode-slim routing (`oh-my-opencode-slim.json`).
+- The `cc-safety-net` plugin blocks destructive commands and secret reads. It
+  is necessary because OpenCode's own `deny` patterns
+  [can be bypassed](https://github.com/anomalyco/opencode/issues/28682).
+- `updateOpencodeSlim` refreshes the Slim skills and keeps the routing. It does
+  not update model IDs. `--reset` replaces the routing and makes a backup.
+- For machine-only providers, create `~/.config/opencode/opencode-local.json`.
+  `.zshenv` sets `OPENCODE_CONFIG` to it when the file exists.
+- RTK generates its own OpenCode and Claude Code integration files after each
+  apply. They are not tracked.
+
+## SSH and GPG keys
+
+Keys are stored in Bitwarden, not in this repo. `~/.ssh/config.local`
+(untracked) holds the machine-specific `Host` blocks.
+
+- SSH: the secure notes `Personal SSH Key` and `Work SSH Key` have the custom
+  fields `privateKey` and `publicKey`. Use a secure note, not an "SSH Key"
+  item: its import removes the passphrase protection.
+- GPG: the secure note `Personal GPG Key` has the field `privateKey`. Fill it
+  with `gpg --armor --export-secret-keys <fingerprint>`. The apply imports the
+  key only when it is missing or when the note changed. gpg asks for the
+  passphrase at the first signature.
+- chezmoi renders the keys only when the vault is reachable: an interactive
+  run, or `BW_SESSION` set. In CI and containers they are skipped. The
+  standalone `bw` is glibc-only, so musl systems skip the keys too.
+- The session key is stored in `~/.secrets/bw-session`. Only `install.sh` and
+  the `bw` and `chezmoi` shell functions use it, and the chezmoi scripts that
+  run third-party installers unset it. It does not expire until
+  `bw lock`/`bw logout`.
+
+## Tests
+
+`tests/cases/*.yaml` lists the test cases: an image plus `hasGUI`/`hasGnome`.
+Each case runs `install.sh` as a non-root user in a container, then
+`tests/install.bats` checks the result. CI builds its matrix from the same
+files.
 
 ```sh
-git -C ~/.dotfiles pull --prune
-~/.dotfiles/install.sh
+tests/run.sh fedora-desktop-gnome   # one case
+tests/run.sh --all                  # all cases
+CONTAINER_RUNTIME=docker tests/run.sh --all
 ```
 
-Or use the `updateDotfiles` alias.
-
-Every apply updates the zsh plugins and the Rust toolchain. The nvim config
-updates at most once every 24h. The dependency script is
-`run_onchange`: it re-runs (system packages, script installers, fnm and
-`fnm install --lts`, cargo and npm packages) only when its rendered content
-changes, i.e. when a declared package, its version or `scripts/pkg-utils.sh`
-changes. No pinned node version is tracked.
-
-## Environment variables
-
-- `OPENCODE_CONFIG`: path to an untracked local opencode provider config (set in `.zshenv`)
-- `PATH`: set in `.zshenv` from `home/zsh/init/00-path.zsh`, so non-interactive
-  shells (`ssh host cmd`, cron, scripts) also find `~/.local/bin`, cargo and the
-  default fnm node. `.zshrc` loads it again, since some `/etc/profile` (Alpine)
-  reset `PATH` in login shells.
-- `~/.secrets/.env`: untracked secrets, loaded only by interactive shells as
-  unexported variables: `$VAR` works in commands you type, but child processes
-  (agents, MCP servers, scripts) do not get them. Pass one explicitly when a tool
-  needs it: `VAR=$VAR cmd`.
-- `DOCKER_HOST`: the rootless podman socket. chezmoi enables `podman.socket`
-  with the `sockets.target.wants` symlink in `home/dot_config/systemd/user/`,
-  so it starts from the next login.
-
-## Dependency management
-
-Dependencies are declared in YAML files under `home/.chezmoidata/` and installed
-automatically by chezmoi scripts. The system is cross-distro and detects the
-package manager at apply time.
-
-### Distro families (source of truth)
-
-`home/.chezmoidata/families.yaml` is the single source of truth that maps a
-distro `os-release` id to a package manager and a "family":
-
-```yaml
-families:
-  fedora:
-    pm: dnf
-    distros: [fedora]
-  rhel:
-    pm: dnf
-    distros: [almalinux, centos, ol, rhel, rocky]
-  debian:
-    pm: apt-get
-    distros: [debian]
-  ubuntu:
-    pm: apt-get
-    distros: [ubuntu]
-  alpine:
-    pm: apk
-    distros: [alpine]
-```
-
-A system matches **exactly one** family via `/etc/os-release`'s `id`; the
-package manager is derived from that family's `pm` field (never redeclared
-elsewhere). Both `system.yaml` and `repos.yaml` are keyed by these family
-names, so adding a distro to an existing family is just adding its id to the
-`distros` list here — no other file changes. If no family matches, the
-installed PM is detected by `lookPath` (fallback) and only the `common`
-sections are used (no family-specific repos or packages).
-
-### System packages
-
-`home/.chezmoidata/system.yaml` organises dependencies by distro **family**.
-The `common` section (cross-family, package-manager-agnostic) applies to every
-system; each family section (`fedora`, `rhel`, `debian`, `ubuntu`, `alpine`)
-holds only packages/scripts that family can actually install — a package is
-listed under a family only if that family enables a repo providing it (see
-`repos.yaml`). Each section has `base` and `desktop` keys — desktop entries are
-only installed when a GUI session is detected.
-
-```yaml
-common:
-  base:
-    pm:
-      - bat
-      - git
-      - neovim
-      - tmux
-      - zsh
-    script:
-      - name: Rust
-        url: "https://sh.rustup.rs"
-        args: ["--no-modify-path", "--quiet", "-y"]
-      - name: Uv
-        url: "https://astral.sh/uv/install.sh"
-        envs: ["UV_NO_MODIFY_PATH=1"]
-      - name: Terragrunt
-        url: "https://terragrunt.com/install"
-        args: ["--force"]
-
-fedora:
-  desktop:
-    pm:
-      - bibata-cursor-themes # repo peterwu/rendezvous
-      - ghostty # repo scottames/ghostty
-
-rhel:
-  desktop:
-    pm: []
-```
-
-- **`pm`**: List of packages to install via the native package manager.
-- **`script`**: List of URL-based installers to download and execute.
-  - `name`: Display name for logs.
-  - `url`: Script URL.
-  - `args` (optional): Arguments passed to the script.
-  - `envs` (optional): Environment variables passed to the script (e.g. `["KEY=value"]`).
-
-Before any of this, `install.sh` calls `bootstrap_env` (in `scripts/pkg-utils.sh`),
-which ensures the core tools the install process itself depends on (shell,
-downloader, VCS, GPG, unzip for the Bitwarden CLI bootstrap) are present,
-installing them with the native PM if any are missing. GPG is needed because
-`enable_repo`'s apt-get `custom` kind (see
-below) has to dearmor signing keys, and that step always runs _before_ `pm`
-packages (including `gnupg` itself) are installed.
-
-The install script:
-
-1. Enables repositories (`enable_repo pm kind name [key=value ...]`)
-2. Installs PM packages (`install_pkgs pm pkg1 pkg2 ...`)
-3. Adds Flatpak remotes and installs Flatpak apps (GUI only, see below)
-4. Runs script-based installers (`install_script name url [args...]`)
-5. Installs the latest LTS node via [fnm](https://github.com/Schniz/fnm) (managed, per-user; on
-   musl/Alpine it fetches a musl-linked build from the unofficial mirror) and defaults to it
-6. Installs cargo packages with `--locked`
-7. Installs npm global packages (via fnm's per-user npm)
-
-### Flatpak
-
-Flatpak is desktop-only: `flatpak` is a `common.desktop` package, and the
-remotes (`flatpak.remotes`) and apps (`flatpak.apps`) declared in
-`home/.chezmoidata/flatpak.yaml` are added only when a GUI session is detected.
-They are installed per user (`--user`), in the same install script as system
-packages, right after `flatpak` itself; `run_after_40-updates.sh` runs
-`flatpak update --user` on every apply.
-
-Currently declared: Google Chrome, RustConn, Spotify, Telegram Desktop, Teams
-for Linux and Vesktop. Ghostty stays a native package (not on Flathub).
-
-### Repositories
-
-Some packages (e.g. HashiCorp tools) aren't in the default repos and need one
-enabled first. All repositories are declared centrally in
-`home/.chezmoidata/repos.yaml`, keyed by the **same distro family** names as
-`system.yaml` (from `families.yaml`), each with the `base`/`desktop` split, and
-enabled before packages are installed so the package itself is then just a
-normal entry under `pm`. The system's family (from `.chezmoi.toml.tmpl`) picks
-the section; there's no `common` split here because a repo is intrinsically
-package-manager-specific, so each family already carries exactly the repos its
-own PM needs (repos shared by several families of the same PM are simply
-repeated per family):
-
-```yaml
-repos:
-  rhel:
-    base:
-      - kind: custom
-        name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
-        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
-      - kind: rpm-release
-        name: epel-release
-        url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm"
-  fedora:
-    base:
-      - kind: custom
-        name: hashicorp
-        baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
-        gpgkey: "https://rpm.releases.hashicorp.com/gpg"
-    desktop:
-      - kind: copr
-        name: peterwu/rendezvous
-```
-
-Each family section has `base` (enabled always) and `desktop` (enabled only
-when a GUI session is detected). The target system is matched to **exactly
-one** family via `/etc/os-release`'s `id` (from `families.yaml`). A package is
-listed in `system.yaml` under a family only if that family enables a repo
-providing it — e.g. `bibata-cursor-themes` needs a Fedora-only COPR so it
-appears under `fedora` but NOT `rhel`. A family section here lists
-exactly the repos that family enables; adding a new family is just adding it to
-`families.yaml` plus a section in `system.yaml`/`repos.yaml`; no template
-changes needed.
-
-- **`kind: copr`** (dnf only): enables a Fedora COPR repo (`dnf copr enable`).
-- **`kind: rpm-release`** (dnf only): installs a release RPM directly (`dnf install <url>`), for
-  packages distributed as a release package rather than a repo file (e.g. EPEL).
-- **`kind: deb-release`** (apt-get only): downloads a `.deb` to a temp file and installs it
-  (`apt-get` can't install directly from a URL like `dnf` can).
-- **`kind: apk-testing`** (apk only): installs one package from Alpine's edge/testing repo
-  (`apk add --repository ...`) without switching the whole system to edge.
-- **`kind: custom`**: writes the repo config natively.
-  - dnf: `baseurl` + `gpgkey` → `/etc/yum.repos.d/<name>.repo`.
-  - apt-get: `uri`, `suites`, `components`, `signed_by` → a signing key dearmored
-    into `/usr/share/keyrings/<name>.gpg` and a deb822 source file at
-    `/etc/apt/sources.list.d/<name>.sources`.
-
-Every field besides `kind`/`name` is passed to `enable_repo` as `key=value`
-pairs, so the template itself never branches on package manager or kind —
-`enable_repo` in `scripts/pkg-utils.sh` handles the dispatch entirely.
-
-### Repo URL/field placeholders
-
-Some repo fields need a value only known at runtime on the target machine,
-resolved by `enable_repo` before use (not by the chezmoi template):
-
-- `$releasever` / `$basearch` (dnf `custom` baseurl, `rpm-release` url): DNF's
-  own variables. For `custom`, DNF expands them itself when reading the
-  written `.repo` file. For `rpm-release`, since the URL is passed directly as
-  a `dnf install` argument (not read from a repo file), `enable_repo` resolves
-  them itself via `rpm -E %fedora`/`rpm -E %_arch` before calling `dnf install`
-  (falling back to `%rhel` when `%fedora` is undefined, i.e. RHEL-family).
-- `$distro` (dnf `custom` baseurl): some vendors (HashiCorp) publish a
-  separate repo tree per distro family instead of one shared "fedora" tree —
-  resolved to `fedora` or `RHEL` the same way as above.
-- `$codename` (apt-get `custom` suites): resolved by `enable_repo` from
-  `/etc/os-release`'s `VERSION_CODENAME`, for repos (like HashiCorp's) that
-  publish per-codename suites instead of a generic channel name like `stable`.
-
-These fields are written with single quotes (`squote`) in the generated
-script so the literal `$...` survives shell parsing and reaches `enable_repo`
-unexpanded.
-
-### GUI detection
-
-`hasGUI` is available as a chezmoi template variable. It detects a desktop
-environment by checking for actual session entries inside
-`/usr/share/xsessions` or `/usr/share/wayland-sessions` (not just that the
-directory exists — Fedora/RHEL ship it empty by default even on headless
-systems) — no distro-specific logic.
-
-### Toolchain packages
-
-`home/.chezmoidata/cargo.yaml` and `home/.chezmoidata/npm.yaml` declare
-packages installed via their respective toolchains, each a list under
-`base`/`desktop` (e.g. `cargo.base`, `cargo.desktop`). Each package is an
-object with a `name` (`pkg@ver`) and an optional `args` list of extra
-toolchain flags (e.g. `args: ["--force"]`). Managed by Renovate for
-auto-updates. RTK is a Cargo Git dependency pinned to a GitHub release tag and managed by Renovate.
-
-Node itself comes from fnm (`Fnm` script installer in `system.yaml`), which
-manages one LTS node per-user and is set up in `home/zsh/init/10-fnm.zsh`;
-npm globals are installed through that same per-user npm. See "Updating" for
-how the LTS is kept current.
-
-### Script-based installs
-
-URL-based installers (rustup, terragrunt, etc.) are downloaded,
-saved to a temp directory, made executable, and run respecting their shebang.
-
-### GNOME settings (dconf)
-
-`home/dconf/` holds GNOME desktop settings as plain dconf keyfiles, one file
-per settings category (e.g. `interface.ini`, `peripherals.ini`,
-`keybindings.ini`). `run_after_20-load-gnome-settings.sh.tmpl`
-pipes the output of `scripts/render-dconf.sh` (every `*.ini` file plus every
-`*.ini.tmpl` file rendered via `chezmoi execute-template`) to `dconf load /`.
-The tests use the same script. It runs
-on every apply (not `run_onchange`), so manual drift made in the GNOME
-Settings app gets reverted back to the declared state on the next apply.
-Skipped entirely when `hasGnome` is false.
-
-`extensions.ini.tmpl` is the one templated file: it lists desired GNOME Shell
-extension UUIDs and only enables the ones actually installed, checked via
-`stat` against `/usr/share/gnome-shell/extensions/` and
-`~/.local/share/gnome-shell/extensions/` — no package-manager-specific logic,
-works regardless of which PM (or method) installed the extension.
-
-`home/.chezmoidata/gnome.yaml` declares packages (e.g. GNOME Shell extensions)
-that should only be installed when `hasGnome` is true, independently of
-`hasGUI` — a KDE/XFCE desktop has `hasGUI = true` but doesn't need
-`gnome-shell-extension-*` packages. Keyed by distro **family**, so each family
-lists only extensions its repos carry (e.g. `appindicator` is Fedora-only).
-
-`hasGnome` is a chezmoi template variable (like `hasGUI`), detected via
-`lookPath "gnome-shell"`.
-
-### Claude Code configuration
-
-`home/.chezmoitemplates/claude-settings.json` is the tracked base of
-`~/.claude/settings.json`. Its
-`permissions.deny` list blocks the agent's file tools from reading secrets kept
-outside this repo (`.env` files, `~/.ssh`, `~/.gnupg`, `~/.secrets`, the
-Bitwarden CLI data, and the `claude`/`gh`/`opencode` token stores).
-
-Its `PreToolUse` and `SessionStart` hooks run `rtk hook claude`.
-Machine-specific settings go in the untracked
-`~/.claude/settings.overrides.json`: `home/dot_claude/private_settings.json.tmpl`
-merges it at apply time (its hooks and `permissions.deny` rules are appended to
-the tracked ones, any other key overrides the tracked value). `/config` changes are reverted on
-apply.
-
-Both plugin marketplaces in `extraKnownMarketplaces` set `autoUpdate: true`.
-Claude Code updates their plugins in the background after each session starts,
-so the apply does not update them. Third-party marketplaces do not auto-update
-by default.
-
-MCP servers are installed via `npm.yaml` and registered by hand with
-`claude mcp add`.
-
-The status line is [ccstatusline](https://github.com/sirmalloc/ccstatusline).
-`npm.yaml` pins its version and `statusLine` in the tracked settings runs it.
-`home/dot_config/ccstatusline/settings.json` is its config. After you save
-changes in the `ccstatusline` TUI, run
-`chezmoi re-add ~/.config/ccstatusline/settings.json` to keep them, or the
-apply reverts them. Do not use the TUI's install or uninstall option: it edits
-`~/.claude/settings.json`, and the apply reverts that change.
-
-### OpenCode configuration
-
-`home/dot_config/opencode/` holds config for [OpenCode](https://opencode.ai)
-(the CLI itself is installed via `npm.yaml` as `@opencode/cli`, not here). The
-files use the native V2 format: `opencode.json` (model, provider allow-list
-policies, agents, plugins, and MCP servers) and `cli.json` (terminal client
-settings).
-
-Hybrid Slim agents allow external-directory access without prompts. `.env`
-files, other secrets, and dangerous commands remain separately protected: the
-`cc-safety-net` plugin adds an independent guardrail that blocks destructive
-commands (`rm -rf`, `git reset --hard`, force pushes, etc.) and secret file
-access, running as its own hook rather than through opencode's own permission
-system, since pattern-based `deny` rules there have
-[known bugs](https://github.com/anomalyco/opencode/issues/28682) where they
-can be silently bypassed.
-
-The Slim routing config is tracked at
-`home/dot_config/opencode/oh-my-opencode-slim.json`. Its active `hybrid` preset
-routes across Copilot/OpenAI and protects cross-provider fallback with one
-retry. `updateOpencodeSlim` (`bunx oh-my-opencode-slim install
---companion=no`, aliased in `home/zsh/aliases.zsh`) refreshes Slim/plugin-managed
-skills but preserves routing; it does not refresh model IDs. `--reset` replaces
-routing and creates a backup.
-
-Ordinary OpenCode auth and runtime state remains excluded on purpose: `logs/`
-and `~/.local/share/opencode/auth.json`/`account.json` (real credentials) are
-not tracked here. `node_modules/`, `bun.lock`, and `package*.json` are excluded
-as well.
-
-On Linux, the post-apply update script initializes RTK for both OpenCode and
-Claude Code after each apply. RTK owns its generated user-local integration
-files, including `~/.config/opencode/plugins/rtk.ts`; neither they nor RTK's
-runtime data in `~/.local/share/rtk/` is tracked here.
-
-Machines needing extra providers not shared here (e.g. a local-only provider)
-point `OPENCODE_CONFIG` at an untracked `~/.config/opencode/opencode-local.json`
-via `home/dot_zshenv` (set only if that file exists); the tracked
-`opencode.json` stays shared and host-agnostic.
-
-### SSH configuration
-
-`home/private_dot_ssh/private_config` ships a generic `~/.ssh/config` `Host *`
-block (keepalive, `known_hosts` hygiene, no global agent forwarding) — safe,
-host-agnostic defaults. `Include ~/.ssh/config.local` at the top pulls in
-machine/work-specific `Host` blocks (VPN ranges, enterprise aliases, etc.)
-from an untracked file, silently skipped by ssh if absent. SSH connection
-multiplexing (`ControlMaster`) is intentionally disabled — it was previously
-used but caused connection issues.
-
-The `.ssh` directory itself is tracked as `private_dot_ssh`, so chezmoi
-enforces `700` permissions on every apply.
-
-SSH keys live in Bitwarden, not in this repo. Two note items in the vault
-(`Personal SSH Key`, `Work SSH Key`) map to `~/.ssh/personal{,.pub}` and
-`~/.ssh/work{,.pub}` via templates evaluated at apply time. Each note stores
-the key as two custom fields, `privateKey` and `publicKey` — deliberately a
-**note (secure note)** item and NOT an "SSH Key" item, whose import strips the
-passphrase bcrypt header and silently saves the key in clear (so the rendered
-key keeps its passphrase). They're rendered only when `bw` is on PATH and the vault is reachable —
-an interactive run (chezmoi prompts for the master password via
-`bitwarden.unlock = "auto"`) or when `BW_SESSION` is set; in a non-interactive
-run with no session (CI, container) `.chezmoiignore` skips them so `bw` is
-never invoked. Git uses the personal key via `core.sshCommand`.
-
-The passphrase-protected OpenPGP secret key is also kept out of the repository.
-Create a Bitwarden secure note named `Personal GPG Key` with one custom field named
-`privateKey`. On the source machine, export the desired secret key directly
-for copying into that field:
-
-```sh
-gpg --armor --export-secret-keys <fingerprint>
-```
-
-The export preserves the key's existing passphrase protection. When an
-interactive chezmoi run or `BW_SESSION` makes the vault reachable, the
-Linux-only `run_before_00-import-gpg-key.sh.tmpl` script runs on every
-enabled apply. It fetches the field once, stores only its SHA-256 hash under
-the chezmoi state directory, and streams the armor directly to
-`gpg --batch --import` only if the secret key is missing locally or the armor
-changed. This also repairs a locally deleted key on the next enabled apply; no
-armored key file is created. Import should not prompt. The first signing
-operation prompts via pinentry for the key's existing passphrase unless
-`gpg-agent` already has it cached.
-
-The Bitwarden CLI is what makes this possible on a genuinely fresh machine, where
-bw isn't installed yet at render time. Before invoking chezmoi, `install.sh`
-runs `scripts/password-manager.sh install`, which installs the standalone `bw`
-binary at `/usr/local/bin/bw` (version pinned in the script and managed by
-Renovate) and persists the session key in `~/.secrets/bw-session`. It is a cheap no-op when the pinned
-bw is already present and the persisted token is valid, or in non-interactive
-CI/container runs where the keys are skipped anyway. The standalone binary is
-glibc-only: on musl systems it is not installed and the keys are skipped.
-
-The session key lives in the untracked `~/.secrets/bw-session`, and no shell
-loads it. The installer exports it before running chezmoi, the `bw` and
-`chezmoi` shell functions in `home/zsh/aliases.zsh` pass it to those two
-commands only, and the chezmoi scripts that run third-party installers unset
-it. This limits accidental exposure; it is not a hard boundary, since anything
-running as the user can still read the file. Bitwarden session keys never
-expire on their own — they only die on `bw lock`/`bw logout` — so once
-persisted, `chezmoi apply` (even a no-op one) and `bw` are prompt-free: with
-`bitwarden.unlock = "auto"`, a present `BW_SESSION` means chezmoi neither
-re-unlocks nor locks. If the key is ever invalidated, the next `install.sh` run
-re-authenticates and rewrites it.
-`unzip` is ensured by both `bootstrap_env` and the `common` system packages.
-
-## Testing
-
-`tests/cases/*.yaml` (one file per distro family) declares test
-cases — a distro image plus forced `hasGUI`/`hasGnome` values. `tests/run.sh`
-reads them and runs `install.sh` for one case or all of them, locally
-or in CI (docker via `CONTAINER_RUNTIME=docker`):
-
-```sh
-tests/run.sh fedora-desktop-gnome   # single case
-tests/run.sh --all                  # every case
-```
-
-Each case runs in a disposable container as a genuine non-root user (not
-root — install.sh must actually work the way a real person runs it), then
-`tests/install.bats` asserts on the result (packages present, config valid,
-permissions correct, idempotent re-run, desktop/GNOME packages present only
-when expected). `.github/workflows/test-configuration.yaml` generates its
-job matrix directly from the same `tests/cases/*.yaml` files — no case list
-duplicated between local and CI.
-
-## Post-install updates
-
-`run_after_40-updates.sh.tmpl` runs after every chezmoi apply and handles updates.
-On Linux, it also refreshes RTK's generated OpenCode plugin and updates the
-OpenCode plugins with `opencode plugin update`. The plugins are unpinned, and
-OpenCode only checks them for updates. A failed refresh or update only emits a
-warning.
-
-## External dependencies (version-pinned)
-
-Managed via `.chezmoiexternal.toml.tmpl`, `.chezmoiversion` and
-`scripts/password-manager.sh`. Renovate
-auto-updates the following:
-
-| Dependency              | Tracks                                                    |
-| ----------------------- | --------------------------------------------------------- |
-| chezmoi                 | `twpayne/chezmoi` GitHub releases — via `.chezmoiversion` |
-| antidote                | `mattmc3/antidote` GitHub releases                        |
-| JetBrainsMono Nerd Font | `ryanoasis/nerd-fonts` GitHub releases                    |
-| Bitwarden CLI           | `bitwarden/clients` GitHub releases (`cli-v*`)            |
-| gpakosz/.tmux           | master branch commit SHA (no releases)                    |
-
-gab.lazy (nvim) is not managed by Renovate: it tracks its main branch,
-intentionally unpinned, and is pulled at most once every 24h.
+## Version pins
+
+Renovate updates chezmoi (`.chezmoiversion`), the externals in
+`.chezmoiexternal.toml.tmpl`, the Bitwarden CLI
+(`scripts/password-manager.sh`), and the cargo/npm packages. gab.lazy is not
+pinned: it follows `main` and updates at most once every 24h.

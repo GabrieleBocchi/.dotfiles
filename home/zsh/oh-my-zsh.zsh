@@ -13,7 +13,6 @@ fi
 # oh-my-zsh is managed by antidote (`antidote update`)
 zstyle ':omz:update' mode disabled
 
-# Load Antidote
 zsh_plugins_list=$DOTFILES/home/zsh/.zsh_plugins.txt
 zsh_plugins_static=$HOME/.cache/antidote/.zsh_plugins.zsh
 

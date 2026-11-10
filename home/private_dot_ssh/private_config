@@ -1,5 +1,4 @@
-# Machine/work-specific Host blocks (VPN ranges, enterprise aliases, etc.) live
-# in this untracked include, not here - kept out of the repo on purpose.
+# Untracked, machine-specific Host blocks
 Include ~/.ssh/config.local
 
 Host *

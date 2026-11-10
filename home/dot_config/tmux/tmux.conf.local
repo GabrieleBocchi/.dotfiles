@@ -1,4 +1,1 @@
-# gpakosz/.tmux local customizations.
-# This file is sourced by tmux.conf as $TMUX_CONF.local.
-# Add your personal overrides below.
-# See https://github.com/gpakosz/.tmux#customization for reference.
+# Overrides for gpakosz/.tmux: https://github.com/gpakosz/.tmux#customization

@@ -1,7 +1,4 @@
-# Repositories to enable before installing packages, keyed by distro family.
-#
-# Every entry has `kind` + `name`; any other field is passed to `enable_repo`
-# as `key=value` (see scripts/pkg-utils.sh for per-kind handling).
+# Repositories enabled before packages, keyed by family.
 repos:
   # ── apk family ──────────────────────────────────────────────────────────────
   alpine:

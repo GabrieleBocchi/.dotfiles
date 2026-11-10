@@ -1,21 +1,17 @@
-# Files inside home/ that should NOT be deployed by chezmoi.
-# They are tracked in git but deployed manually by scripts.
-
-# zsh/ — sourced directly by .zshrc via $DOTFILES/home/zsh/
+# Sourced by .zshrc from $DOTFILES/home/zsh/
 zsh/
 
-# dconf/ — loaded into the dconf database by a script, not deployed as a file
+# Loaded with `dconf load` by a script
 dconf/
 
-# GUI/desktop tools not available on headless machines
+# Desktop-only
 {{- if not .hasGUI }}
 .config/ghostty
 .config/kanata
 .config/systemd/user/kanata.service
 {{- end }}
 
-# SSH keys come from Bitwarden; render them only when bw exists AND the vault
-# is reachable.
+# SSH keys come from Bitwarden: render them only when the vault is reachable
 {{- if not (includeTemplate "bitwarden-available" .) }}
 .ssh/personal
 .ssh/personal.pub

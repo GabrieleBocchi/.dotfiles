@@ -9,9 +9,6 @@ unset BW_SESSION
 
 # pkg-utils.sh sha256: {{ include (joinPath (dir .chezmoi.sourceDir) "scripts/pkg-utils.sh") | sha256sum }}
 
-# .chezmoidata/ data is automatically merged into the template root context.
-# `family` (from .chezmoi.toml.tmpl) selects the family section in both
-# system.yaml (packages) and repos.yaml (repositories).
 {{ $family := .family -}}
 {{ $pmData := default (dict) (get . $family) -}}
 {{ $pmBase := default (dict) (get $pmData "base") -}}
@@ -90,7 +87,7 @@ echo "▸ npm packages"
 npm install -g {{ range default (list) (get . "args") }}{{ . | squote }} {{ end }}{{ .name | squote }}
 {{ end -}}
 
-# bw now comes from scripts/password-manager.sh
+# Migration: bw now comes from scripts/password-manager.sh
 if npm ls -g --depth=0 @bitwarden/cli >/dev/null 2>&1; then
     npm uninstall -g @bitwarden/cli
 fi

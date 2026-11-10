@@ -1,9 +1,7 @@
-# Starship must be initialized outside of antidote's static bundle: antidote
-# corrupts the prompt into a string literal when starship is loaded as a
-# deferred/bundled plugin (https://github.com/starship/starship/issues/7168).
-# Sourcing it here, after antidote in oh-my-zsh.zsh, avoids that entirely.
+# Not an antidote plugin: the static bundle breaks the prompt
+# (https://github.com/starship/starship/issues/7168).
 
-# Remove the default trailing-space gap before right-aligned prompt segments
+# No gap after the right prompt
 ZLE_RPROMPT_INDENT=0
 
 eval "$(starship init zsh)"

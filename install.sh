@@ -4,7 +4,6 @@ set -eu
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Bootstrap the environment
 . "$DOTFILES_DIR/scripts/pkg-utils.sh" && bootstrap_env
 
 TARGET_VERSION="$(cat "$DOTFILES_DIR/.chezmoiversion")"
@@ -27,10 +26,8 @@ if [ "$current_ver" != "$TARGET_VERSION" ]; then
     echo "✓ chezmoi ${TARGET_VERSION} installed"
 fi
 
-# Install password manager and login to it
 "$DOTFILES_DIR/scripts/password-manager.sh" install
 
-# Load password manager session
 if [ -r "$HOME/.secrets/bw-session" ]; then
     BW_SESSION="$(cat "$HOME/.secrets/bw-session")"
     export BW_SESSION
