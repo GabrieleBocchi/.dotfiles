@@ -336,6 +336,14 @@ by default.
 MCP servers are installed via `npm.yaml` and registered by hand with
 `claude mcp add`.
 
+The status line is [ccstatusline](https://github.com/sirmalloc/ccstatusline).
+`npm.yaml` pins its version and `statusLine` in the tracked settings runs it.
+`home/dot_config/ccstatusline/settings.json` is its config. After you save
+changes in the `ccstatusline` TUI, run
+`chezmoi re-add ~/.config/ccstatusline/settings.json` to keep them, or the
+apply reverts them. Do not use the TUI's install or uninstall option: it edits
+`~/.claude/settings.json`, and the apply reverts that change.
+
 ### OpenCode configuration
 
 `home/dot_config/opencode/` holds config for [OpenCode](https://opencode.ai)

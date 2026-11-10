@@ -52,11 +52,11 @@ repos:
 
   rhel:
     base:
+      - kind: rpm-release
+        name: epel-release
+        url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm"
       - kind: custom
         name: hashicorp
         baseurl: "https://rpm.releases.hashicorp.com/$distro/$releasever/$basearch/stable"
         gpgkey: "https://rpm.releases.hashicorp.com/gpg"
-      - kind: rpm-release
-        name: epel-release
-        url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$releasever.noarch.rpm"
     desktop: []
