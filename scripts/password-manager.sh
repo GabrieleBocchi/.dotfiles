@@ -25,7 +25,7 @@ install_bw() {
         ;;
     esac
 
-    asset="bw-${os}${suffix}-${BW_VERSION}.zip"
+    asset="bw-bit-${os}${suffix}-${BW_VERSION}.zip"
     url="https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/${asset}"
 
     tmp="$(mktemp -d)"
