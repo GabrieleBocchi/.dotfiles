@@ -77,7 +77,7 @@
     {
       "customType": "regex",
       "description": "Pin test container images",
-      "managerFilePatterns": ["tests/cases/*.yaml", "!tests/cases/fedora.yaml"],
+      "managerFilePatterns": ["tests/cases/*.yaml"],
       "matchStrings": [
         "(?<indentation>\\s*)image:\\s+(?<depName>[^@\\s:]+):(?<currentValue>[^@\\s:]+)(@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
@@ -92,17 +92,32 @@
         "(?<indentation>\\s*)image:\\s+fedora:(?<currentValue>[^@\\s:]+)(@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
       "autoReplaceStringTemplate": "{{{indentation}}}image: fedora:{{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}",
-      "datasourceTemplate": "endoflife-date",
+      "datasourceTemplate": "custom.fedora-stable",
       "depNameTemplate": "fedora",
       "versioningTemplate": "loose"
     }
   ],
+  "customDatasources": {
+    "fedora-stable": {
+      "description": "Docker Hub Fedora tags up to the one that 'latest' points to (skips branched and rawhide)",
+      "defaultRegistryUrlTemplate": "https://hub.docker.com/v2/repositories/library/fedora/tags?page_size=100&ordering=last_updated",
+      "transformTemplates": [
+        "( $latest := results[name = \"latest\"].digest; $stable := $number(results[digest = $latest and $contains(name, /^[0-9]+$/)].name); { \"releases\": [results[$contains(name, /^[0-9]+$/) and $exists(digest) and $number(name) <= $stable].{ \"version\": name, \"digest\": digest }] } )"
+      ]
+    }
+  },
   "packageRules": [
     {
       "description": "Schedule test case image updates weekly",
       "matchManagers": ["custom.regex"],
       "matchFileNames": ["tests/cases/*.yaml"],
       "schedule": ["* 0-3 * * 1"]
+    },
+    {
+      "description": "Fedora uses custom.fedora-stable, not the generic Docker manager",
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["tests/cases/fedora.yaml"],
+      "enabled": false
     }
   ]
 }
