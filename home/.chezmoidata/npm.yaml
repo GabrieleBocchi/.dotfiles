@@ -2,12 +2,12 @@
 npm:
   base:
     - name: "@j178/prek@0.5.11"
-    - name: "@opencode/cli@2.3.0"
+    - name: "@opencode/cli@2.3.2"
       args: ["--allow-scripts=@opencode/cli"] # npm blocks its postinstall (binary fetch) otherwise
-    - name: "@playwright/mcp@0.0.85"
-    - name: "@upstash/context7-mcp@4.7.1"
-    - name: bun@1.4.4
+    - name: "@playwright/mcp@0.0.86"
+    - name: "@upstash/context7-mcp@4.7.3"
+    - name: bun@1.4.5
       args: ["--allow-scripts=bun"] # its postinstall (node install.js) fetches the bun binary
     - name: ccstatusline@2.2.34
-    - name: npm@12.2.2
+    - name: npm@12.2.3
   desktop: []
