@@ -36,8 +36,10 @@ fi
 # ── OpenCode plugins ────────────────────────────────────────────────────────
 # Plugins are unpinned in opencode.json; opencode only checks them for updates.
 echo "▸ OpenCode plugins"
+if [ ! -d "${XDG_CACHE_HOME:-$HOME/.cache}/opencode/npm" ]; then
+    echo "✓ OpenCode plugins (not installed yet, opencode installs them on first run)"
 # opencode is an npm global under fnm's default Node, not on PATH in a fresh install
-if PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH" opencode plugin update; then
+elif PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH" opencode plugin update; then
     echo "✓ OpenCode plugins"
 else
     echo "⚠ OpenCode plugin update failed" >&2
