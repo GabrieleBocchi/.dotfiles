@@ -2,7 +2,7 @@
 npm:
   base:
     - name: "@j178/prek@0.5.11"
-    - name: "@opencode/cli@2.3.2"
+    - name: "@opencode/cli@2.4.0"
       args: ["--allow-scripts=@opencode/cli"] # npm blocks its postinstall (binary fetch) otherwise
     - name: "@playwright/mcp@0.0.86"
     - name: "@upstash/context7-mcp@4.7.3"
